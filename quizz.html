@@ -33,10 +33,13 @@ h2 { text-align:center; color:#2E7D32; }
     <h2>Choisissez un quiz</h2>
     <div class="quiz-grid">
       <div class="quiz-card" onclick="selectQuiz('scientifique')">
-        <h3>🔬 Scientifique</h3>
-        <p>Biologie et caractéristiques des hérissons.</p>
-        <p>Questions : 20 | Score : <span id="score-scientifique">0/20</span></p>
-      </div>
+  <h3>🔬 Scientifique</h3>
+  <p>Biologie et caractéristiques des hérissons.</p>
+  <p>Questions : 20</p>
+  <div class="score-bar-container">
+    <div id="score-bar-scientifique" class="score-bar"></div>
+  </div>
+</div>
       <div class="quiz-card" onclick="selectQuiz('comportement')">
         <h3>🛡 Réactions & soins</h3>
         <p>Réactions face aux hérissons (vivants, blessés, bébés).</p>
@@ -221,10 +224,14 @@ function finishQuiz(){
   answersEl.innerHTML="";
   feedbackEl.textContent=`Votre score : ${score} / ${currentQuiz.length}`;
   progressBar.style.width="100%";
-  // Mettre à jour le score sur la carte
+
   const ids = ["scientifique","comportement","ecologie","sante"];
   ids.forEach(id=>{
-    if(currentQuiz===quizzes[id]) document.getElementById(`score-${id}`).textContent=`${score}/${currentQuiz.length}`;
+    if(currentQuiz===quizzes[id]){
+      const bar = document.getElementById(`score-bar-${id}`);
+      const percent = (score/currentQuiz.length)*100;
+      bar.style.width = percent + "%";
+    }
   });
 }
 </script>
