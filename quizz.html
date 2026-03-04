@@ -6,18 +6,18 @@
 <title>Quiz Hérisson – Team hérisson</title>
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f6f0; }
-header { background:#4CAF50; padding:10px; text-align:center; color:white; }
-.container { max-width: 900px; margin: 20px auto; padding: 10px; }
+header { background:#4CAF50; padding:15px; text-align:center; color:white; }
+.container { max-width: 1000px; margin: 20px auto; padding: 10px; }
 .quiz-cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
 .quiz-card {
-  background:#e8f5e9; border-radius:10px; padding:15px; width:250px; text-align:center;
+  background:#e8f5e9; border-radius:10px; padding:20px; width:280px; text-align:center;
   cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;
 }
 .quiz-card:hover { transform: translateY(-5px); }
 .quiz-card h3 { margin-top:0; }
 .score-bar-container { width: 100%; height: 15px; background: #ddd; border-radius: 8px; overflow: hidden; margin-top:5px; }
 .score-bar { width: 0%; height: 100%; background: #4CAF50; transition: width 0.5s; }
-#quiz-container { margin-top:30px; }
+#quiz-container { margin-top:30px; display:none; }
 #answers button { width:100%; text-align:left; margin:5px 0; padding:8px; border:none; border-radius:5px; cursor:pointer; font-size:16px; }
 .correct { background-color:#4CAF50; color:white; }
 .wrong { background-color:#F44336; color:white; }
@@ -44,7 +44,7 @@ header { background:#4CAF50; padding:10px; text-align:center; color:white; }
     <div class="quiz-card" onclick="selectQuiz('comportement')">
       <h3>🦔 Comportement</h3>
       <p>Que faire face à un hérisson vivant, malade ou mort ?</p>
-      <p>Questions : 0</p>
+      <p>Questions : 5</p>
       <div class="score-bar-container"><div id="score-bar-comportement" class="score-bar"></div></div>
     </div>
     <div class="quiz-card" onclick="selectQuiz('ecologie')">
@@ -61,7 +61,7 @@ header { background:#4CAF50; padding:10px; text-align:center; color:white; }
     </div>
   </div>
 
-  <div id="quiz-container" style="display:none;">
+  <div id="quiz-container">
     <div id="progress-container"><div id="progress-bar"></div></div>
     <h2 id="question"></h2>
     <div id="answers"></div>
@@ -77,10 +77,61 @@ header { background:#4CAF50; padding:10px; text-align:center; color:white; }
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Structure vide pour ajouter questions validées plus tard
+// Quiz exemple : Comportement validé
 const quizzes = {
   scientifique:[],
-  comportement:[],
+  comportement:[
+    {
+      question: "Que devez-vous faire si vous trouvez un hérisson adulte blessé sur la route ?",
+      answers: [
+        "Le laisser et continuer votre chemin",
+        "Le ramasser et le déposer dans un jardin à proximité",
+        "Le prendre et contacter un centre de soins pour animaux sauvages",
+        "Le nourrir avec du pain et du lait"
+      ],
+      correct: 2
+    },
+    {
+      question: "Vous trouvez un bébé hérisson seul dans votre jardin. Quelle est la bonne réaction ?",
+      answers: [
+        "Le mettre dans votre maison avec vos animaux domestiques",
+        "Le laisser là où il est car sa mère est probablement à proximité",
+        "Le nourrir avec du lait de vache",
+        "Le placer directement dans un bac à eau pour qu'il survive"
+      ],
+      correct: 1
+    },
+    {
+      question: "Un hérisson mort est trouvé dans le jardin. Que faire ?",
+      answers: [
+        "Le jeter à la poubelle avec les déchets ménagers",
+        "L’enterrer loin des zones fréquentées par les humains et animaux domestiques",
+        "Le laisser sur place sans précaution",
+        "Le mettre dans votre jardin comme décoration"
+      ],
+      correct: 1
+    },
+    {
+      question: "Quel comportement est normal chez un hérisson que vous observez la nuit ?",
+      answers: [
+        "Il reste immobile au centre du jardin",
+        "Il se déplace lentement et fouille le sol pour trouver des insectes",
+        "Il aboie ou grogne comme un chien",
+        "Il reste en boule sans se nourrir toute la nuit"
+      ],
+      correct: 1
+    },
+    {
+      question: "Un hérisson est malade ou faible. Quelle est la bonne manière de l’aider ?",
+      answers: [
+        "Le nourrir uniquement avec du lait de vache",
+        "Le transporter délicatement dans une boîte et contacter un centre de soins pour hérissons",
+        "Le laisser se débrouiller, les hérissons se rétablissent seuls",
+        "Le mettre avec vos animaux domestiques pour le protéger"
+      ],
+      correct: 1
+    }
+  ],
   ecologie:[],
   sante:[]
 };
@@ -151,7 +202,6 @@ function finishQuiz(){
   answersEl.innerHTML="";
   feedbackEl.textContent=`Score : ${score} / ${currentQuiz.length}`;
   progressBar.style.width="100%";
-  // remplir barre sur carte
   const keys=["scientifique","comportement","ecologie","sante"];
   keys.forEach(k=>{
     if(currentQuiz===quizzes[k]){
