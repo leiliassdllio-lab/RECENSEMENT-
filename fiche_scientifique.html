@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche scientifique – Hérisson</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #F4F1E8;
+  margin: 0;
+  padding: 0;
+  color: #2E3D2F;
+}
+
+header {
+  background-color: #2E5E3E;
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.scientific-card {
+  background-color: white;
+  width: 350px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.scientific-card:hover {
+  transform: scale(1.03);
+}
+
+.scientific-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.card-content h2 {
+  margin-top: 0;
+  color: #2E5E3E;
+  text-align: center;
+}
+
+.latin-name {
+  text-align: center;
+  font-style: italic;
+  color: #6B4F3A;
+  margin-bottom: 20px;
+}
+
+.identity {
+  background-color: #F0F6F0;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.identity p {
+  margin: 8px 0;
+  font-size: 0.95em;
+}
+
+.identity strong {
+  color: #2E5E3E;
+}
+
+footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #2E5E3E;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🦔 Fiche scientifique du Hérisson</h1>
+</header>
+
+<main>
+
+  <div class="scientific-card">
+
+    <img src="herisson.jpg" alt="Hérisson européen">
+
+    <div class="card-content">
+
+      <h2>Hérisson d’Europe</h2>
+      <div class="latin-name">Erinaceus europaeus</div>
+
+      <div class="identity">
+        <p><strong>Famille :</strong> Erinaceidae</p>
+        <p><strong>Ordre :</strong> Eulipotyphla</p>
+        <p><strong>Taille :</strong> 20 à 30 cm</p>
+        <p><strong>Poids :</strong> 600 à 1200 g (jusqu’à 2 kg avant hibernation)</p>
+        <p><strong>Longévité :</strong> 3 à 5 ans en milieu naturel</p>
+        <p><strong>Nombre de piquants :</strong> 5 000 à 7 000</p>
+        <p><strong>Régime alimentaire :</strong> Insectivore opportuniste (coléoptères, vers, limaces)</p>
+        <p><strong>Activité :</strong> Nocturne</p>
+        <p><strong>Hibernation :</strong> Octobre à mars selon climat</p>
+        <p><strong>Statut :</strong> Espèce protégée dans plusieurs pays européens</p>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  © <span id="year"></span> – Team Hérisson
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
