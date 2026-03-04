@@ -1,70 +1,150 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz Hérisson – Team hérisson</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; }
-    .container { max-width: 600px; margin: 20px auto; padding: 10px; }
-    .btn { padding: 10px 15px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; }
-    #answers button { width: 100%; text-align: left; }
-    .correct { background-color: #4CAF50; color: white; }
-    .wrong { background-color: #F44336; color: white; }
-    #progress-container { background-color: #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-    #progress-bar { width: 0%; height: 20px; background-color: #4CAF50; transition: width 0.3s; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Hérisson – Team Hérisson</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f2f6f2; color:#2c3e2c; }
+.container { max-width: 700px; margin: 20px auto; padding: 10px; }
+.btn { padding: 10px 15px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; margin:5px 0; }
+#answers button { width: 100%; text-align: left; }
+.correct { background-color: #4CAF50; color: white; }
+.wrong { background-color: #F44336; color: white; }
+#progress-container { background-color: #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+#progress-bar { width: 0%; height: 20px; background-color: #4CAF50; transition: width 0.3s; }
+header { background-color: #4CAF50; color:white; padding:20px; text-align:center; }
+footer { text-align:center; padding:15px; background-color:#4CAF50; color:white; margin-top:20px; }
+</style>
 </head>
 <body>
 
-  <header class="hero">
-    <div class="container">
-      <a href="main.html" class="btn">Retour à l'accueil</a>
-    </div>
-  </header>
+<header>
+<h1>🦔 Quiz Hérisson – Team Hérisson 🦔</h1>
+<a href="main.html" class="btn">Retour à l'accueil</a>
+</header>
 
-  <main class="container">
-    <div id="quiz-container">
-      <div id="progress-container">
-        <div id="progress-bar"></div>
-      </div>
-      <h2 id="question"></h2>
-      <div id="answers"></div>
-      <p id="feedback"></p>
-    </div>
-  </main>
+<main class="container">
+<div id="quiz-selection">
+<h2>Choisissez un quiz 📝</h2>
+<button class="btn" onclick="selectQuiz('scientifique')">Quiz Scientifique</button>
+<button class="btn" onclick="selectQuiz('comportement')">Réactions et soins</button>
+<button class="btn" onclick="selectQuiz('ecologie')">Écologie & Conservation</button>
+<button class="btn" onclick="selectQuiz('sante')">Santé et soins</button>
+</div>
 
-  <footer>
-    <p>© <span id="year"></span> – Team hérisson</p>
-  </footer>
+<div id="quiz-container" style="display:none;">
+<div id="progress-container">
+<div id="progress-bar"></div>
+</div>
+<h2 id="question"></h2>
+<div id="answers"></div>
+<p id="feedback"></p>
+</div>
+</main>
+
+<footer>
+<p>© <span id="year"></span> – Team Hérisson</p>
+</footer>
 
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
 
-const quiz = [
-  {question:"Le hérisson est principalement :",answers:["Herbivore","Carnivore insectivore","Omnivore strict","Granivore"],correct:1},
-  {question:"Le hérisson est surtout actif :",answers:["Le matin","L'après-midi","La nuit","En permanence"],correct:2},
-  {question:"Combien de piquants possède un hérisson adulte ?",answers:["500","1500","5000 à 7000","20000"],correct:2},
-  {question:"Le hérisson hiberne :",answers:["En été","En automne","En hiver","Toute l'année"],correct:2},
-  {question:"Principal danger routier :",answers:["Vélos","Voitures","Bus","Motos"],correct:1},
-  {question:"Famille :",answers:["Rongeurs","Insectivores","Mustélidés","Reptiles"],correct:1},
-  {question:"Il se défend en :",answers:["Mordant","Fuyant","Se roulant en boule","Criant"],correct:2},
-  {question:"Durée de vie moyenne :",answers:["1 an","3 à 5 ans","10 ans","20 ans"],correct:1},
-  {question:"Le hérisson peut nager :",answers:["Non","Oui","Seulement bébé","Jamais en nature"],correct:1},
-  {question:"Il a un excellent :",answers:["Vue","Odorat","Ouïe","Goût"],correct:1},
-  {question:"Il mange :",answers:["Escargots","Herbe","Pain","Riz"],correct:0},
-  {question:"Un bébé s'appelle :",answers:["Hérissonneau","Piquant","Petit hérisson","Rat sauvage"],correct:0},
-  {question:"Il est protégé dans plusieurs pays :",answers:["Oui","Non","Seulement Afrique","Seulement Asie"],correct:0},
-  {question:"Distance parcourue par nuit :",answers:["100m","1km","Plusieurs km","50km"],correct:2},
-  {question:"Les piquants sont faits de :",answers:["Os","Kératine","Fer","Cartilage"],correct:1},
-  {question:"Il est sensible aux :",answers:["Ombres","Pesticides","Vent","Pluie légère"],correct:1},
-  {question:"Habitat principal :",answers:["Désert","Jardins et haies","Mer","Montagne neigeuse"],correct:1},
-  {question:"Il est solitaire :",answers:["Oui","Non","Toujours groupe","Seulement hiver"],correct:0},
-  {question:"Prédateur naturel :",answers:["Renard","Lapin","Poulet","Taupe"],correct:0},
-  {question:"Il aide à :",answers:["Augmenter insectes","Contrôler insectes","Manger plantes","Polliniser"],correct:1}
-];
+const quizzes = {
+  scientifique: [
+    {question:"Le hérisson est principalement :", answers:["Herbivore","Carnivore insectivore","Omnivore strict","Granivore"], correct:1},
+    {question:"Combien de piquants possède un hérisson adulte ?", answers:["500","1500","5000 à 7000","20000"], correct:2},
+    {question:"Les piquants sont faits de :", answers:["Os","Kératine","Fer","Cartilage"], correct:1},
+    {question:"Durée de vie moyenne en nature :", answers:["1 an","3 à 5 ans","10 ans","20 ans"], correct:1},
+    {question:"Le hérisson peut nager :", answers:["Non","Oui","Seulement bébé","Jamais en nature"], correct:1},
+    {question:"Le hérisson est un animal :", answers:["Nocturne","Diurne","Crépusculaire","Aurore"], correct:0},
+    {question:"Il est solitaire :", answers:["Oui","Non","Toujours groupe","Seulement hiver"], correct:0},
+    {question:"Il est capable de se rouler en boule pour :", answers:["Se reposer","Se défendre","Se déplacer","Jouer"], correct:1},
+    {question:"Prédateur naturel :", answers:["Renard","Lapin","Poulet","Taupe"], correct:0},
+    {question:"Il se nourrit principalement de :", answers:["Herbe","Insectes et vers","Fruits","Fleurs"], correct:1},
+    {question:"Le bébé hérisson s'appelle :", answers:["Hérissonneau","Petit hérisson","Piquant","Rat sauvage"], correct:0},
+    {question:"Le hérisson hiberne :", answers:["En été","En automne","En hiver","Toute l'année"], correct:2},
+    {question:"L'hibernation dépend de :", answers:["Température et nourriture","Seul le climat","Le poids","La couleur des piquants"], correct:0},
+    {question:"Distance parcourue la nuit :", answers:["100 m","1 km","Plusieurs km","50 km"], correct:2},
+    {question:"Il aide à :", answers:["Augmenter insectes","Contrôler insectes","Manger plantes","Polliniser"], correct:1},
+    {question:"Vue du hérisson :", answers:["Excellente","Moyenne","Mauvaise","Nulle"], correct:2},
+    {question:"Odorat :", answers:["Faible","Moyen","Excellent","Inutile"], correct:2},
+    {question:"Ouïe :", answers:["Faible","Moyenne","Excellente","Inutile"], correct:2},
+    {question:"Il est protégé légalement :", answers:["Oui en Belgique et Europe","Non","Seulement Afrique","Seulement Asie"], correct:0},
+    {question:"Nombre de portées par an :", answers:["1","2","3","4"], correct:1}
+  ],
 
+  comportement: [
+    {question:"Vous trouvez un bébé hérisson seul le jour :", answers:["Le laisser tranquille","Appeler un centre de soins","Le nourrir au lait","Le mettre dans un nid d’oiseau"], correct:1},
+    {question:"Un hérisson blessé sur la route :", answers:["L’ignorer","Le déplacer doucement vers un abri","Le nourrir avec du pain","Le laver à l’eau"], correct:1},
+    {question:"Un hérisson mort :", answers:["Le mettre à la poubelle","Informer un centre spécialisé","Le toucher avec les mains nues","Le laisser dehors"], correct:1},
+    {question:"Que faire si un hérisson semble malade ?", answers:["Laisser seul","Contacter un refuge faune","Donner du lait","Le nourrir avec des croquettes"], correct:1},
+    {question:"Si vous trouvez un hérisson stressé :", answers:["Le caresser","Le laisser se calmer seul","Le nourrir","Le déplacer"], correct:1},
+    {question:"Ne jamais donner aux hérissons :", answers:["Insectes","Eau","Lait de vache","Vers"], correct:2},
+    {question:"Un hérisson agressif :", answers:["Doit être touché","Doit être observé à distance","Doit être caressé","Doit être nourri"], correct:1},
+    {question:"Comment réagir si bébé hérisson semble abandonné ?", answers:["Laisser sur place et surveiller","Le ramasser immédiatement","Le nourrir","Le transporter à la maison"], correct:0},
+    {question:"Hérisson dans jardin en hiver :", answers:["Réveiller","Laisser hiberner","Le nourrir","Le déplacer"], correct:1},
+    {question:"Ne pas utiliser :", answers:["Jardin naturel","Clôtures amovibles","Pesticides chimiques","Haies"], correct:2},
+    {question:"Quand manipuler un hérisson ?", answers:["Toujours","Seulement avec gants","Jamais","Seulement les bébés"], correct:1},
+    {question:"Le hérisson blessé :", answers:["Peut être soigné par vous","Doit aller au centre spécialisé","On le nourrit uniquement","Ignorer"], correct:1},
+    {question:"Le bébé hérisson :", answers:["Peut être nourri au lait de vache","Nourriture spéciale du centre","Peut manger des légumes","Peut manger pain"], correct:1},
+    {question:"Si un hérisson vit près d'une route :", answers:["Le déplacer","Créer un passage sûr","L’ignorer","Le nourrir"], correct:1},
+    {question:"Réaction face à hérisson domestique ?", answers:["Le laisser libre","Le enfermer","Le caresser souvent","Le nourrir"], correct:0},
+    {question:"En cas de blessure par tondeuse :", answers:["Panser soi-même","Contacter refuge","Ignorer","Nourrir"], correct:1},
+    {question:"Hérisson trouvé sous maison :", answers:["Le déranger","Laisser tranquille","Le nourrir","Le sortir"], correct:1},
+    {question:"Si piquant arraché :", answers:["Ignorer","Appeler un vétérinaire spécialisé","Toucher","Mettre à la poubelle"], correct:1},
+    {question:"Réaction face à hérisson malade :", answers:["Le manipuler","Appeler un centre de soins","Le nourrir","Jouer avec"], correct:1},
+    {question:"Bébé hérisson trouvé au printemps :", answers:["Appeler centre soins","Le nourrir","Le laisser dehors","Le mettre dans un nid"], correct:0}
+  ],
+
+  ecologie: [
+    {question:"Habitat principal du hérisson :", answers:["Désert","Jardins et haies","Mer","Montagne neigeuse"], correct:1},
+    {question:"Prédateur naturel :", answers:["Renard","Lapin","Poulet","Taupe"], correct:0},
+    {question:"Le hérisson aide à :", answers:["Augmenter insectes","Contrôler insectes","Manger plantes","Polliniser"], correct:1},
+    {question:"Liste rouge UICN :", answers:["Préoccupation mineure","Quasi menacé","En danger","Éteint"], correct:1},
+    {question:"Fragmentation des habitats :", answers:["Bonne pour hérisson","Mauvaise","Indifférent","Aucune"], correct:1},
+    {question:"Pesticides :", answers:["Favorables","Néfastes","Indifférents","Utiles"], correct:1},
+    {question:"Rôle écologique :", answers:["Pollinisation","Régulation insectes","Élevage animaux","Plantation arbres"], correct:1},
+    {question:"Milieu urbain :", answers:["Favorise","Limite","Indifférent","Aucune influence"], correct:1},
+    {question:"Hibernation sécurisée dépend de :", answers:["Refuges","Couvert végétal","Alimentation","Toutes les réponses"], correct:3},
+    {question:"Routes et mortalité :", answers:["Pas de risque","Risques élevés","Bénéfique","Indifférent"], correct:1},
+    {question:"Haies et jardinage :", answers:["Favorables","Néfaste","Indifférent","Peu importe"], correct:0},
+    {question:"Clôtures imperméables :", answers:["Limitent déplacement","Favorables","Indifférent","Indispensable"], correct:0},
+    {question:"Zones agricoles intensives :", answers:["Bonne pour hérisson","Mauvaise","Indifférent","Aucune"], correct:1},
+    {question:"Nourrir hérisson sauvages :", answers:["Toujours","Parfois","Seulement en centre","Jamais"], correct:2},
+    {question:"Espèces invasives impact :", answers:["Aucun","Négatif","Positif","Indifférent"], correct:1},
+    {question:"Surveillance populations :", answers:["Inutile","Importante","Facultative","Indifférent"], correct:1},
+    {question:"Conservation protégée :", answers:["Oui","Non","Seulement Afrique","Seulement Asie"], correct:0},
+    {question:"Jardins urbains :", answers:["Favorables","Indifférents","Néfaste","Aucune influence"], correct:0},
+    {question:"Sensibilisation publique :", answers:["Indispensable","Inutile","Peu utile","Facultatif"], correct:0},
+    {question:"Collecte données citoyenne :", answers:["Utile","Inutile","Peu utile","Ne sert à rien"], correct:0}
+  ],
+
+  sante: [
+    {question:"Que faire si un hérisson est malade ?", answers:["Laisser seul","Contacter un centre","Le nourrir au lait","Le manipuler"], correct:1},
+    {question:"Hérisson avec blessure légère :", answers:["Soigner soi-même","Refuge spécialisé","Ignorer","Jouer avec"], correct:1},
+    {question:"Bébé trouvé :", answers:["Laisser sur place","Appeler centre soins","Le nourrir au lait","Le transporter"], correct:1},
+    {question:"Hérisson déshydraté :", answers:["Laisser","Offrir eau","Laver","Ignorer"], correct:1},
+    {question:"Stress chez hérisson :", answers:["Caresses fréquentes","Observation à distance","Alimentation","Manipulation"], correct:1},
+    {question:"Collision avec voiture :", answers:["Laisser","Transporter centre","Donner nourriture","Ignorer"], correct:1},
+    {question:"Nettoyage du hérisson :", answers:["Eau chaude","Jamais","Savon doux","Toujours"], correct:1},
+    {question:"Alimentation inadaptée :", answers:["Danger santé","Sûr","Indifférent","Aucune"], correct:0},
+    {question:"Hérisson jeune trouvé sous maison :", answers:["Toucher","Laisser tranquille","Nourrir","Sortir"], correct:1},
+    {question:"Hibernation perturbée :", answers:["Dangereux","Inoffensif","Bon","Indifférent"], correct:0},
+    {question:"Manipulation par public :", answers:["Oui","Non","Seulement vétérinaire","Seulement bébé"], correct:1},
+    {question:"Habitat sécurisé :", answers:["Indispensable","Pas utile","Peu utile","Indifférent"], correct:0},
+    {question:"Refuge faune :", answers:["Inutile","Indispensable","Peu utile","Indifférent"], correct:1},
+    {question:"Signes maladie :", answers:["Odeur, léthargie, blessures","Poids seul","Couleur piquants","Aucune"], correct:0},
+    {question:"Isolement du hérisson malade :", answers:["Oui","Non","Jamais","Toujours"], correct:0},
+    {question:"Alimentation artificielle :", answers:["Peut nuire","Sûr","Indifférent","Aucune"], correct:0},
+    {question:"Température inappropriée :", answers:["Dangereux","Sans effet","Bon","Indifférent"], correct:0},
+    {question:"Hydratation :", answers:["Indispensable","Peu utile","Indifférent","Négligeable"], correct:0},
+    {question:"Contact humain :", answers:["Limiter","Toujours","Jamais","Indifférent"], correct:0},
+    {question:"Transport hérisson blessé :", answers:["Refuge spécialisé","Maison","Jardin","Aucune importance"], correct:0}
+  ]
+};
+
+let currentQuiz = [];
 let currentQuestion = 0;
 let score = 0;
 let selectedAnswer = null;
@@ -74,11 +154,20 @@ const answersEl = document.getElementById("answers");
 const feedbackEl = document.getElementById("feedback");
 const progressBar = document.getElementById("progress-bar");
 
+function selectQuiz(type){
+  currentQuiz = quizzes[type];
+  currentQuestion = 0;
+  score = 0;
+  document.getElementById("quiz-selection").style.display = "none";
+  document.getElementById("quiz-container").style.display = "block";
+  loadQuestion();
+}
+
 function loadQuestion() {
   feedbackEl.textContent = "";
   selectedAnswer = null;
-  const q = quiz[currentQuestion];
-  questionEl.textContent = `Question ${currentQuestion+1} / ${quiz.length} : ${q.question}`;
+  const q = currentQuiz[currentQuestion];
+  questionEl.textContent = `Question ${currentQuestion+1} / ${currentQuiz.length} : ${q.question}`;
   answersEl.innerHTML = "";
 
   q.answers.forEach((answer,index)=>{
@@ -88,23 +177,20 @@ function loadQuestion() {
     btn.style.display="block";
     btn.style.margin="10px 0";
     btn.onclick = () => {
-      if(selectedAnswer!==null) return; // Empêche de changer après clic
+      if(selectedAnswer!==null) return;
       selectedAnswer = index;
 
-      // Coloration
       q.answers.forEach((a,i)=>{
         const button = answersEl.children[i];
         if(i === q.correct) button.classList.add("correct");
         else if(i === selectedAnswer) button.classList.add("wrong");
       });
 
-      // Mettre à jour score
       if(selectedAnswer === q.correct) score++;
 
-      // Passage automatique à la question suivante
       setTimeout(()=>{
         currentQuestion++;
-        if(currentQuestion < quiz.length){
+        if(currentQuestion < currentQuiz.length){
           loadQuestion();
           updateProgress();
         } else {
@@ -118,18 +204,16 @@ function loadQuestion() {
 }
 
 function updateProgress(){
-  const percent = ((currentQuestion)/quiz.length)*100;
+  const percent = ((currentQuestion)/currentQuiz.length)*100;
   progressBar.style.width = percent + "%";
 }
 
 function finishQuiz(){
   questionEl.textContent="Quiz terminé !";
   answersEl.innerHTML="";
-  feedbackEl.textContent=`Votre score : ${score} / ${quiz.length}`;
+  feedbackEl.textContent=`Votre score : ${score} / ${currentQuiz.length}`;
   progressBar.style.width = "100%";
 }
-
-loadQuestion();
 </script>
 
 </body>
