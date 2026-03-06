@@ -22,55 +22,57 @@ button:hover { background:#43a047; }
 .tree2 { bottom:10px; right:20px; }
 .tree3 { top:50px; right:50px; }
 #preview img { max-width:100%; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); margin-top:10px; }
-#logoutBtn { background:#d32f2f; margin-bottom:20px; }
+#logoutBtn { background:#d32f2f; margin-bottom:10px; }
 #logoutBtn:hover { background:#b71c1c; }
+#usernameDisplay { font-weight:bold; margin-bottom:10px; }
 </style>
 </head>
 <body>
 
 <header>
-<h1>🦔 Recense un Hérisson</h1>
-<div class="container">
-  <button id="logoutBtn">Se déconnecter</button>
-</div>
+  <h1>🦔 Recense un Hérisson</h1>
+  <div class="container">
+    <div id="usernameDisplay">Utilisateur : </div>
+    <button id="logoutBtn">Se déconnecter</button>
+  </div>
 </header>
 
 <div class="container">
-<div class="tree tree1">🌳</div>
-<div class="tree tree2">🌲</div>
-<div class="tree tree3">🌳</div>
+  <div class="tree tree1">🌳</div>
+  <div class="tree tree2">🌲</div>
+  <div class="tree tree3">🌳</div>
 
-<h2>Localisation & Observation</h2>
-<div id="map"></div>
+  <h2>Localisation & Observation</h2>
+  <div id="map"></div>
 
-<form id="recensementForm">
-  <p class="icon-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
-  <input type="text" id="lieu" required>
+  <form id="recensementForm">
+    <p class="icon-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
+    <input type="text" id="lieu" required>
 
-  <p class="icon-label"><span>📅</span> Quand l’avez-vous observé ?</p>
-  <input type="date" id="date" required>
+    <p class="icon-label"><span>📅</span> Quand l’avez-vous observé ?</p>
+    <input type="date" id="date" required>
 
-  <p class="icon-label"><span>🔍</span> Comment l’avez-vous vu ?</p>
-  <select id="methode" required>
-    <option value="">--Sélectionnez--</option>
-    <option value="observatoire">Observation directe</option>
-    <option value="camera">Caméra / piège photo</option>
-    <option value="autre">Autre</option>
-  </select>
+    <p class="icon-label"><span>🔍</span> Comment l’avez-vous vu ?</p>
+    <select id="methode" required>
+      <option value="">--Sélectionnez--</option>
+      <option value="observatoire">Observation directe</option>
+      <option value="camera">Caméra / piège photo</option>
+      <option value="autre">Autre</option>
+    </select>
 
-  <p class="icon-label"><span>📷</span> Ajouter une image</p>
-  <label for="photoUpload" style="display:flex; flex-direction:column; align-items:center; border:2px dashed #4CAF50; padding:15px; border-radius:10px; cursor:pointer;">
-    <span style="font-size:2em;">📸</span>
-    <span>Cliquer pour choisir ou prendre une photo</span>
-  </label>
-  <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
-  <div id="preview"></div>
+    <p class="icon-label"><span>📷</span> Ajouter une image</p>
+    <label for="photoUpload" style="display:flex; flex-direction:column; align-items:center; border:2px dashed #4CAF50; padding:15px; border-radius:10px; cursor:pointer;">
+      <span style="font-size:2em;">📸</span>
+      <span>Cliquer pour choisir ou prendre une photo</span>
+    </label>
+    <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
+    <div id="preview"></div>
 
-  <p class="icon-label"><span>📝</span> Notes supplémentaires</p>
-  <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
+    <p class="icon-label"><span>📝</span> Notes supplémentaires</p>
+    <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
 
-  <button type="submit">Envoyer</button>
-</form>
+    <button type="submit">Envoyer</button>
+  </form>
 </div>
 
 <footer>© <span id="year"></span> – Team Hérisson</footer>
@@ -94,22 +96,23 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let currentUsername = null;
+const logoutBtn = document.getElementById("logoutBtn");
+const usernameDisplay = document.getElementById("usernameDisplay");
 
-// 🔹 Redirection si non connecté et récupération du username
+// Redirection si non connecté et affichage username si connecté
 onAuthStateChanged(auth, async user => {
-  if(!user) {
-    window.location.href = "login.html";
-  } else {
-    const userDoc = await getDoc(doc(db,"users",user.uid));
-    if(userDoc.exists()) currentUsername = userDoc.data().username;
-  }
+  if(!user) return window.location.href="login.html";
+  const userDoc = await getDoc(doc(db,"users",user.uid));
+  if(userDoc.exists()) usernameDisplay.textContent = "Utilisateur : " + userDoc.data().username;
 });
 
-const logoutBtn = document.getElementById("logoutBtn");
-logoutBtn.addEventListener("click", async () => { await signOut(auth); window.location.href="login.html"; });
+// Déconnexion
+logoutBtn.addEventListener("click", async ()=>{
+  await signOut(auth);
+  window.location.href="login.html";
+});
 
-// Date et année
+// Pré-remplir la date et année
 const dateInput = document.getElementById('date');
 const today = new Date();
 dateInput.value = today.toISOString().slice(0,10);
@@ -117,7 +120,8 @@ document.getElementById("year").textContent = today.getFullYear();
 
 // Carte et géolocalisation
 const map = L.map('map').setView([50.8467,4.3525],13);
-L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+
 let marker;
 function updateLieu(lat,lon){ document.getElementById('lieu').value=`Lat:${lat.toFixed(5)}, Lon:${lon.toFixed(5)}`; }
 if(navigator.geolocation){
@@ -143,11 +147,10 @@ photoInput.addEventListener('change', function(){
 const form=document.getElementById('recensementForm');
 form.addEventListener('submit', async e=>{
   e.preventDefault();
-  if(!auth.currentUser || !currentUsername) return window.location.href="login.html";
+  if(!auth.currentUser) return window.location.href="login.html";
 
   const recensement={
     uid: auth.currentUser.uid,
-    username: currentUsername,
     lieu: document.getElementById('lieu').value,
     date: dateInput.value,
     methode: document.getElementById('methode').value,
