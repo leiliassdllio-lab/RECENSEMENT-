@@ -10,36 +10,50 @@ body { font-family: Arial,sans-serif; margin:0; padding:0; background:#f7f9f7; d
 h1 { color:#4CAF50; margin-bottom:20px; }
 input { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
 button { width:100%; padding:10px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer; transition:0.3s; }
-#loginBtn { background-color:#4CAF50; color:white; }
-#loginBtn:hover { background-color:#43a047; }
-#googleBtn { background-color:#4285F4; color:white; margin-top:15px; }
+button:hover { opacity:0.9; }
+#loginBtn, #createBtn { background-color:#4CAF50; color:white; }
+#googleBtn { background-color:#4285F4; color:white; margin-top:10px; }
 #googleBtn:hover { background-color:#357ae8; }
 p { font-size:0.9em; margin-top:12px; }
-.error { color:red; margin-top:10px; }
+a { cursor:pointer; color:#4CAF50; text-decoration:none; }
+.error { color:red; margin-top:10px; font-size:0.9em; }
+.hidden { display:none; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Connexion / Création</h1>
 
-  <!-- Identifiant (username ou email) -->
-  <input type="text" id="userIdentifier" placeholder="Nom d’utilisateur ou email" required>
-  <input type="password" id="password" placeholder="Mot de passe" required>
+  <!-- Connexion -->
+  <div id="loginDiv">
+    <h1>Connexion</h1>
+    <input type="text" id="loginUser" placeholder="Nom d’utilisateur / Email">
+    <input type="password" id="loginPass" placeholder="Mot de passe">
+    <button id="loginBtn">Se connecter</button>
+    <button id="googleBtn">Se connecter avec Google</button>
+    <p>Pas encore de compte ? <a id="showSignup">Créer un compte</a></p>
+    <div class="error" id="loginError"></div>
+  </div>
 
-  <!-- Boutons -->
-  <button id="loginBtn">Se connecter</button>
-  <button id="googleBtn">Se connecter avec Google</button>
-  <p>Pas encore de compte ? <a href="#" id="signupLink">Créer un compte</a></p>
-  <div class="error" id="errorMsg"></div>
+  <!-- Création compte -->
+  <div id="signupDiv" class="hidden">
+    <h1>Créer un compte</h1>
+    <input type="text" id="signupUser" placeholder="Nom d’utilisateur">
+    <input type="email" id="signupEmail" placeholder="Email">
+    <input type="password" id="signupPass" placeholder="Mot de passe">
+    <button id="createBtn">Créer votre compte</button>
+    <p>Déjà un compte ? <a id="showLogin">Se connecter</a></p>
+    <div class="error" id="signupError"></div>
+  </div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// --- Config Firebase ---
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
   authDomain: "herisson-f80ba.firebaseapp.com",
@@ -54,73 +68,72 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-const userInput = document.getElementById("userIdentifier");
-const passwordInput = document.getElementById("password");
+// Elements
+const loginDiv = document.getElementById("loginDiv");
+const signupDiv = document.getElementById("signupDiv");
+const loginUser = document.getElementById("loginUser");
+const loginPass = document.getElementById("loginPass");
+const signupUser = document.getElementById("signupUser");
+const signupEmail = document.getElementById("signupEmail");
+const signupPass = document.getElementById("signupPass");
+const loginError = document.getElementById("loginError");
+const signupError = document.getElementById("signupError");
+
 const loginBtn = document.getElementById("loginBtn");
 const googleBtn = document.getElementById("googleBtn");
-const signupLink = document.getElementById("signupLink");
-const errorMsg = document.getElementById("errorMsg");
+const createBtn = document.getElementById("createBtn");
+const showSignup = document.getElementById("showSignup");
+const showLogin = document.getElementById("showLogin");
 
-// 🔹 Redirection si déjà connecté
+// Switch affichage
+showSignup.addEventListener("click", ()=>{ loginDiv.classList.add("hidden"); signupDiv.classList.remove("hidden"); });
+showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); loginDiv.classList.remove("hidden"); });
+
+// Redirection si déjà connecté
 onAuthStateChanged(auth, user => { if(user) window.location.href="recensement.html"; });
 
-// 🔹 Récupérer email depuis username
+// Récupérer email via username
 async function getEmailFromUsername(username){
-  const q = query(collection(db,"users"), where("username","==",username));
+  const q = query(db.collection(db,"users"), where("username","==",username));
   const snapshot = await getDocs(q);
   if(!snapshot.empty) return snapshot.docs[0].data().email;
   return null;
 }
 
-// 🔹 Récupérer username depuis uid
-async function getUsername(uid){
-  const userDoc = await getDoc(doc(db,"users",uid));
-  return userDoc.exists() ? userDoc.data().username : null;
-}
-
-// 🔹 Connexion
+// Connexion
 loginBtn.addEventListener("click", async ()=>{
-  errorMsg.textContent="";
+  loginError.textContent="";
   try{
-    let identifier = userInput.value.trim();
+    let identifier = loginUser.value.trim();
     let email = identifier.includes("@") ? identifier : await getEmailFromUsername(identifier);
-    if(!email){ errorMsg.textContent="Nom d'utilisateur introuvable"; return; }
-
-    const userCredential = await signInWithEmailAndPassword(auth,email,passwordInput.value);
-    const username = await getUsername(userCredential.user.uid);
-    localStorage.setItem("username", username || "");
-  }catch(e){ errorMsg.textContent=e.message; }
+    if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
+    await signInWithEmailAndPassword(auth,email,loginPass.value);
+  }catch(e){ loginError.textContent=e.message; }
 });
 
-// 🔹 Connexion Google
+// Connexion Google
 googleBtn.addEventListener("click", async ()=>{
-  errorMsg.textContent="";
-  try{
-    const userCredential = await signInWithPopup(auth, provider);
-    const uid = userCredential.user.uid;
-    const username = await getUsername(uid);
-    localStorage.setItem("username", username || "");
-  }catch(e){ errorMsg.textContent=e.message; }
+  loginError.textContent="";
+  try{ await signInWithPopup(auth, provider); }
+  catch(e){ loginError.textContent=e.message; }
 });
 
-// 🔹 Création de compte
-signupLink.addEventListener("click", async e=>{
-  e.preventDefault();
-  errorMsg.textContent="";
+// Création compte
+createBtn.addEventListener("click", async ()=>{
+  signupError.textContent="";
   try{
-    const username = prompt("Choisissez un nom d'utilisateur unique :");
-    if(!username){ errorMsg.textContent="Nom d'utilisateur requis"; return; }
+    const username = signupUser.value.trim();
+    const email = signupEmail.value.trim();
+    const password = signupPass.value;
+    if(!username || !email || !password){ signupError.textContent="Tous les champs sont requis"; return; }
 
-    const identifier = userInput.value.trim();
-    if(!identifier.includes("@")){ errorMsg.textContent="Email requis pour la création"; return; }
-
-    const userCredential = await createUserWithEmailAndPassword(auth, identifier, passwordInput.value);
+    // Créer compte Auth
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
     const uid = userCredential.user.uid;
 
     // Stocker username dans Firestore
-    await setDoc(doc(db,"users",uid), { uid, email: identifier, username });
-    localStorage.setItem("username", username);
-  }catch(e){ errorMsg.textContent=e.message; }
+    await setDoc(doc(db,"users",uid),{ uid, email, username });
+  }catch(e){ signupError.textContent=e.message; }
 });
 </script>
 
