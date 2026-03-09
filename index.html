@@ -8,65 +8,72 @@
   <link rel="stylesheet" href="style.css">
   <style>
     /* --- Header hero --- */
-    header.hero {
+    .hero {
       position: relative;
-      width: 100%;
-      height: 70vh;
       background-image: url('fond.jpg');
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
-      color: white;
+      height: 100vh; /* couvre tout l'écran */
     }
 
-    .hero-overlay {
+    .hero::before {
+      content: "";
       position: absolute;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.4);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: rgba(0,0,0,0.4);
+      z-index: 1;
     }
 
-    .hero-content {
+    .hero .container {
       position: relative;
       z-index: 2;
       padding: 20px;
       max-width: 900px;
+      margin: 0 auto;
+      animation: fadeIn 1s ease-out;
     }
 
-    .hero-content h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
     }
 
-    .hero-content .subtitle {
-      font-size: 1.2rem;
+    .subtitle {
+      opacity: 0.85;
       margin-bottom: 30px;
+      font-size: 1.2rem;
       text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
     }
 
-    .hero-content .btn {
+    .btn {
       display: inline-block;
       padding: 14px 36px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #fff;
+      border-radius: 8px;
       background-color: #4CAF50;
+      color: white;
       text-decoration: none;
-      border-radius: 6px;
-      transition: background 0.3s, transform 0.2s;
+      font-weight: bold;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
     }
 
-    .hero-content .btn:hover {
-      background-color: #43a047;
+    .btn:hover {
+      background-color: #45a049;
       transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* --- Général --- */
@@ -166,13 +173,13 @@
 
     /* --- Responsive --- */
     @media (max-width: 768px) {
-      .hero-content h1 {
-        font-size: 1.8rem;
+      .hero h1 {
+        font-size: 2rem;
       }
-      .hero-content .subtitle {
+      .subtitle {
         font-size: 1rem;
       }
-      .hero-content .btn {
+      .btn {
         padding: 12px 28px;
         font-size: 1rem;
       }
@@ -183,12 +190,10 @@
 
   <!-- Header hero -->
   <header class="hero">
-    <div class="hero-overlay">
-      <div class="hero-content">
-        <h1>Participez au recensement des hérissons en Wallonie</h1>
-        <p class="subtitle">Contribuez à la biodiversité et aidez-nous à protéger les hérissons.</p>
-        <a href="#projets" class="btn">Voir notre projet</a>
-      </div>
+    <div class="container">
+      <h1>État des données et stratégie de science participative pour la conservation du hérisson en Wallonie</h1>
+      <p class="subtitle">Étudiants · Projets environnement · Science & terrain</p>
+      <a href="#projets" class="btn">Voir notre projet</a>
     </div>
   </header>
 
@@ -202,9 +207,11 @@
           <div class="bubble-icon">🦔</div>
           <h3>Qui sommes-nous ?</h3>
           <p>
-            Nous sommes un groupe de 6 étudiants en bachelier bioingénieur à l’Université libre de Bruxelles.
-            Notre projet consiste à identifier les lacunes de données en Wallonie sur le hérisson d’Europe
-            et à proposer des pistes et outils concrets pour renforcer sa conservation.
+            Nous sommes un groupe de 6 étudiants en bachelier de bioingénieurie à l’Université libre de Bruxelles.
+            Notre projet consiste à identifier les lacunes de données en Wallonie sur le hérisson d’Europe (Erinaceus europaeus)
+            et à proposer et développer des pistes et outils concrets d’amélioration pour renforcer la conservation de l’espèce.
+            Ce projet nous tient à cœur car, en tant que futures scientifiques, nous pensons qu’il est important de s’intéresser
+            à la biodiversité qui nous entoure et d’en prendre soin.
           </p>
         </div>
 
@@ -212,8 +219,10 @@
           <div class="bubble-icon">🦔</div>
           <h3>Qui sont les hérissons ?</h3>
           <p>
-            Le hérisson d’Europe (Erinaceus europaeus) est un petit mammifère nocturne.
-            Espèce protégée, il régule les populations d’invertébrés et fréquente jardins, parcs et campagnes.
+            En Belgique, le hérisson présent est l’Erinaceus europaeus, aussi appelé hérisson d’Europe.
+            Il s’agit d’un petit mammifère insectivore nocturne, reconnaissable à ses piquants et fréquent
+            dans les jardins, parcs et milieux agricoles. Espèce protégée, il joue un rôle écologique important
+            en régulant les populations d’invertébrés.
           </p>
         </div>
 
@@ -221,17 +230,21 @@
           <div class="bubble-icon">🦔</div>
           <h3>Pourquoi leur population diminue-t-elle ?</h3>
           <p>
-            Fragmentation des habitats, mortalité routière, pesticides et jardins trop “propres”
-            entraînent un déclin important des populations.
+            Les hérissons sont sur la liste rouge de l’UICN : ils passent de “préoccupation mineure” à “quasi menacé”.
+            La population d’Erinaceus europaeus diminue principalement à cause de la fragmentation des habitats
+            (urbanisation, routes, clôtures imperméables) qui limite ses déplacements. La mortalité routière est une cause majeure.
+            L’usage de pesticides réduit aussi ses ressources alimentaires (insectes, invertébrés). Enfin, les robots tondeuses nocturnes,
+            les jardins trop “propres” et la perte de sites d’hibernation aggravent le déclin.
           </p>
         </div>
 
         <div class="about-bubble">
           <div class="bubble-icon">🦔</div>
-          <h3>Nos objectifs</h3>
+          <h3>Quels sont nos objectifs ?</h3>
           <p>
-            Sensibiliser le public, collecter plus de données et proposer des solutions pour protéger
-            les hérissons en Wallonie.
+            Nous voudrions sensibiliser un maximum de personnes de tout âge et motiver les citoyens à s’intéresser davantage
+            aux hérissons et à leur conservation. Nous voudrions également comprendre pourquoi en Wallonie les données sont insuffisantes
+            (état des populations), comparé à la Flandres.
           </p>
         </div>
       </div>
