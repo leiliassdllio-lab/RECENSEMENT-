@@ -186,6 +186,15 @@
     }
   </style>
 </head>
+<script>
+document.querySelectorAll('.read-more-link').forEach(link => {
+  link.addEventListener('click', () => {
+    const p = link.previousElementSibling;
+    p.classList.toggle('expanded');
+    link.textContent = p.classList.contains('expanded') ? 'Lire moins' : 'Lire plus';
+  });
+});
+</script>
 <body>
 
   <!-- Header hero -->
