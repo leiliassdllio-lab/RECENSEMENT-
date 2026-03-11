@@ -4,41 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recense un Hérisson</title>
+<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<style>
-body { font-family:'Arial',sans-serif; background:#f7f9f7; margin:0; padding:0; }
-header, footer { background:#4CAF50; color:white; text-align:center; padding:10px 0; }
-.container { width:90%; max-width:800px; margin:20px auto; background:white; border-radius:10px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.2); position:relative; }
-h2 { text-align:center; color:#4CAF50; margin-bottom:20px; }
-form p { margin:15px 0 5px; font-weight:bold; }
-input, select, textarea, button { width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
-button { background:#4CAF50; color:white; font-weight:bold; border:none; cursor:pointer; margin-top:15px; transition:0.3s; }
-button:hover { background:#43a047; }
-#map { height:300px; border-radius:10px; margin-bottom:20px; }
-.icon-label { display:flex; align-items:center; gap:10px; font-weight:normal; }
-.icon-label span { font-size:1.5em; }
-.tree { position:absolute; font-size:2em; opacity:0.4; }
-.tree1 { top:10px; left:10px; }
-.tree2 { bottom:10px; right:20px; }
-.tree3 { top:50px; right:50px; }
-#preview img { max-width:100%; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); margin-top:10px; }
-#logoutBtn { background:#d32f2f; margin-bottom:20px; }
-#logoutBtn:hover { background:#b71c1c; }
-
-/* Cartes état */
-.choice-grid {
-  display: flex; flex-wrap: wrap; gap:15px; justify-content: center; margin-top:10px;
-}
-.choice-card {
-  width:100px; height:100px;
-  border:2px solid #ccc; border-radius:12px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  cursor:pointer; transition:all 0.3s;
-}
-.choice-card img { max-width:50px; max-height:50px; margin-bottom:5px; }
-.choice-card.selected-main { border-color:#2196F3; background:rgba(33,150,243,0.1); }
-.choice-card.selected-sub { border-color:#4CAF50; background:rgba(76,175,80,0.1); }
-</style>
 </head>
 <body>
 
@@ -133,25 +100,18 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Redirection si non connecté
-onAuthStateChanged(auth,user=>{
-  if(!user) window.location.href="login.html";
-});
-
-// Déconnexion
+onAuthStateChanged(auth,user=>{ if(!user) window.location.href="login.html"; });
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await signOut(auth);
   localStorage.removeItem("username");
   window.location.href="login.html";
 });
 
-// Date automatique
 const dateInput = document.getElementById('date');
 const today = new Date();
 dateInput.value = today.toISOString().slice(0,10);
 document.getElementById("year").textContent = today.getFullYear();
 
-// Carte et géolocalisation
 const map = L.map('map').setView([50.8467,4.3525],13);
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
 let marker;
@@ -166,7 +126,6 @@ if(navigator.geolocation){
   }, err=>{ alert("Impossible de récupérer votre position : "+err.message); });
 }
 
-// Sélection état et sous-état
 function selectEtat(val, el){
   document.getElementById("etat").value = val;
   document.querySelectorAll("#etatGrid .choice-card").forEach(c => c.classList.remove("selected-main"));
@@ -183,7 +142,6 @@ function selectSousEtat(val, el){
   el.classList.add("selected-sub");
 }
 
-// Prévisualisation photo
 const photoInput = document.getElementById('photoUpload');
 const previewDiv = document.getElementById('preview');
 photoInput.addEventListener('change', function(){
@@ -191,7 +149,6 @@ photoInput.addEventListener('change', function(){
   if(file){ const reader=new FileReader(); reader.onload=e=>previewDiv.innerHTML=`<img src="${e.target.result}">`; reader.readAsDataURL(file);}
 });
 
-// Soumission formulaire
 const form=document.getElementById('recensementForm');
 form.addEventListener('submit', async e=>{
   e.preventDefault();
