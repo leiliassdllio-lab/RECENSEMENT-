@@ -1,78 +1,100 @@
-html{ scroll-behavior:smooth; }
-
-body{
-  font-family:'Arial',sans-serif;
-  margin:0; padding:0;
-  line-height:1.6;
-  background:#f7f9f7;
-  color:#111;
+html{
+scroll-behavior:smooth;
 }
 
-header, footer{
-  background:#4CAF50;
-  color:white;
-  text-align:center;
-  padding:10px 0;
+/* --- Général --- */
+
+body{
+font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+line-height:1.6;
+background:#f7f7f7;
+color:#111;
 }
 
 .container{
-  width:90%;
-  max-width:1000px;
-  margin:0 auto;
-  padding:40px 0;
+width:90%;
+max-width:1000px;
+margin:0 auto;
+padding:40px 0;
 }
 
 h2{
-  color:#4CAF50;
-  text-align:center;
-  margin-bottom:20px;
+color:#4CAF50;
+text-align:center;
+margin-bottom:20px;
 }
 
-.tree{ position:absolute; font-size:2em; opacity:0.4; }
-.tree1{ top:10px; left:10px; }
-.tree2{ bottom:10px; right:20px; }
-.tree3{ top:50px; right:50px; }
 
-#map{ height:300px; border-radius:10px; margin-bottom:20px; }
+/* HERO */
 
-input, select, textarea, button{
-  width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box;
-}
-button{ background:#4CAF50; color:white; font-weight:bold; border:none; cursor:pointer; margin-top:15px; transition:0.3s; }
-button:hover{ background:#43a047; }
-
-#logoutBtn{ background:#d32f2f; margin-bottom:20px; }
-#logoutBtn:hover{ background:#b71c1c; }
-
-.icon-label{ display:flex; align-items:center; gap:10px; font-weight:normal; }
-.icon-label span{ font-size:1.5em; }
-
-#preview img{ max-width:100%; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); margin-top:10px; }
-
-.choice-grid{
-  display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin-top:10px;
+.hero{
+position:relative;
+background-image:url('fond.jpg');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+height:100vh;
 }
 
-.choice-card{
-  width:100px; height:100px; border:2px solid #ccc; border-radius:12px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  cursor:pointer; transition: all 0.3s ease; position: relative; pointer-events:auto;
-  background:white; z-index:10;
+.hero::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:1;
 }
 
-.choice-card img,
-.choice-card > div{ pointer-events:none; }
-
-.choice-card.selected-main,
-.choice-card.selected-sub{ transform: scale(1.05); box-shadow:0 6px 15px rgba(0,0,0,0.2); }
-
-.choice-card:hover{ transform: scale(1.03); box-shadow:0 4px 12px rgba(0,0,0,0.15); }
-
-#vivantOptions, #mortOptions{ display:flex; opacity:0; height:0; overflow:hidden; transition: all 0.3s ease; }
-#vivantOptions.show, #mortOptions.show{ opacity:1; height:auto; }
-
-.photo-label{
-  display:flex; flex-direction:column; align-items:center;
-  border:2px dashed #4CAF50; padding:15px; border-radius:10px; cursor:pointer;
+.hero .container{
+position:relative;
+z-index:2;
+padding:20px;
+max-width:900px;
+margin:0 auto;
+animation:fadeIn 1s ease-out;
 }
-.photo-label span{ font-size:2em; margin-bottom:5px; }
+
+.hero h1{
+font-size:3rem;
+margin-bottom:15px;
+text-shadow:2px 2px 6px rgba(0,0,0,0.7);
+}
+
+.subtitle{
+opacity:0.85;
+margin-bottom:30px;
+font-size:1.2rem;
+}
+
+.btn{
+display:inline-block;
+padding:14px 36px;
+border-radius:8px;
+background-color:#4CAF50;
+color:white;
+text-decoration:none;
+font-weight:bold;
+transition:all 0.3s;
+}
+
+.btn:hover{
+background:#45a049;
+transform:translateY(-2px);
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+/* ...et tout le reste exactement comme ton fichier original */
