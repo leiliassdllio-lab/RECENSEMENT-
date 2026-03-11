@@ -17,66 +17,66 @@
 </header>
 
 <div class="container">
-  <div class="tree tree1">🌳</div>
-  <div class="tree tree2">🌲</div>
-  <div class="tree tree3">🌳</div>
+<div class="tree tree1">🌳</div>
+<div class="tree tree2">🌲</div>
+<div class="tree tree3">🌳</div>
 
-  <h2>Localisation & Observation</h2>
-  <div id="map"></div>
+<h2>Localisation & Observation</h2>
+<div id="map"></div>
 
-  <form id="recensementForm">
-    <p class="icon-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
-    <input type="text" id="lieu" required>
+<form id="recensementForm">
+  <p class="icon-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
+  <input type="text" id="lieu" required>
 
-    <p class="icon-label"><span>📅</span> Quand l’avez-vous observé ?</p>
-    <input type="date" id="date" required>
+  <p class="icon-label"><span>📅</span> Quand l’avez-vous observé ?</p>
+  <input type="date" id="date" required>
 
-    <p class="icon-label"><span>🦔</span> État du hérisson</p>
-    <div id="etatGrid" class="choice-grid">
-      <div class="choice-card" onclick="selectEtat('vivant',this)">
-        <img src="vivant.png"><div>Vivant</div>
-      </div>
-      <div class="choice-card" onclick="selectEtat('mort',this)">
-        <img src="mort.png"><div>Mort</div>
-      </div>
+  <p class="icon-label"><span>🦔</span> État du hérisson</p>
+  <div id="etatGrid" class="choice-grid">
+    <div class="choice-card" onclick="selectEtat('vivant',this)">
+      <img src="vivant.png"><div>Vivant</div>
     </div>
-    <input type="hidden" id="etat">
-
-    <div id="vivantOptions" class="choice-grid">
-      <div class="choice-card" onclick="selectSousEtat('sain',this)">
-        <img src="images/sain.png"><div>Bonne santé</div>
-      </div>
-      <div class="choice-card" onclick="selectSousEtat('blesse',this)">
-        <img src="images/blesse.png"><div>Blessé</div>
-      </div>
-      <div class="choice-card" onclick="selectSousEtat('malade',this)">
-        <img src="images/malade.png"><div>Malade</div>
-      </div>
+    <div class="choice-card" onclick="selectEtat('mort',this)">
+      <img src="mort.png"><div>Mort</div>
     </div>
+  </div>
+  <input type="hidden" id="etat">
 
-    <div id="mortOptions" class="choice-grid">
-      <div class="choice-card" onclick="selectSousEtat('route',this)">
-        <img src="images/route.png"><div>Sur route</div>
-      </div>
-      <div class="choice-card" onclick="selectSousEtat('hors_route',this)">
-        <img src="images/horsroute.png"><div>Hors route</div>
-      </div>
+  <div id="vivantOptions" class="choice-grid">
+    <div class="choice-card" onclick="selectSousEtat('sain',this)">
+      <img src="images/sain.png"><div>Bonne santé</div>
     </div>
-    <input type="hidden" id="sousEtat">
+    <div class="choice-card" onclick="selectSousEtat('blesse',this)">
+      <img src="images/blesse.png"><div>Blessé</div>
+    </div>
+    <div class="choice-card" onclick="selectSousEtat('malade',this)">
+      <img src="images/malade.png"><div>Malade</div>
+    </div>
+  </div>
 
-    <p class="icon-label"><span>📷</span> Ajouter une image</p>
-    <label for="photoUpload" class="photo-label">
-      <span>📸</span>
-      <span>Cliquer pour choisir ou prendre une photo</span>
-    </label>
-    <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
-    <div id="preview"></div>
+  <div id="mortOptions" class="choice-grid">
+    <div class="choice-card" onclick="selectSousEtat('route',this)">
+      <img src="images/route.png"><div>Sur route</div>
+    </div>
+    <div class="choice-card" onclick="selectSousEtat('hors_route',this)">
+      <img src="images/horsroute.png"><div>Hors route</div>
+    </div>
+  </div>
+  <input type="hidden" id="sousEtat">
 
-    <p class="icon-label"><span>📝</span> Notes supplémentaires</p>
-    <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
+  <p class="icon-label"><span>📷</span> Ajouter une image</p>
+  <label for="photoUpload" class="photo-label">
+    <span>📸</span>
+    <span>Cliquer pour choisir ou prendre une photo</span>
+  </label>
+  <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
+  <div id="preview"></div>
 
-    <button type="submit">Envoyer</button>
-  </form>
+  <p class="icon-label"><span>📝</span> Notes supplémentaires</p>
+  <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
+
+  <button type="submit">Envoyer</button>
+</form>
 </div>
 
 <footer>© <span id="year"></span> – Team Hérisson</footer>
@@ -100,23 +100,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Redirection si non connecté
 onAuthStateChanged(auth,user=>{ if(!user) window.location.href="login.html"; });
 
-// Déconnexion
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await signOut(auth);
   localStorage.removeItem("username");
   window.location.href="login.html";
 });
 
-// Date automatique
 const dateInput = document.getElementById('date');
 const today = new Date();
 dateInput.value = today.toISOString().slice(0,10);
 document.getElementById("year").textContent = today.getFullYear();
 
-// Carte et géolocalisation
 const map = L.map('map').setView([50.8467,4.3525],13);
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
 let marker;
@@ -131,7 +127,6 @@ if(navigator.geolocation){
   }, err=>{ alert("Impossible de récupérer votre position : "+err.message); });
 }
 
-// Sélection état et sous-état
 function selectEtat(val, el){
   document.getElementById("etat").value = val;
   document.querySelectorAll("#etatGrid .choice-card").forEach(c => c.classList.remove("selected-main"));
@@ -153,7 +148,6 @@ function selectSousEtat(val, el){
   el.classList.add("selected-sub");
 }
 
-// Prévisualisation photo
 const photoInput = document.getElementById('photoUpload');
 const previewDiv = document.getElementById('preview');
 photoInput.addEventListener('change', function(){
@@ -161,7 +155,6 @@ photoInput.addEventListener('change', function(){
   if(file){ const reader=new FileReader(); reader.onload=e=>previewDiv.innerHTML=`<img src="${e.target.result}">`; reader.readAsDataURL(file);}
 });
 
-// Soumission formulaire
 const form=document.getElementById('recensementForm');
 form.addEventListener('submit', async e=>{
   e.preventDefault();
@@ -184,6 +177,5 @@ form.addEventListener('submit', async e=>{
   }catch(err){ console.error(err); alert("Impossible d'enregistrer le recensement."); }
 });
 </script>
-
 </body>
 </html>
