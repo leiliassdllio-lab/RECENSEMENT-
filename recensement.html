@@ -176,6 +176,7 @@ function selectEtat(val, el){
   if(val === "vivant") document.getElementById("vivantOptions").style.display = "flex";
   if(val === "mort") document.getElementById("mortOptions").style.display = "flex";
 }
+
 function selectSousEtat(val, el){
   document.getElementById("sousEtat").value = val;
   el.parentElement.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
