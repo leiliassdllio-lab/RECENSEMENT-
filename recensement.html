@@ -24,6 +24,20 @@ button:hover { background:#43a047; }
 #preview img { max-width:100%; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.2); margin-top:10px; }
 #logoutBtn { background:#d32f2f; margin-bottom:20px; }
 #logoutBtn:hover { background:#b71c1c; }
+
+/* Cartes état */
+.choice-grid {
+  display: flex; flex-wrap: wrap; gap:15px; justify-content: center; margin-top:10px;
+}
+.choice-card {
+  width:100px; height:100px;
+  border:2px solid #ccc; border-radius:12px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s;
+}
+.choice-card img { max-width:50px; max-height:50px; margin-bottom:5px; }
+.choice-card.selected-main { border-color:#2196F3; background:rgba(33,150,243,0.1); }
+.choice-card.selected-sub { border-color:#4CAF50; background:rgba(76,175,80,0.1); }
 </style>
 </head>
 <body>
@@ -51,60 +65,36 @@ button:hover { background:#43a047; }
   <input type="date" id="date" required>
 
   <p class="icon-label"><span>🦔</span> État du hérisson</p>
-  
-  <div class="choice-grid">
-  
-  <div class="choice-card" onclick="selectEtat('vivant',this)">
-  <img src="images/vivant.png">
-  <div>Vivant</div>
+  <div id="etatGrid" class="choice-grid">
+    <div class="choice-card" onclick="selectEtat('vivant',this)">
+      <img src="images/vivant.png"><div>Vivant</div>
+    </div>
+    <div class="choice-card" onclick="selectEtat('mort',this)">
+      <img src="images/mort.png"><div>Mort</div>
+    </div>
   </div>
-  
-  <div class="choice-card" onclick="selectEtat('mort',this)">
-  <img src="images/mort.png">
-  <div>Mort</div>
+  <input type="hidden" id="etat">
+
+  <div id="vivantOptions" class="choice-grid" style="display:none;">
+    <div class="choice-card" onclick="selectSousEtat('sain',this)">
+      <img src="images/sain.png"><div>Bonne santé</div>
+    </div>
+    <div class="choice-card" onclick="selectSousEtat('blesse',this)">
+      <img src="images/blesse.png"><div>Blessé</div>
+    </div>
+    <div class="choice-card" onclick="selectSousEtat('malade',this)">
+      <img src="images/malade.png"><div>Malade</div>
+    </div>
   </div>
 
+  <div id="mortOptions" class="choice-grid" style="display:none;">
+    <div class="choice-card" onclick="selectSousEtat('route',this)">
+      <img src="images/route.png"><div>Sur route</div>
+    </div>
+    <div class="choice-card" onclick="selectSousEtat('hors_route',this)">
+      <img src="images/horsroute.png"><div>Hors route</div>
+    </div>
   </div>
-  
-  <input type="hidden" id="etat">
-  
-  <!-- options vivant -->
-  
-  <div id="vivantOptions" class="choice-grid" style="display:none;margin-top:15px;">
-  
-  <div class="choice-card" onclick="selectSousEtat('sain',this)">
-  <img src="images/sain.png">
-  <div>Bonne santé</div>
-  </div>
-  
-  <div class="choice-card" onclick="selectSousEtat('blesse',this)">
-  <img src="images/blesse.png">
-  <div>Blessé</div>
-  </div>
-  
-  <div class="choice-card" onclick="selectSousEtat('malade',this)">
-  <img src="images/malade.png">
-  <div>Malade</div>
-  </div>
-  
-  </div>
-  
-  <!-- options mort -->
-  
-  <div id="mortOptions" class="choice-grid" style="display:none;margin-top:15px;">
-  
-  <div class="choice-card" onclick="selectSousEtat('route',this)">
-  <img src="images/route.png">
-  <div>Sur route</div>
-  </div>
-  
-  <div class="choice-card" onclick="selectSousEtat('hors_route',this)">
-  <img src="images/horsroute.png">
-  <div>Hors route</div>
-  </div>
-  
-  </div>
-  
   <input type="hidden" id="sousEtat">
 
   <p class="icon-label"><span>📷</span> Ajouter une image</p>
@@ -143,25 +133,25 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// 🔹 Redirection si non connecté
+// Redirection si non connecté
 onAuthStateChanged(auth,user=>{
   if(!user) window.location.href="login.html";
 });
 
-// 🔹 Bouton déconnexion
+// Déconnexion
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
   await signOut(auth);
   localStorage.removeItem("username");
   window.location.href="login.html";
 });
 
-// 🔹 Date et année
+// Date automatique
 const dateInput = document.getElementById('date');
 const today = new Date();
 dateInput.value = today.toISOString().slice(0,10);
 document.getElementById("year").textContent = today.getFullYear();
 
-// 🔹 Carte et géolocalisation
+// Carte et géolocalisation
 const map = L.map('map').setView([50.8467,4.3525],13);
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
 let marker;
@@ -175,35 +165,24 @@ if(navigator.geolocation){
     marker.on('dragend', e=>{ const p=e.target.getLatLng(); updateLieu(p.lat,p.lng); });
   }, err=>{ alert("Impossible de récupérer votre position : "+err.message); });
 }
-function selectEtat(val,el){
 
-document.getElementById("etat").value=val
-
-document.querySelectorAll(".choice-grid .choice-card").forEach(c=>c.classList.remove("selected"))
-el.classList.add("selected")
-
-document.getElementById("vivantOptions").style.display="none"
-document.getElementById("mortOptions").style.display="none"
-
-if(val==="vivant"){
-document.getElementById("vivantOptions").style.display="grid"
+// Sélection état et sous-état
+function selectEtat(val, el){
+  document.getElementById("etat").value = val;
+  document.querySelectorAll("#etatGrid .choice-card").forEach(c => c.classList.remove("selected-main"));
+  el.classList.add("selected-main");
+  document.getElementById("vivantOptions").style.display = "none";
+  document.getElementById("mortOptions").style.display = "none";
+  if(val === "vivant") document.getElementById("vivantOptions").style.display = "flex";
+  if(val === "mort") document.getElementById("mortOptions").style.display = "flex";
+}
+function selectSousEtat(val, el){
+  document.getElementById("sousEtat").value = val;
+  el.parentElement.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+  el.classList.add("selected-sub");
 }
 
-if(val==="mort"){
-document.getElementById("mortOptions").style.display="grid"
-}
-
-}
-
-function selectSousEtat(val,el){
-
-document.getElementById("sousEtat").value=val
-
-el.parentElement.querySelectorAll(".choice-card").forEach(c=>c.classList.remove("selected"))
-el.classList.add("selected")
-
-}
-// 🔹 Prévisualisation photo
+// Prévisualisation photo
 const photoInput = document.getElementById('photoUpload');
 const previewDiv = document.getElementById('preview');
 photoInput.addEventListener('change', function(){
@@ -211,24 +190,21 @@ photoInput.addEventListener('change', function(){
   if(file){ const reader=new FileReader(); reader.onload=e=>previewDiv.innerHTML=`<img src="${e.target.result}">`; reader.readAsDataURL(file);}
 });
 
-// 🔹 Soumission formulaire vers Firestore
+// Soumission formulaire
 const form=document.getElementById('recensementForm');
 form.addEventListener('submit', async e=>{
   e.preventDefault();
   if(!auth.currentUser) return window.location.href="login.html";
-
-  const recensement={
+  const recensement = {
     uid: auth.currentUser.uid,
     username: localStorage.getItem("username") || "Inconnu",
     lieu: document.getElementById('lieu').value,
     date: dateInput.value,
-    methode: document.getElementById('methode').value,
-    notes: document.getElementById('notes').value
-    etat: document.getElementById("etat").value
-    sousEtat: document.getElementById("sousEtat").value,
+    notes: document.getElementById('notes').value,
+    etat: document.getElementById("etat").value,
+    sousEtat: document.getElementById("sousEtat").value
   };
   if(marker){ const p=marker.getLatLng(); recensement.latitude=p.lat; recensement.longitude=p.lng; }
-
   try{
     await addDoc(collection(db,"recensements"), recensement);
     form.reset(); previewDiv.innerHTML="";
