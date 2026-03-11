@@ -130,10 +130,16 @@ function selectEtat(val, el){
   document.getElementById("etat").value = val;
   document.querySelectorAll("#etatGrid .choice-card").forEach(c => c.classList.remove("selected-main"));
   el.classList.add("selected-main");
-  document.getElementById("vivantOptions").style.display = "none";
-  document.getElementById("mortOptions").style.display = "none";
-  if(val === "vivant") document.getElementById("vivantOptions").style.display = "flex";
-  if(val === "mort") document.getElementById("mortOptions").style.display = "flex";
+
+  const vivant = document.getElementById("vivantOptions");
+  const mort = document.getElementById("mortOptions");
+
+  vivant.classList.remove("show");
+  mort.classList.remove("show");
+
+  if(val === "vivant") vivant.classList.add("show");
+  if(val === "mort") mort.classList.add("show");
+}
 }
 
 function selectSousEtat(val, el){
