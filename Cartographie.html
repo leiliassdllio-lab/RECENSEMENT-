@@ -2,37 +2,24 @@
 <html lang="fr">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Cartographie des observations</title>
-
 <link rel="stylesheet" href="style.css">
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-
 </head>
 
 <body>
 
-
 <div class="map-page">
-
 <h1 class="map-title">Cartographie des observations de hérissons</h1>
 
 <p class="map-description">
-Cette carte présente les observations du hérisson d’Europe
-collectées par les citoyens en Belgique.
+Cette carte présente les observations du hérisson d’Europe collectées par les citoyens en Belgique.
 Chaque point correspond à un signalement enregistré.
 </p>
-
-
-<div id="controls">
-
-Afficher les observations :
 
 <div id="controls">
   <b>Filtres :</b><br>
@@ -42,102 +29,70 @@ Afficher les observations :
   <label><input type="radio" name="region" value="flandre"> Flandre</label>
 </div>
 
-</div>
-
-
-<div id="map"></div>
-
+<div id="map" style="height: 600px;"></div>
 
 <div class="map-legend">
-
 <b>Légende</b><br><br>
-
-<span class="legend-dot"></span>
-Observation de hérisson
-
+<span class="legend-dot"></span> Observation de hérisson
 </div>
-
 
 <div id="stats"></div>
-
 </div>
-
-
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
-
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-
 const firebaseConfig = {
-
-apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
-authDomain: "herisson-f80ba.firebaseapp.com",
-projectId: "herisson-f80ba",
-storageBucket: "herisson-f80ba.firebasestorage.app",
-messagingSenderId: "142270421417",
-appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
-
+  apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+  authDomain: "herisson-f80ba.firebaseapp.com",
+  projectId: "herisson-f80ba",
+  storageBucket: "herisson-f80ba.firebasestorage.app",
+  messagingSenderId: "142270421417",
+  appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
 };
-
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
-
 const belgiqueBounds = [[49.5, 2.5], [51.6, 6.4]];
+const wallonieBounds = [[49.5,4.5],[50.5,6.4]];
+const flandreBounds = [[50.5,2.5],[51.6,5.0]];
+
+function isInside(lat, lon, bounds){
+  return lat >= bounds[0][0] && lat <= bounds[1][0] && lon >= bounds[0][1] && lon <= bounds[1][1];
+}
 
 const map = L.map('map',{
-
-maxBounds: belgiqueBounds,
-maxBoundsViscosity:1.0,
-minZoom:7,
-maxZoom:12
-
+  maxBounds: belgiqueBounds,
+  maxBoundsViscosity:1.0,
+  minZoom:7,
+  maxZoom:12
 }).setView([50.8467,4.3525],8);
 
-
-
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{
-
-attribution:'© OpenStreetMap'
-
+  attribution:'© OpenStreetMap'
 }).addTo(map);
 
-
-
-const wallonieBounds=[[49.5,4.5],[50.5,6.4]];
-const flandreBounds=[[50.5,2.5],[51.6,5.0]];
-
-
-
-function isInside(lat,lon,bounds){
-
-return lat>=bounds[0][0] &&
-lat<=bounds[1][0] &&
-lon>=bounds[0][1] &&
-lon<=bounds[1][1];
-
-}
-const markers=L.markerClusterGroup();
+const markers = L.markerClusterGroup();
 map.addLayer(markers);
-let allRecensements=[];
+
+let allRecensements = [];
+
 async function loadRecensements(){
-const querySnapshot=await getDocs(collection(db,"recensements"));
-querySnapshot.forEach(doc=>{
-const data=doc.data();
-if(data.latitude && data.longitude){
-allRecensements.push(data);
+  const querySnapshot = await getDocs(collection(db,"recensements"));
+  querySnapshot.forEach(doc => {
+    const data = doc.data();
+    if(data.latitude && data.longitude){
+      allRecensements.push(data);
+    }
+  });
+  displayMarkers();
 }
-});
-displayMarkers('all');
-}
+
 function displayMarkers() {
   markers.clearLayers();
   
@@ -151,7 +106,7 @@ function displayMarkers() {
     filtered = filtered.filter(d => isInside(d.latitude,d.longitude, wallonieBounds));
   } else if(region === 'flandre'){
     filtered = filtered.filter(d => isInside(d.latitude,d.longitude, flandreBounds));
-  } // sinon all = pas de filtrage
+  }
 
   // Filtrer par Mes recensements si coché
   if(myRecensements && auth.currentUser){
@@ -160,7 +115,7 @@ function displayMarkers() {
 
   // Ajout des marqueurs
   filtered.forEach(data => {
-    const marker = L.circleMarker([data.latitude,data.longitude], {
+    const marker = L.circleMarker([data.latitude, data.longitude], {
       color:'#2e7d32',
       fillColor:'#4CAF50',
       radius:7,
@@ -185,40 +140,13 @@ function displayMarkers() {
   document.getElementById("stats").innerHTML = `<b>${filtered.length}</b> observations affichées`;
 }
 
-// Écouteurs
+// Écouteurs pour filtrer
 document.querySelectorAll('input[name="region"], #myRecensements').forEach(el => {
   el.addEventListener('change', displayMarkers);
 });
 
-const marker=L.circleMarker(
-[data.latitude,data.longitude],
-{
-color:'#2e7d32',
-fillColor:'#4CAF50',
-radius:7,
-weight:1.5,
-fillOpacity:0.85
-});
-const popupContent=`
-<b>Observation de hérisson</b><br><br>
-<b>Date :</b> ${data.date}<br>
-<b>Méthode :</b> ${data.methode}<br>
-<b>État :</b> ${data.etat || 'N/A'}<br>
-<b>Sous-état :</b> ${data.sousEtat || 'N/A'}<br>
-<b>Utilisateur :</b> ${data.username || 'Inconnu'}<br>
-<b>Email :</b> ${data.email || 'Non renseigné'}<br>
-${data.notes ? `<b>Notes :</b> ${data.notes}` : ''}
-`;
-marker.bindPopup(popupContent);
-markers.addLayer(marker);
-});
-}
-
-
 loadRecensements();
-
 </script>
-
 
 </body>
 </html>
