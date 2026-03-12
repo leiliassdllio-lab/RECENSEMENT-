@@ -27,7 +27,17 @@ h2 {
 }
 
 /* HERO */
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr); /* 2 cartes par ligne */
+  }
+}
 
+@media (max-width: 600px) {
+  .cards {
+    grid-template-columns: 1fr; /* 1 carte par ligne */
+  }
+}
 .hero {
   position: relative;
   background-image: url('fond.jpg');
