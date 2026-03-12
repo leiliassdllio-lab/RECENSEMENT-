@@ -250,6 +250,7 @@ form.addEventListener('submit', async e=>{
     notes: document.getElementById('notes').value,
     etat: document.getElementById("etat").value,
     sousEtat: document.getElementById("sousEtat").value
+    email: auth.currentUser.email || "Non renseigné"
   };
 
   if(marker){
