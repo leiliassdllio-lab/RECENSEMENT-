@@ -34,13 +34,13 @@ Chaque point correspond à un signalement enregistré.
 
 Afficher les observations :
 
-<select id="regionFilter">
-
-<option value="all">Belgique entière</option>
-<option value="wallonie">Wallonie</option>
-<option value="flandre">Flandre</option>
-
-</select>
+<div id="controls">
+  <b>Filtres :</b><br>
+  <label><input type="checkbox" id="myRecensements"> Mes recensements</label><br>
+  <label><input type="radio" name="region" value="all" checked> Belgique entière</label>
+  <label><input type="radio" name="region" value="wallonie"> Wallonie</label>
+  <label><input type="radio" name="region" value="flandre"> Flandre</label>
+</div>
 
 </div>
 
@@ -138,14 +138,58 @@ allRecensements.push(data);
 });
 displayMarkers('all');
 }
-function displayMarkers(region){
-markers.clearLayers();
-let filtered=allRecensements;
-if(region==='wallonie'){
-filtered=allRecensements.filter(d=>
-isInside(d.latitude,d.longitude,wallonieBounds));
+function displayMarkers() {
+  markers.clearLayers();
+  
+  const region = document.querySelector('input[name="region"]:checked').value;
+  const myRecensements = document.getElementById('myRecensements').checked;
+  
+  let filtered = allRecensements;
 
+  // Filtrer par région
+  if(region === 'wallonie'){
+    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, wallonieBounds));
+  } else if(region === 'flandre'){
+    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, flandreBounds));
+  } // sinon all = pas de filtrage
+
+  // Filtrer par Mes recensements si coché
+  if(myRecensements && auth.currentUser){
+    filtered = filtered.filter(d => d.uid === auth.currentUser.uid);
+  }
+
+  // Ajout des marqueurs
+  filtered.forEach(data => {
+    const marker = L.circleMarker([data.latitude,data.longitude], {
+      color:'#2e7d32',
+      fillColor:'#4CAF50',
+      radius:7,
+      weight:1.5,
+      fillOpacity:0.85
+    });
+    
+    const popupContent = `
+      <b>Observation de hérisson</b><br>
+      <b>Date :</b> ${data.date}<br>
+      <b>État :</b> ${data.etat || 'N/A'}<br>
+      <b>Sous-état :</b> ${data.sousEtat || 'N/A'}<br>
+      <b>Utilisateur :</b> ${data.username || 'Inconnu'}<br>
+      <b>Email :</b> ${data.email || 'Non renseigné'}<br>
+      ${data.notes ? `<b>Notes :</b> ${data.notes}` : ''}
+    `;
+    
+    marker.bindPopup(popupContent);
+    markers.addLayer(marker);
+  });
+
+  document.getElementById("stats").innerHTML = `<b>${filtered.length}</b> observations affichées`;
 }
+
+// Écouteurs
+document.querySelectorAll('input[name="region"], #myRecensements').forEach(el => {
+  el.addEventListener('change', displayMarkers);
+});
+
 
 else if(region==='flandre'){
 
@@ -178,10 +222,7 @@ markers.addLayer(marker);
 document.getElementById("stats").innerHTML=
 `<b>${filtered.length}</b> observations affichées`;
 }
-document.getElementById('regionFilter')
-.addEventListener('change',e=>{
-displayMarkers(e.target.value);
-});
+
 
 loadRecensements();
 
