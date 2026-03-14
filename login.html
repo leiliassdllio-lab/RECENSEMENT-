@@ -91,7 +91,7 @@ showSignup.addEventListener("click", ()=>{ loginDiv.classList.add("hidden"); sig
 showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); loginDiv.classList.remove("hidden"); });
 
 // --- Redirection si déjà connecté ---
-onAuthStateChanged(auth, user => { if(user) window.location.href = "recensement.html"; });
+onAuthStateChanged(auth, user => { if(user) window.location.href = "recensement_test.html"; });
 
 // --- Récupérer email via username ---
 async function getEmailFromUsername(username){
@@ -109,7 +109,7 @@ loginBtn.addEventListener("click", async ()=>{
     const email = identifier.includes("@") ? identifier : await getEmailFromUsername(identifier);
     if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
     await signInWithEmailAndPassword(auth,email,loginPass.value);
-    window.location.href = "recensement.html"; // redirection directe après succès
+    window.location.href = "recensement_test.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -118,7 +118,7 @@ googleBtn.addEventListener("click", async ()=>{
   loginError.textContent="";
   try{
     await signInWithPopup(auth, provider);
-    window.location.href = "recensement.html"; // redirection directe après succès
+    window.location.href = "recensement_test.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -135,7 +135,7 @@ createBtn.addEventListener("click", async ()=>{
     const uid = userCredential.user.uid;
     await setDoc(doc(db,"users",uid),{ uid, email, username });
 
-    window.location.href = "recensement.html"; // redirection directe après création
+    window.location.href = "recensement_test.html"; // redirection directe après création
   }catch(e){ signupError.textContent=e.message; }
 });
 </script>
