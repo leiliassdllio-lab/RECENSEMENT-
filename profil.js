@@ -62,18 +62,22 @@ onAuthStateChanged(auth, async user => {
   {id: 'badge-10', target: 10},
 ];
 
+// Après avoir récupéré recensementsCount
 badgeRecensements.forEach(b => {
   const fill = document.getElementById(`progress-${b.target}`);
   const text = document.getElementById(`progress-text-${b.target}`);
-  const progress = Math.min(recensementsCount / b.target, 1); // max 100%
-  
+  const badgeEl = document.getElementById(b.id);
+
+  const progress = Math.min(recensementsCount / b.target, 1);
   fill.style.width = (progress * 100) + "%";
   text.textContent = `${Math.min(recensementsCount, b.target)}/${b.target}`;
 
-  // Verrouiller ou non le badge
-  const badgeEl = document.getElementById(b.id);
+  // Badge verrouillé si objectif non atteint
   if(recensementsCount < b.target) {
     badgeEl.classList.add('locked');
+    badgeEl.dataset.tooltip = `Vous devez recenser ${b.target} hérissons pour débloquer ce badge`;
+  } else {
+    badgeEl.classList.remove('locked');
   }
 });
   // Données supplémentaires depuis ton API (exemple)
@@ -96,5 +100,16 @@ badgeRecensements.forEach(b => {
     const el = document.getElementById(badge.id);
     if(!badge.condition) el.classList.add('locked'); // grisé via CSS
   });
-
+const quizBadge = document.getElementById('badge-quiz');
+const quizProgress = document.getElementById('progress-quiz');
+const quizText = document.getElementById('progress-text-quiz');
+if(userData.quizCompleted){
+  quizBadge.classList.remove('locked');
+  quizProgress.style.width = "100%";
+  quizText.textContent = "Terminé";
+} else {
+  quizBadge.classList.add('locked');
+  quizBadge.dataset.tooltip = "Vous devez terminer le quiz pour débloquer ce badge";
+  quizProgress.style.width = "0%";
+  quizText.textContent = "0/1";
 });
