@@ -478,3 +478,28 @@ grid-template-columns:1fr;
   font-size: 0.75rem;
   margin-top: 2px;
 }
+/* Barre de progression principale du quiz */
+#progress-bar-container {
+  width: 100%;           /* largeur totale de la barre */
+  max-width: 120px;      /* tu peux ajuster selon ton design */
+  height: 10px;          /* hauteur de la barre */
+  background-color: #ddd; 
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 5px auto 0 auto;  /* centré sous le badge */
+}
+
+#progress-quiz {
+  height: 100%;
+  width: 0%;             /* sera mis à jour via JS */
+  background-color: #4CAF50; 
+  transition: width 0.5s ease;
+}
+
+#progress-text-quiz {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 2px;
+  color: #333;
+}
