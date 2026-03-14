@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil – Hérisson</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="container profile-page">
+
+  <section class="profile-header">
+    <div class="profile-photo">
+      <img id="userPhoto" src="avatar_default.png" alt="Photo de profil">
+      <input type="file" id="photoUpload" accept="image/*" style="display:none;">
+      <button onclick="document.getElementById('photoUpload').click();">Changer la photo</button>
+    </div>
+
+    <div class="profile-info">
+      <h2 id="username">NomUtilisateur</h2>
+      <p id="userEmail">utilisateur@email.com</p>
+      <button onclick="window.location.href='recensement.html';" class="btn">Mes Recensements</button>
+    </div>
+  </section>
+
+  <section class="profile-badges">
+    <h3>Mes Badges</h3>
+    <div class="badges-container">
+      <div class="badge" id="badge-quiz">
+        <img src="badge_quiz.png" alt="Badge Quiz">
+        <p>Quiz complété</p>
+      </div>
+      <div class="badge" id="badge-1">
+        <img src="badge_1.png" alt="1er recensement">
+        <p>1er recensement</p>
+      </div>
+      <div class="badge" id="badge-5">
+        <img src="badge_5.png" alt="5 recensements">
+        <p>5 recensements</p>
+      </div>
+      <div class="badge" id="badge-10">
+        <img src="badge_10.png" alt="10 recensements">
+        <p>10 recensements</p>
+      </div>
+      <div class="badge" id="badge-photo">
+        <img src="badge_photo.png" alt="Meilleure photo du mois">
+        <p>Meilleure photo</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="profil.js"></script>
+</body>
+</html>
