@@ -2,26 +2,19 @@
 const photoInput = document.getElementById('photoUpload');
 const userPhoto = document.getElementById('userPhoto');
 
-photoInput.addEventListener('change', function(){
-  const file = this.files[0];
-  if(file){
-    const reader = new FileReader();// Changer la photo localement
-const photoInput = document.getElementById('photoUpload');
-const userPhoto = document.getElementById('userPhoto');
-
-photoInput.addEventListener('change', function(){
+photoInput.addEventListener('change', function() {
   const file = this.files[0];
   if(file){
     const reader = new FileReader();
     reader.onload = function(e){
       userPhoto.src = e.target.result;
-      // Ici tu peux ajouter l'envoi vers le serveur si besoin
+      // Ici tu peux ajouter l'envoi vers le serveur si nécessaire
     }
     reader.readAsDataURL(file);
   }
 });
 
-// Données utilisateur simulées
+// Données utilisateur simulées (ou à récupérer depuis ton API)
 const userData = {
   quizCompleted: true,
   recensements: 7,
@@ -29,58 +22,22 @@ const userData = {
 };
 
 // Gestion des badges dynamiques
-function updateBadges(){
-  if(!userData.quizCompleted){
-    document.getElementById('badge-quiz').classList.add('locked');
-  }
+function updateBadges() {
+  const badges = [
+    {id: 'badge-quiz', condition: userData.quizCompleted},
+    {id: 'badge-1', condition: userData.recensements >= 1},
+    {id: 'badge-5', condition: userData.recensements >= 5},
+    {id: 'badge-10', condition: userData.recensements >= 10},
+    {id: 'badge-photo', condition: userData.votedBestPhoto}
+  ];
 
-  if(userData.recensements < 1){
-    document.getElementById('badge-1').classList.add('locked');
-  }
-  if(userData.recensements < 5){
-    document.getElementById('badge-5').classList.add('locked');
-  }
-  if(userData.recensements < 10){
-    document.getElementById('badge-10').classList.add('locked');
-  }
-
-  if(!userData.votedBestPhoto){
-    document.getElementById('badge-photo').classList.add('locked');
-  }
-}
-
-updateBadges();
-    reader.onload = function(e){
-      userPhoto.src = e.target.result;
-      // Ici on peut envoyer le fichier sur le serveur si nécessaire
+  badges.forEach(badge => {
+    const el = document.getElementById(badge.id);
+    if(!badge.condition) {
+      el.classList.add('locked'); // grisé et inactif via CSS
     }
-    reader.readAsDataURL(file);
-  }
-});
-
-// Exemple badges dynamiques
-// Supposons que tu as ces données depuis ton stockage ou base
-const userData = {
-  quizCompleted: true,
-  recensements: 7,
-  votedBestPhoto: false
-};
-
-// Gestion des badges
-if(!userData.quizCompleted){
-  document.getElementById('badge-quiz').style.opacity = 0.3;
+  });
 }
 
-if(userData.recensements < 1){
-  document.getElementById('badge-1').style.opacity = 0.3;
-}
-if(userData.recensements < 5){
-  document.getElementById('badge-5').style.opacity = 0.3;
-}
-if(userData.recensements < 10){
-  document.getElementById('badge-10').style.opacity = 0.3;
-}
-
-if(!userData.votedBestPhoto){
-  document.getElementById('badge-photo').style.opacity = 0.3;
-}
+// Initialisation
+updateBadges();
