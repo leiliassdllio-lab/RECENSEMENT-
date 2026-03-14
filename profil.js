@@ -66,18 +66,17 @@ async function loadQuizProgress(uid) {
   const quizBadge = document.getElementById('badge-quiz');
   const quizProgress = document.getElementById('progress-quiz');
   const quizText = document.getElementById('progress-text-quiz');
-
-  quizProgress.style.width = percent + "%";
-  quizText.textContent = `${completed}/${totalQuizzes}`;
-
-  if(completed === totalQuizzes){
+  
+  if(userData.quizCompleted){
     quizBadge.classList.remove('locked');
-    quizBadge.dataset.tooltip = "Quiz terminé ! Badge débloqué.";
+    quizProgress.style.width = "100%";
+    quizText.textContent = "Terminé";
   } else {
     quizBadge.classList.add('locked');
-    quizBadge.dataset.tooltip = "Vous devez terminer tous les quiz pour débloquer ce badge";
+    quizBadge.dataset.tooltip = "Vous devez terminer le quiz pour débloquer ce badge";
+    quizProgress.style.width = "0%";
+    quizText.textContent = "0/1";
   }
-}
 
 // --- Initialisation badges et profil ---
 onAuthStateChanged(auth, async user => {
