@@ -27,41 +27,51 @@
       <h3>Mes Badges</h3>
       <div class="badges-container">
 
-        <div class="badge" id="badge-quiz" data-tooltip="Compléter tous les quiz">
-          <img src="badge_quiz.png" alt="Badge Quiz">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-quiz"></div>
+        <div class="badge-box">
+          <div class="badge" id="badge-quiz" data-tooltip="Compléter tous les quiz">
+            <img src="badge_quiz.png" alt="Badge Quiz">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-quiz"></div>
+            </div>
+            <span class="progress-text" id="progress-text-quiz">0/1</span>
           </div>
-          <span class="progress-text" id="progress-text-quiz">0/1</span>
         </div>
 
-        <div class="badge" id="badge-1" data-tooltip="Vous devez recenser 1 hérisson pour débloquer ce badge">
-          <img src="badge1.png" alt="Badge 1 recensement">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-1"></div>
+        <div class="badge-box">
+          <div class="badge" id="badge-1" data-tooltip="Vous devez recenser 1 hérisson pour débloquer ce badge">
+            <img src="badge1.png" alt="Badge 1 recensement">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-1"></div>
+            </div>
+            <span class="progress-text" id="progress-text-1">0/1</span>
           </div>
-          <span class="progress-text" id="progress-text-1">0/1</span>
         </div>
 
-        <div class="badge" id="badge-5" data-tooltip="Vous devez recenser 5 hérissons pour débloquer ce badge">
-          <img src="badge5.png" alt="Badge 5 recensements">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-5"></div>
+        <div class="badge-box">
+          <div class="badge" id="badge-5" data-tooltip="Vous devez recenser 5 hérissons pour débloquer ce badge">
+            <img src="badge5.png" alt="Badge 5 recensements">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-5"></div>
+            </div>
+            <span class="progress-text" id="progress-text-5">0/5</span>
           </div>
-          <span class="progress-text" id="progress-text-5">0/5</span>
         </div>
 
-        <div class="badge" id="badge-10" data-tooltip="Vous devez recenser 10 hérissons pour débloquer ce badge">
-          <img src="badge10.png" alt="Badge 10 recensements">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-10"></div>
+        <div class="badge-box">
+          <div class="badge" id="badge-10" data-tooltip="Vous devez recenser 10 hérissons pour débloquer ce badge">
+            <img src="badge10.png" alt="Badge 10 recensements">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-10"></div>
+            </div>
+            <span class="progress-text" id="progress-text-10">0/10</span>
           </div>
-          <span class="progress-text" id="progress-text-10">0/10</span>
         </div>
 
-        <div class="badge" id="badge-photo" data-tooltip="Meilleure photo du mois">
-          <img src="badge_photo.png" alt="Meilleure photo">
-          <p>Meilleure photo</p>
+        <div class="badge-box">
+          <div class="badge" id="badge-photo" data-tooltip="Meilleure photo du mois">
+            <img src="badge_photo.png" alt="Meilleure photo">
+            <p>Meilleure photo</p>
+          </div>
         </div>
 
       </div>
@@ -70,130 +80,109 @@
   </main>
 
   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-// --- Config Firebase ---
-const firebaseConfig = {
-  apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
-  authDomain: "herisson-f80ba.firebaseapp.com",
-  projectId: "herisson-f80ba",
-  storageBucket: "herisson-f80ba.firebasestorage.app",
-  messagingSenderId: "142270421417",
-  appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+      authDomain: "herisson-f80ba.firebaseapp.com",
+      projectId: "herisson-f80ba",
+      storageBucket: "herisson-f80ba.firebasestorage.app",
+      messagingSenderId: "142270421417",
+      appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-// --- Déconnexion (si bouton logout existe) ---
-const logoutBtn = document.getElementById("logoutBtn");
-if(logoutBtn){
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-    localStorage.removeItem("username");
-    window.location.href = "login.html";
-  });
-}
+    const photoInput = document.getElementById('photoUpload');
+    const userPhoto = document.getElementById('userPhoto');
+    photoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          userPhoto.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
 
-// --- Changer photo ---
-const photoInput = document.getElementById('photoUpload');
-const userPhoto = document.getElementById('userPhoto');
-photoInput.addEventListener('change', function() {
-  const file = this.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = function(e){
-      userPhoto.src = e.target.result;
+    async function getRecensementsCount(uid) {
+      const q = query(collection(db, "recensements"), where("uid", "==", uid));
+      const snapshot = await getDocs(q);
+      return snapshot.size;
     }
-    reader.readAsDataURL(file);
-  }
-});
 
-// --- Compter recensements ---
-async function getRecensementsCount(uid) {
-  const q = query(collection(db, "recensements"), where("uid", "==", uid));
-  const snapshot = await getDocs(q);
-  return snapshot.size;
-}
+    function updateRecensementBadges(count) {
+      const badgeRecensements = [
+        {id: 'badge-1', target: 1},
+        {id: 'badge-5', target: 5},
+        {id: 'badge-10', target: 10},
+      ];
 
-// --- Mettre à jour badges recensements ---
-function updateRecensementBadges(count) {
-  const badgeRecensements = [
-    {id: 'badge-1', target: 1},
-    {id: 'badge-5', target: 5},
-    {id: 'badge-10', target: 10},
-  ];
+      badgeRecensements.forEach(b => {
+        const fill = document.getElementById(`progress-${b.target}`);
+        const text = document.getElementById(`progress-text-${b.target}`);
+        const badgeEl = document.getElementById(b.id);
 
-  badgeRecensements.forEach(b => {
-    const fill = document.getElementById(`progress-${b.target}`);
-    const text = document.getElementById(`progress-text-${b.target}`);
-    const badgeEl = document.getElementById(b.id);
+        const progress = Math.min(count / b.target, 1);
+        fill.style.width = (progress * 100) + "%";
+        text.textContent = `${Math.min(count, b.target)}/${b.target}`;
 
-    const progress = Math.min(count / b.target, 1);
-    fill.style.width = (progress * 100) + "%";
-    text.textContent = `${Math.min(count, b.target)}/${b.target}`;
-
-    if(count < b.target){
-      badgeEl.classList.add('locked');
-      badgeEl.dataset.tooltip = `Vous devez recenser ${b.target} hérissons pour débloquer ce badge`;
-    } else {
-      badgeEl.classList.remove('locked');
-      badgeEl.dataset.tooltip = `Badge débloqué !`;
+        if(count < b.target){
+          badgeEl.classList.add('locked');
+          badgeEl.dataset.tooltip = `Vous devez recenser ${b.target} hérissons pour débloquer ce badge`;
+        } else {
+          badgeEl.classList.remove('locked');
+          badgeEl.dataset.tooltip = `Badge débloqué !`;
+        }
+      });
     }
-  });
-}
 
-// --- Charger progression quiz ---
-async function loadQuizProgress(uid) {
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
+    async function loadQuizProgress(uid) {
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
 
-  let quizScores = {};
-  if(userSnap.exists()){
-    quizScores = userSnap.data().quizScores || {};
-  }
+      let quizScores = {};
+      if(userSnap.exists()){
+        quizScores = userSnap.data().quizScores || {};
+      }
 
-  const totalQuizzes = 4;
-  let completed = 0;
-  for(const q of ['scientifique','comportement','ecologie','sante']){
-    if(quizScores[q] === 20) completed++;
-  }
+      const totalQuizzes = 4;
+      let completed = 0;
+      for(const q of ['scientifique','comportement','ecologie','sante']){
+        if(quizScores[q] === 20) completed++;
+      }
 
-  const percent = (completed / totalQuizzes) * 100;
-  const quizBadge = document.getElementById('badge-quiz');
-  const quizProgress = document.getElementById('progress-quiz');
-  const quizText = document.getElementById('progress-text-quiz');
+      const percent = (completed / totalQuizzes) * 100;
+      const quizBadge = document.getElementById('badge-quiz');
+      const quizProgress = document.getElementById('progress-quiz');
+      const quizText = document.getElementById('progress-text-quiz');
 
-  if(completed === totalQuizzes){
-    quizBadge.classList.remove('locked');
-    quizProgress.style.width = "100%";
-    quizText.textContent = "Terminé";
-  } else {
-    quizBadge.classList.add('locked');
-    quizBadge.dataset.tooltip = "Vous devez terminer tous les quiz pour débloquer ce badge";
-    quizProgress.style.width = (percent) + "%";
-    quizText.textContent = `${completed}/${totalQuizzes}`;
-  }
-}
+      if(completed === totalQuizzes){
+        quizBadge.classList.remove('locked');
+        quizProgress.style.width = "100%";
+        quizText.textContent = "Terminé";
+      } else {
+        quizBadge.classList.add('locked');
+        quizBadge.dataset.tooltip = "Vous devez terminer tous les quiz pour débloquer ce badge";
+        quizProgress.style.width = (percent) + "%";
+        quizText.textContent = `${completed}/${totalQuizzes}`;
+      }
+    }
 
-// --- Initialisation profil et badges ---
-onAuthStateChanged(auth, async user => {
-  if(!user) return window.location.href = "login.html";
+    onAuthStateChanged(auth, async user => {
+      if(!user) return window.location.href = "login.html";
+      document.getElementById("userEmail").textContent = user.email || "Non renseigné";
+      document.getElementById("username").textContent = localStorage.getItem("username") || "Inconnu";
 
-  // Afficher username et email
-  document.getElementById("userEmail").textContent = user.email || "Non renseigné";
-  document.getElementById("username").textContent = localStorage.getItem("username") || "Inconnu";
-
-  // Récupérer nombre de recensements et mettre à jour badges
-  const recensementsCount = await getRecensementsCount(user.uid);
-  updateRecensementBadges(recensementsCount);
-
-  // Charger progression quiz
-  await loadQuizProgress(user.uid);
-});
+      const recensementsCount = await getRecensementsCount(user.uid);
+      updateRecensementBadges(recensementsCount);
+      await loadQuizProgress(user.uid);
+    });
   </script>
 </body>
 </html>
