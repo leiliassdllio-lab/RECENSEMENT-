@@ -389,20 +389,6 @@ grid-template-columns:1fr;
   gap: 20px;
   justify-content: center;
 }
-
-.badge-box {
-  width: 140px;
-  height: 160px;
-  background-color: #f7f9f7;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-}
-
 .badge {
   display: flex;
   flex-direction: column;
@@ -420,14 +406,6 @@ grid-template-columns:1fr;
   border-radius: 10px;
   border: 2px solid #4CAF50;
   margin-bottom: 5px;
-}
-
-.badge .progress-bar {
-  width: 80%;
-  height: 8px;
-  background-color: #ddd;
-  border-radius: 4px;
-  overflow: hidden;
 }
 
 .badge .progress-fill {
@@ -469,16 +447,41 @@ grid-template-columns:1fr;
   opacity: 1;
 }
 
-@media (max-width: 480px) {
-  .badge-box {
-    width: 120px;
-    height: 140px;
-  }
-  .badge img {
+.badge-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;             /* largeur du carré */
+  height: 170px;            /* hauteur du carré */
+  padding: 10px;
+  border-radius: 15px;      /* coins arrondis */
+  background-color: #f0f4f8; /* couleur claire */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin: 10px;             /* espace entre les carrés */
+  flex-direction: column;   /* empile contenu verticalement */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}  
+.badge-box:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+.badge img {
     width: 60px;
     height: 60px;
-  }
-  .badge .progress-bar {
-    width: 70%;
-  }
+}
+.badge .progress-bar {
+  width: 80%;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+.badge-box .badge {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
