@@ -383,3 +383,47 @@ grid-template-columns:1fr;
   color:#4CAF50;
   text-align:center;
 }
+/* Tooltip container */
+.badge {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Tooltip text */
+.badge::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%; /* au-dessus du badge */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+/* Flèche du tooltip */
+.badge::before {
+  content: '';
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0,0,0,0.75) transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Affiche tooltip au survol */
+.badge:hover::after,
+.badge:hover::before {
+  opacity: 1;
+}
