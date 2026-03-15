@@ -392,18 +392,27 @@ grid-template-columns:1fr;
 }
 
 .badge{
+  display:flex;
+  flex-direction:column; /* image + barre + texte empilés */
+  align-items:center;
+  justify-content:flex-start;
+  width:120px;  /* largeur fixe de la case */
+  height:150px; /* hauteur fixe de la case */
+  padding:10px;
+  border-radius:12px; /* coins arrondis */
+  background:#f7f9f7;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
   text-align:center;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
+  position:relative;
 }
 
 .badge img{
   width:70px;
   height:70px;
   object-fit:contain;
+  margin-bottom:8px;
   border-radius:10px;
-  border: 2px solid #4CAF50;
+  border:2px solid #4CAF50;
 }
 
 .badge p{
@@ -411,16 +420,11 @@ grid-template-columns:1fr;
   font-size:0.9rem;
   font-weight:bold;
 }
-.badges-container{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  justify-content:center;
-}
+
 
 /* Effet au survol */
 .badge:hover{
-  transform:translateY(-5px) scale(1.1);
+  transform:translateY(-5px) scale(1.05);
   box-shadow:0 6px 15px rgba(0,0,0,0.2);
 }
 
@@ -456,28 +460,29 @@ grid-template-columns:1fr;
   filter: grayscale(80%);
 }  
 /* Barre de progression sous les badges */
-.badge .progress-bar {
-  width: 70px;           /* même largeur que l'image du badge */
-  height: 8px;
-  background-color: #ddd;
-  border-radius: 4px;
-  margin: 5px auto 0 auto; /* centré sous l'image */
-  overflow: hidden;
+.badge .progress-bar{
+  width:80%; /* légèrement plus petite que la case */
+  height:8px;
+  background-color:#ddd;
+  border-radius:4px;
+  overflow:hidden;
+  margin-top:5px;
 }
 
 .badge .progress-fill {
   height: 100%;
   width: 0%;
   background-color: #4CAF50;
-  transition: width 0.5s;
+  transition: width 0.5s ease;
 }
+.badge .progress-text{
+  display:block;
+  font-size:0.75rem;
+  margin-top:2px;
+  text-align:center;
+  color:#333
 
-.badge .progress-text {
-  display: block;
-  text-align: center;
-  font-size: 0.75rem;
-  margin-top: 2px;
-}
+
 /* Barre de progression principale du quiz */
 #progress-bar-container {
   width: 100%;           /* largeur totale de la barre */
