@@ -203,16 +203,20 @@ if(!snap.exists())return;
 
 const scores=snap.data().quizScores||{};
 let completed=0;
-if(scores.scientifique)completed++;
-if(scores.comportement)completed++;
-if(scores.ecologie)completed++;
-if(scores.sante)completed++;
+const scores = snap.data().quizScores || {};
+let completed = 0;
 
-const percent=(completed/4)*100;
+const quizzes = ["scientifique","comportement","ecologie","sante"];
+
+quizzes.forEach(q=>{
+  if(scores[q] >= 20) completed++;
+});
+
+const percent=(completed/quizzes.length)*100;
 document.getElementById("progress-quiz").style.width=percent+"%";
 document.getElementById("progress-text-quiz").textContent=completed+"/4";
 
-if(completed===4)document.getElementById("badge-quiz").classList.remove("locked");
+if(completed===quizzes.length)document.getElementById("badge-quiz").classList.remove("locked");
 else document.getElementById("badge-quiz").classList.add("locked");
 }
 
