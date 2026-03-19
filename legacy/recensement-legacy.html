@@ -245,7 +245,6 @@ form.addEventListener('submit', async e=>{
   const recensement = {
   uid: auth.currentUser.uid,
   username: localStorage.getItem("username") || "Inconnu",
-  email: auth.currentUser.email || "Non renseigné",
   lieu: document.getElementById('lieu').value,
   date: dateInput.value,
   notes: document.getElementById('notes').value,

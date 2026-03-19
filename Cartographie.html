@@ -523,6 +523,20 @@ function formatText(value,fallback="Non renseigné"){
   return text ? text : fallback;
 }
 
+function looksLikeEmail(value){
+  const text = String(value ?? "").trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
+}
+
+function getPublicReporterName(data){
+  const username = String(data.username ?? "").trim();
+  if(username && !looksLikeEmail(username)){
+    return username;
+  }
+
+  return "Participant";
+}
+
 function buildPopupContent(data){
   const popup = document.createElement("div");
   const lines = [
@@ -530,7 +544,7 @@ function buildPopupContent(data){
     ["Date", formatText(data.date, "Date non renseignée")],
     ["État", formatText(data.etat, "N/A")],
     ["Sous-état", formatText(data.sousEtat, "N/A")],
-    ["Utilisateur", formatText(data.username, "Inconnu")]
+    ["Signalé par", getPublicReporterName(data)]
   ];
 
   if(data.notes){
@@ -579,7 +593,7 @@ function renderRecensementsList(items){
 
   container.innerHTML = items.map(data => {
     const status = getStatusInfo(data);
-    const username = escapeHtml(formatText(data.username, "Inconnu"));
+    const username = escapeHtml(getPublicReporterName(data));
     const lieu = escapeHtml(formatText(data.lieu, "Non renseignée"));
     const environnement = escapeHtml(formatText(data.environnement, "Non renseigné"));
     const date = escapeHtml(formatText(data.date, "Date non renseignée"));
@@ -595,7 +609,7 @@ function renderRecensementsList(items){
           <span class="recensement-date">${date}</span>
         </div>
         <div class="recensement-meta">
-          <div><strong>Utilisateur :</strong> ${username}</div>
+          <div><strong>Signalé par :</strong> ${username}</div>
           <div><strong>Adresse :</strong> ${lieu}</div>
           <div><strong>Environnement :</strong> ${environnement}</div>
           <div><strong>Coordonnées :</strong> ${data.latitude?.toFixed?.(5) ?? 'N/A'}, ${data.longitude?.toFixed?.(5) ?? 'N/A'}</div>
