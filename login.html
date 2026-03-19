@@ -18,15 +18,28 @@ p { font-size:0.9em; margin-top:12px; }
 a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 .error { color:red; margin-top:10px; font-size:0.9em; }
 .hidden { display:none; }
+.back-box { display:flex; justify-content:center; margin:-4px 0 18px; }
+.back-link {
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:10px;
+  background:#ffffff;
+  color:#2f4f2f;
+  text-decoration:none;
+  font-weight:bold;
+  border:2px solid #d9e6d9;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+}
+.back-link:hover { background:#f1f7f1; }
 </style>
 </head>
 <body>
 
 <div class="container">
-
   <!-- Connexion -->
   <div id="loginDiv">
     <h1>Connexion</h1>
+    <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
     <input type="text" id="loginUser" placeholder="Nom d’utilisateur / Email">
     <input type="password" id="loginPass" placeholder="Mot de passe">
     <button id="loginBtn">Se connecter</button>
@@ -38,6 +51,7 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
   <!-- Création compte -->
   <div id="signupDiv" class="hidden">
     <h1>Créer un compte</h1>
+    <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
     <input type="text" id="signupUser" placeholder="Nom d’utilisateur">
     <input type="email" id="signupEmail" placeholder="Email">
     <input type="password" id="signupPass" placeholder="Mot de passe">

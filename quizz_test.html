@@ -7,6 +7,7 @@
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f6f0; }
 header { background:#4CAF50; padding:15px; text-align:center; color:white; }
+.back-box { display:flex; justify-content:center; margin-top:14px; }
 .container { max-width: 1000px; margin: 20px auto; padding: 10px; }
 .quiz-cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
 .quiz-card {
@@ -24,13 +25,15 @@ header { background:#4CAF50; padding:15px; text-align:center; color:white; }
 #progress-container { background-color: #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px; height:20px;}
 #progress-bar { width:0%; height:100%; background-color:#4CAF50; transition: width 0.3s;}
 .btn { padding:10px 15px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px; display:inline-block; margin-top:10px; }
+.back-link { background:white; color:#2f4f2f; border:2px solid #d9e6d9; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
+.back-link:hover { background:#f1f7f1; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Quiz Hérisson 🦔🌿</h1>
-  <a href="index.html" class="btn">Retour à l'accueil</a>
+  <div class="back-box"><a href="index.html" class="btn back-link">Retour à l'accueil</a></div>
 </header>
 
 <div class="container">

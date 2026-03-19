@@ -19,7 +19,7 @@
   h1 {
     color: #4CAF50;
     font-size:2em;
-    margin-bottom:20px;
+    margin-bottom:12px;
     animation: fadeIn 2s ease-in-out;
   }
   p {
@@ -44,24 +44,30 @@
     50% { transform: translateY(-15px);}
   }
 
+  .back-box {
+    display:flex;
+    justify-content:center;
+    margin:0 0 20px;
+  }
   a {
-    margin-top:20px;
     display:inline-block;
-    padding:10px 20px;
-    background-color:#4CAF50;
-    color:white;
-    border-radius:8px;
+    padding:10px 18px;
+    background-color:white;
+    color:#2f4f2f;
+    border-radius:10px;
     text-decoration:none;
     font-weight:bold;
+    border:2px solid #d9e6d9;
+    box-shadow:0 3px 10px rgba(0,0,0,0.06);
     transition: background 0.3s;
   }
-  a:hover { background-color:#43a047; }
+  a:hover { background-color:#f1f7f1; }
 </style>
 </head>
 <body>
   <div class="hedgehog">🦔</div>
   <h1>Votre recensement a été enregistré !</h1>
+  <div class="back-box"><a href="index.html">Retour à l'accueil</a></div>
   <p>Merci pour votre contribution à la protection des hérissons.</p>
-  <a href="index.html">Retour à l'accueil</a>
 </body>
 </html>

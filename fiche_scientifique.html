@@ -21,11 +21,34 @@ header {
   padding: 30px 20px;
 }
 
+.back-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
 main {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  gap: 24px;
   padding: 40px 20px;
+}
+
+.back-link {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: white;
+  color: #2E5E3E;
+  text-decoration: none;
+  font-weight: bold;
+  border: 2px solid #d8e3d8;
+}
+
+.back-link:hover {
+  background: #f3f6f1;
 }
 
 .scientific-card {
@@ -92,10 +115,10 @@ footer {
 
 <header>
   <h1>🦔 Fiche scientifique du Hérisson</h1>
+  <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
 </header>
 
 <main>
-
   <div class="scientific-card">
 
     <img src="im_herisson.png" alt="Hérisson européen">
