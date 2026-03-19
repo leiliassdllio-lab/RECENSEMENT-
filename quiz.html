@@ -5,20 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quiz Hérisson – Team hérisson</title>
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f6f0; }
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f6f0; min-height:100vh; display:flex; flex-direction:column; }
 header { background:#4CAF50; padding:15px; text-align:center; color:white; }
 .back-box { display:flex; justify-content:center; margin-top:14px; }
-.container { max-width: 1000px; margin: 20px auto; padding: 10px; }
-.quiz-cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.container { width:min(1000px, calc(100% - 32px)); margin: 32px auto; padding: 10px; flex:1; display:flex; flex-direction:column; justify-content:center; }
+.quiz-intro { text-align:center; max-width:700px; margin:0 auto 28px; color:#355335; }
+.quiz-cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:stretch; }
 .quiz-card {
-  background:#e8f5e9; border-radius:10px; padding:20px; width:280px; text-align:center;
-  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;
+  background:#e8f5e9; border-radius:16px; padding:22px; width:280px; text-align:center;
+  cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.12); transition: transform 0.2s, box-shadow 0.2s;
 }
-.quiz-card:hover { transform: translateY(-5px); }
+.quiz-card:hover { transform: translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.16); }
 .quiz-card h3 { margin-top:0; }
 .score-bar-container { width: 100%; height: 15px; background: #ddd; border-radius: 8px; overflow: hidden; margin-top:5px; }
 .score-bar { width: 0%; height: 100%; background: #4CAF50; transition: width 0.5s; }
-#quiz-container { margin-top:30px; display:none; max-width:600px; }
+#quiz-container { margin:0 auto; display:none; width:min(680px, 100%); background:white; border-radius:18px; padding:28px; box-shadow:0 12px 28px rgba(0,0,0,0.12); text-align:center; }
+#question { margin-top:0; color:#244224; }
 #answers button { width:100%; text-align:left; margin:5px 0; padding:8px; border:none; border-radius:5px; cursor:pointer; font-size:16px; }
 .correct { background-color:#4CAF50; color:white; }
 .wrong { background-color:#F44336; color:white; }
@@ -27,6 +29,13 @@ header { background:#4CAF50; padding:15px; text-align:center; color:white; }
 .btn { padding:10px 15px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px; display:inline-block; margin-top:10px; }
 .back-link { background:white; color:#2f4f2f; border:2px solid #d9e6d9; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.06); }
 .back-link:hover { background:#f1f7f1; }
+footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
+
+@media (max-width: 640px) {
+  .container { margin:20px auto; }
+  #quiz-container { padding:20px; }
+  .quiz-card { width:100%; }
+}
 </style>
 </head>
 <body>
@@ -37,6 +46,7 @@ header { background:#4CAF50; padding:15px; text-align:center; color:white; }
 </header>
 
 <div class="container">
+  <p class="quiz-intro">Choisis un theme pour lancer un quiz et tester tes connaissances sur les herissons.</p>
   <div class="quiz-cards">
     <div class="quiz-card" onclick="selectQuiz('scientifique')">
       <h3>🔬 Scientifique</h3>
@@ -73,7 +83,7 @@ header { background:#4CAF50; padding:15px; text-align:center; color:white; }
   </div>
 </div>
 
-<footer style="text-align:center; padding:15px; background:#4CAF50; color:white;">
+<footer>
   © <span id="year"></span> – Team hérisson
 </footer>
 <script type="module">
