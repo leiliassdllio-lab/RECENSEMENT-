@@ -452,6 +452,8 @@ grid-template-columns:1fr;
   opacity: 1;
 }
 
+}
+
 /* SHARED PAGE SYSTEM */
 
 :root{
@@ -476,56 +478,62 @@ grid-template-columns:1fr;
 }
 
 .site-header{
-  background:linear-gradient(135deg, var(--site-primary) 0%, var(--site-primary-dark) 100%);
-  color:#fff;
-  text-align:center;
-  padding:28px 20px 22px;
-  box-shadow:0 8px 24px rgba(47,122,57,0.20);
+  background:linear-gradient(135deg, var(--site-primary) 0%, var(--site-primary-dark) 100%) !important;
+  color:#fff !important;
+  text-align:center !important;
+  padding:28px 20px 22px !important;
+  box-shadow:0 8px 24px rgba(47,122,57,0.20) !important;
 }
 
 .site-header-inner{
-  width:min(1080px, calc(100% - 32px));
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  text-align:center;
+  width:min(1080px, calc(100% - 32px)) !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+  text-align:center !important;
 }
 
 .site-header h1{
-  margin:0;
-  font-size:clamp(2rem, 3vw, 2.7rem);
-  text-shadow:1px 1px 4px rgba(0,0,0,0.18);
-  text-align:center;
+  margin:0 !important;
+  font-size:clamp(2rem, 3vw, 2.7rem) !important;
+  text-shadow:1px 1px 4px rgba(0,0,0,0.18) !important;
+  text-align:center !important;
+  color:#fff !important;
 }
 
 .site-header p{
-  margin:12px auto 0;
-  max-width:760px;
-  opacity:0.95;
+  margin:12px auto 0 !important;
+  max-width:760px !important;
+  opacity:0.95 !important;
+  text-align:center !important;
+  color:#fff !important;
 }
 
 .site-header .back-box{
-  width:100%;
-  justify-content:center;
-  margin:4px 0 0;
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  margin:4px 0 0 !important;
 }
 
 .site-header .back-link,
 .site-header .nav-link{
-  background:rgba(255,255,255,0.14);
-  color:#ffffff;
-  border:1px solid rgba(255,255,255,0.32);
-  box-shadow:none;
+  display:inline-block !important;
+  background:rgba(255,255,255,0.14) !important;
+  color:#ffffff !important;
+  border:1px solid rgba(255,255,255,0.32) !important;
+  box-shadow:none !important;
   backdrop-filter:blur(4px);
+  text-align:center !important;
 }
 
 .site-header .back-link:hover,
 .site-header .nav-link:hover{
-  background:rgba(255,255,255,0.22);
-  color:#ffffff;
+  background:rgba(255,255,255,0.22) !important;
+  color:#ffffff !important;
 }
 
 .site-main{
