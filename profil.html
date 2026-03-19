@@ -8,71 +8,303 @@
 
 <style>
 html{scroll-behavior:smooth}
-.container{width:90%;max-width:1000px;margin:auto;padding:40px 0}
-h2{color:#4CAF50;text-align:center}
-h3{text-align:center;margin-top:40px}
-.page-title{text-align:center;color:#4CAF50;margin:0}
-.back-box{display:flex;justify-content:center;margin:14px 0 28px}
-.back-link{display:inline-block;padding:10px 18px;border-radius:10px;background:#fff;color:#2f4f2f;text-decoration:none;font-weight:bold;border:2px solid #d9e6d9;box-shadow:0 3px 10px rgba(0,0,0,.06);transition:all .3s}
-.back-link:hover{background:#f1f7f1;transform:translateY(-2px)}
-
-.profile-header{display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;margin-bottom:40px}
-.profile-photo{text-align:center}
-.profile-photo img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #4CAF50}
-.profile-photo button{margin-top:10px;padding:6px 10px}
-
-.profile-info{text-align:center}
-
-.badges-container{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:20px}
-.badge-box{background:#f0f0f0;border-radius:15px;padding:15px;width:110px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-.badge img{width:80%}
-.progress-bar{background:#e0e0e0;border-radius:10px;height:10px;margin-top:10px}
-.progress-fill{background:#4CAF50;height:100%;width:0%;border-radius:10px;transition:width .4s}
-.progress-text{font-size:12px;margin-top:5px;color:#555}
-.locked{opacity:.4}
-/* Tooltip container */
-.badge {
-  position: relative;
-  cursor: pointer;
+body{
+margin:0;
+background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
+color:#203224;
 }
-
-/* Tooltip text */
-.badge::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 120%; /* au-dessus du badge */
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 5px;
-  white-space: nowrap;
-  font-size: 12px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  z-index: 10;
+.container{
+width:min(92%,1100px);
+margin:26px auto 40px;
 }
-
-/* Flèche du tooltip */
-.badge::before {
-  content: '';
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 5px;
-  border-style: solid;
-  border-color: rgba(0,0,0,0.75) transparent transparent transparent;
-  opacity: 0;
-  transition: opacity 0.3s;
+.profile-shell{
+display:grid;
+gap:24px;
 }
-
-/* Affiche tooltip au survol */
+.hero-panel,
+.badges-panel{
+background:white;
+border:1px solid rgba(111,153,118,.16);
+border-radius:24px;
+box-shadow:0 18px 38px rgba(48,84,56,.12);
+padding:30px;
+}
+.hero-intro{
+text-align:center;
+margin-bottom:24px;
+}
+.page-kicker{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:8px 14px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-weight:bold;
+font-size:.92rem;
+}
+.page-title{
+margin:16px 0 10px;
+font-size:clamp(2rem,3.5vw,2.8rem);
+line-height:1.08;
+color:#234b2c;
+text-align:center;
+}
+.page-subtitle{
+max-width:620px;
+margin:0 auto;
+color:#5a6f5e;
+line-height:1.6;
+text-align:center;
+}
+.profile-card{
+display:grid;
+grid-template-columns:280px minmax(0,1fr);
+gap:26px;
+align-items:stretch;
+}
+.profile-photo-card{
+background:linear-gradient(180deg,#f8fcf7 0%,#eef6eb 100%);
+border:1px solid #dce9d8;
+border-radius:22px;
+padding:24px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:14px;
+text-align:center;
+}
+.profile-photo img{
+width:140px;
+height:140px;
+border-radius:50%;
+object-fit:cover;
+border:5px solid white;
+box-shadow:0 12px 24px rgba(47,122,57,.18);
+}
+.photo-button{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:11px 16px;
+border-radius:12px;
+background:#2f7a39;
+color:white;
+font-weight:bold;
+border:none;
+cursor:pointer;
+transition:background .2s,transform .2s;
+}
+.photo-button:hover{
+background:#286931;
+transform:translateY(-1px);
+}
+.photo-help{
+font-size:.92rem;
+color:#5a6f5e;
+line-height:1.5;
+margin:0;
+}
+.profile-info-card{
+display:grid;
+gap:18px;
+}
+.identity-card,
+.actions-card,
+.stats-card{
+background:#fcfdfb;
+border:1px solid #e0ebdc;
+border-radius:20px;
+padding:20px;
+}
+.identity-card h2{
+margin:0 0 8px;
+font-size:2rem;
+color:#234b2c;
+text-align:left;
+}
+.identity-card p{
+margin:0;
+color:#5a6f5e;
+font-size:1rem;
+}
+.mini-label{
+display:block;
+margin-bottom:10px;
+color:#6b7f6f;
+font-size:.82rem;
+font-weight:bold;
+letter-spacing:.05em;
+text-transform:uppercase;
+}
+.actions-row{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+}
+.primary-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:12px 18px;
+border-radius:12px;
+background:#2f7a39;
+color:white;
+text-decoration:none;
+font-weight:bold;
+transition:background .2s,transform .2s;
+}
+.primary-link:hover{
+background:#286931;
+transform:translateY(-1px);
+}
+.secondary-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:12px 18px;
+border-radius:12px;
+background:white;
+color:#33523a;
+text-decoration:none;
+font-weight:bold;
+border:1px solid #d6e5d4;
+transition:background .2s,transform .2s;
+}
+.secondary-link:hover{
+background:#f3f7f2;
+transform:translateY(-1px);
+}
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:14px;
+}
+.stat-box{
+padding:16px;
+border-radius:16px;
+background:white;
+border:1px solid #e0ebdc;
+text-align:center;
+}
+.stat-value{
+display:block;
+font-size:1.6rem;
+font-weight:bold;
+color:#234b2c;
+}
+.stat-label{
+display:block;
+margin-top:6px;
+font-size:.9rem;
+color:#5a6f5e;
+}
+.badges-heading{
+text-align:center;
+margin-bottom:20px;
+}
+.badges-heading h3{
+margin:0 0 10px;
+font-size:1.8rem;
+color:#234b2c;
+}
+.badges-heading p{
+margin:0;
+color:#5a6f5e;
+}
+.badges-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:18px;
+margin-top:20px;
+}
+.badge-box{
+background:linear-gradient(180deg,#fbfef9 0%,#f5f8f3 100%);
+border:1px solid #e0ebdc;
+border-radius:20px;
+padding:18px 16px;
+text-align:center;
+box-shadow:0 10px 24px rgba(51,82,58,.07);
+}
+.badge{
+position:relative;
+cursor:pointer;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:10px;
+}
+.badge img{
+width:88px;
+height:88px;
+object-fit:contain;
+}
+.progress-bar{
+width:100%;
+background:#e0e8dd;
+border-radius:999px;
+height:10px;
+margin-top:2px;
+overflow:hidden;
+}
+.progress-fill{
+background:linear-gradient(90deg,#58b362 0%,#3f8f49 100%);
+height:100%;
+width:0%;
+border-radius:999px;
+transition:width .4s;
+}
+.progress-text{
+font-size:12px;
+color:#55685a;
+font-weight:bold;
+}
+.locked{opacity:.42}
+.badge::after{
+content:attr(data-tooltip);
+position:absolute;
+bottom:115%;
+left:50%;
+transform:translateX(-50%);
+background:rgba(18,29,21,.88);
+color:#fff;
+padding:8px 11px;
+border-radius:8px;
+white-space:normal;
+width:max-content;
+max-width:200px;
+font-size:12px;
+line-height:1.35;
+opacity:0;
+pointer-events:none;
+transition:opacity .3s;
+z-index:10;
+}
+.badge::before{
+content:"";
+position:absolute;
+bottom:107%;
+left:50%;
+transform:translateX(-50%);
+border-width:6px;
+border-style:solid;
+border-color:rgba(18,29,21,.88) transparent transparent transparent;
+opacity:0;
+transition:opacity .3s;
+}
 .badge:hover::after,
-.badge:hover::before {
-  opacity: 1;
+.badge:hover::before{
+opacity:1;
+}
+@media (max-width: 860px){
+.profile-card{
+grid-template-columns:1fr;
+}
+.stats-grid{
+grid-template-columns:1fr;
+}
 }
 </style>
 </head>
@@ -87,68 +319,110 @@ h3{text-align:center;margin-top:40px}
 </header>
 
 <main class="container">
-
-<section class="profile-header">
-<div class="profile-photo">
-<img id="userPhoto" src="assets/images/cards/profil.png">
-<input type="file" id="photoUpload" accept="image/*" style="display:none">
-<button onclick="document.getElementById('photoUpload').click()">Changer la photo</button>
+<div class="profile-shell">
+<section class="hero-panel">
+<div class="hero-intro">
+<div class="page-kicker">Espace personnel</div>
+<h2 class="page-title">Ton profil hérisson</h2>
+<p class="page-subtitle">Retrouve ton identité, tes raccourcis utiles et l’avancement de tes badges dans un espace plus clair et plus cohérent avec le reste du site.</p>
 </div>
 
-<div class="profile-info">
+<div class="profile-card">
+<div class="profile-photo-card">
+<div class="profile-photo">
+<img id="userPhoto" src="assets/images/cards/profil.png" alt="Photo de profil">
+<input type="file" id="photoUpload" accept="image/*" style="display:none">
+</div>
+<button class="photo-button" onclick="document.getElementById('photoUpload').click()">Changer la photo</button>
+<p class="photo-help">La photo est affichée localement pour personnaliser ton espace.</p>
+</div>
+
+<div class="profile-info-card">
+<section class="identity-card">
+<span class="mini-label">Identité</span>
 <h2 id="username"></h2>
 <p id="userEmail"></p>
-<button onclick="window.location.href='cartographie.html'">Mes Recensements</button>
+</section>
+
+<section class="actions-card">
+<span class="mini-label">Navigation rapide</span>
+<div class="actions-row">
+<a href="cartographie.html" class="primary-link">Mes recensements</a>
+<a href="recensement.html" class="secondary-link">Nouveau recensement</a>
 </div>
 </section>
 
-<section class="profile-badges">
-<h3>Mes Badges</h3>
+<section class="stats-card">
+<span class="mini-label">Aperçu</span>
+<div class="stats-grid">
+<div class="stat-box">
+<span class="stat-value" id="stat-recensements">0</span>
+<span class="stat-label">Recensements</span>
+</div>
+<div class="stat-box">
+<span class="stat-value" id="stat-quiz">0/4</span>
+<span class="stat-label">Quiz validés</span>
+</div>
+<div class="stat-box">
+<span class="stat-value" id="stat-badges">0</span>
+<span class="stat-label">Badges débloqués</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</section>
 
+<section class="badges-panel">
+<div class="badges-heading">
+<h3>Mes badges</h3>
+<p>Survole un badge pour voir la condition à remplir et suis ta progression en temps réel.</p>
+</div>
 <div class="badges-container">
 
-<div class="badge-box"><div class="badge" id="badge-quiz" data-tooltip="Vous devez recenser réussir tous les Quiz">
+<div class="badge-box"><div class="badge" id="badge-quiz" data-tooltip="Réussis les 4 quiz pour débloquer ce badge.">
 <img src="assets/images/badges/badge-quiz.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-quiz"></div></div>
 <span class="progress-text" id="progress-text-quiz">0/4</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-1" data-tooltip="Vous devez recenser votre premier hérissons">
+<div class="badge-box"><div class="badge" id="badge-1" data-tooltip="Réalise ton premier recensement.">
 <img src="assets/images/badges/badge1.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-1"></div></div>
 <span class="progress-text" id="progress-text-1">0/1</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-5"data-tooltip="Vous devez recenser 5 hérissons">
+<div class="badge-box"><div class="badge" id="badge-5" data-tooltip="Réalise 5 recensements.">
 <img src="assets/images/badges/badge5.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-5"></div></div>
 <span class="progress-text" id="progress-text-5">0/5</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-10"data-tooltip="Vous devez recenser 10 hérissons">
+<div class="badge-box"><div class="badge" id="badge-10" data-tooltip="Réalise 10 recensements.">
 <img src="assets/images/badges/badge10.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-10"></div></div>
 <span class="progress-text" id="progress-text-10">0/10</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-50"data-tooltip="Vous devez recenser 50 hérissons">
+<div class="badge-box"><div class="badge" id="badge-50" data-tooltip="Réalise 50 recensements.">
 <img src="assets/images/badges/badge50.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-50"></div></div>
 <span class="progress-text" id="progress-text-50">0/50</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-100"data-tooltip="Vous devez recenser 100 hérissons">
+<div class="badge-box"><div class="badge" id="badge-100" data-tooltip="Réalise 100 recensements.">
 <img src="assets/images/badges/badge100.png">
 <div class="progress-bar"><div class="progress-fill" id="progress-100"></div></div>
 <span class="progress-text" id="progress-text-100">0/100</span>
 </div></div>
 
-<div class="badge-box"><div class="badge" id="badge-photo"data-tooltip="Gagnez le concour mensuel de la meilleur photo">
+<div class="badge-box"><div class="badge" id="badge-photo" data-tooltip="Badge spécial photo à débloquer lors d'un concours photo.">
 <img src="assets/images/badges/badge-photo.png">
 </div></div>
 
 </div>
 </section>
+</div>
 </main>
 
 <footer class="site-footer">
@@ -195,6 +469,7 @@ return snapshot.size;
 function updateRecensementBadges(count){
 
 const badges=[1,5,10,50,100];
+let unlocked=0;
 
 badges.forEach(target=>{
 const fill=document.getElementById("progress-"+target);
@@ -206,15 +481,25 @@ const progress=Math.min(count/target,1);
 fill.style.width=(progress*100)+"%";
 text.textContent=Math.min(count,target)+"/"+target;
 
-if(count>=target)badge.classList.remove("locked");
-else badge.classList.add("locked");
+if(count>=target){
+badge.classList.remove("locked");
+unlocked++;
+} else {
+badge.classList.add("locked");
+}
 });
+
+document.getElementById("stat-recensements").textContent=count;
+return unlocked;
 }
 
 async function loadQuizProgress(uid){
 const ref=doc(db,"users",uid);
 const snap=await getDoc(ref);
-if(!snap.exists())return;
+if(!snap.exists()){
+document.getElementById("stat-quiz").textContent="0/4";
+return 0;
+}
 
 const scores=snap.data().quizScores||{};
 let completed=0;
@@ -228,9 +513,12 @@ quizzes.forEach(q=>{
 const percent=(completed/quizzes.length)*100;
 document.getElementById("progress-quiz").style.width=percent+"%";
 document.getElementById("progress-text-quiz").textContent=completed+"/4";
+document.getElementById("stat-quiz").textContent=completed+"/4";
 
 if(completed===quizzes.length)document.getElementById("badge-quiz").classList.remove("locked");
 else document.getElementById("badge-quiz").classList.add("locked");
+
+return completed;
 }
 
 onAuthStateChanged(auth,async user=>{
@@ -244,8 +532,10 @@ localStorage.setItem("username",username);
 document.getElementById("username").textContent=username;
 
 const count=await getRecensementsCount(user.uid);
-updateRecensementBadges(count);
-await loadQuizProgress(user.uid);
+let unlockedBadges=updateRecensementBadges(count);
+const completedQuiz=await loadQuizProgress(user.uid);
+if(completedQuiz===4) unlockedBadges++;
+document.getElementById("stat-badges").textContent=unlockedBadges;
 });
 
 </script>
