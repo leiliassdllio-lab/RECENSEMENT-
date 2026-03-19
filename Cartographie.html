@@ -509,6 +509,53 @@ map.addLayer(markers);
 
 let allRecensements = [];
 
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatText(value,fallback="Non renseigné"){
+  const text = String(value ?? "").trim();
+  return text ? text : fallback;
+}
+
+function buildPopupContent(data){
+  const popup = document.createElement("div");
+  const lines = [
+    ["Observation de hérisson", null],
+    ["Date", formatText(data.date, "Date non renseignée")],
+    ["État", formatText(data.etat, "N/A")],
+    ["Sous-état", formatText(data.sousEtat, "N/A")],
+    ["Utilisateur", formatText(data.username, "Inconnu")]
+  ];
+
+  if(data.notes){
+    lines.push(["Notes", formatText(data.notes)]);
+  }
+
+  lines.forEach(([label,value],index) => {
+    if(index === 0){
+      const title = document.createElement("strong");
+      title.textContent = label;
+      popup.appendChild(title);
+      popup.appendChild(document.createElement("br"));
+      return;
+    }
+
+    const strong = document.createElement("strong");
+    strong.textContent = `${label} :`;
+    popup.appendChild(strong);
+    popup.append(` ${value}`);
+    popup.appendChild(document.createElement("br"));
+  });
+
+  return popup;
+}
+
 function getStatusInfo(data){
   if(data.etat === 'mort' && data.sousEtat === 'route'){
     return { label:'Mort sur route', className:'badge-mort-route', color:'#FF0000' };
@@ -532,18 +579,27 @@ function renderRecensementsList(items){
 
   container.innerHTML = items.map(data => {
     const status = getStatusInfo(data);
+    const username = escapeHtml(formatText(data.username, "Inconnu"));
+    const lieu = escapeHtml(formatText(data.lieu, "Non renseignée"));
+    const environnement = escapeHtml(formatText(data.environnement, "Non renseigné"));
+    const date = escapeHtml(formatText(data.date, "Date non renseignée"));
+    const notes = String(data.notes ?? "").trim();
+    const notesBlock = notes
+      ? `<div><strong>Notes :</strong> ${escapeHtml(notes)}</div>`
+      : "";
+
     return `
       <article class="recensement-card">
         <div class="recensement-head">
           <span class="recensement-badge ${status.className}">${status.label}</span>
-          <span class="recensement-date">${data.date || 'Date non renseignée'}</span>
+          <span class="recensement-date">${date}</span>
         </div>
         <div class="recensement-meta">
-          <div><strong>Utilisateur :</strong> ${data.username || 'Inconnu'}</div>
-          <div><strong>Adresse :</strong> ${data.lieu || 'Non renseignée'}</div>
-          <div><strong>Environnement :</strong> ${data.environnement || 'Non renseigné'}</div>
+          <div><strong>Utilisateur :</strong> ${username}</div>
+          <div><strong>Adresse :</strong> ${lieu}</div>
+          <div><strong>Environnement :</strong> ${environnement}</div>
           <div><strong>Coordonnées :</strong> ${data.latitude?.toFixed?.(5) ?? 'N/A'}, ${data.longitude?.toFixed?.(5) ?? 'N/A'}</div>
-          ${data.notes ? `<div><strong>Notes :</strong> ${data.notes}</div>` : ''}
+          ${notesBlock}
         </div>
       </article>
     `;
@@ -593,23 +649,11 @@ filtered.forEach(data => {
     weight:1.5,
     fillOpacity:0.85
   });
-    
-    
-    const popupContent = `
-      <b>Observation de hérisson</b><br>
-      <b>Date :</b> ${data.date}<br>
-      <b>État :</b> ${data.etat || 'N/A'}<br>
-      <b>Sous-état :</b> ${data.sousEtat || 'N/A'}<br>
-      <b>Utilisateur :</b> ${data.username || 'Inconnu'}<br>
-      <b>Email :</b> ${data.email || 'Non renseigné'}<br>
-      ${data.notes ? `<b>Notes :</b> ${data.notes}` : ''}
-    `;
-    
-    marker.bindPopup(popupContent);
+    marker.bindPopup(buildPopupContent(data));
     markers.addLayer(marker);
   });
 
-  document.getElementById("stats").innerHTML = `<b>${filtered.length}</b> observations affichées`;
+  document.getElementById("stats").textContent = `${filtered.length} observations affichées`;
   document.getElementById("overviewTotal").textContent = allRecensements.length;
   document.getElementById("overviewFiltered").textContent = filtered.length;
   document.getElementById("overviewRegion").textContent = regionLabel;
