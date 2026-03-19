@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quiz Hérisson – Team hérisson</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f6f0; min-height:100vh; display:flex; flex-direction:column; }
-header { background:#4CAF50; padding:15px; text-align:center; color:white; }
+body { min-height:100vh; display:flex; flex-direction:column; }
+.site-header { padding-bottom:24px; }
 .back-box { display:flex; justify-content:center; margin-top:14px; }
 .container { width:min(1000px, calc(100% - 32px)); margin: 32px auto; padding: 10px; flex:1; display:flex; flex-direction:column; justify-content:center; }
 .quiz-intro { text-align:center; max-width:700px; margin:0 auto 28px; color:#355335; }
@@ -38,11 +39,14 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
 }
 </style>
 </head>
-<body>
+<body class="site-page">
 
-<header>
+<header class="site-header">
+  <div class="site-header-inner">
   <h1>Quiz Hérisson 🦔🌿</h1>
+  <p>Choisis un theme, lance un quiz et suis ta progression depuis ton profil.</p>
   <div class="back-box"><a href="index.html" class="btn back-link">Retour à l'accueil</a></div>
+  </div>
 </header>
 
 <div class="container">
@@ -83,7 +87,7 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
   </div>
 </div>
 
-<footer>
+<footer class="site-footer">
   © <span id="year"></span> – Team hérisson
 </footer>
 <script type="module">

@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion – Hérisson</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
-body { font-family: Arial,sans-serif; margin:0; padding:0; background:#f7f9f7; display:flex; justify-content:center; align-items:center; height:100vh; }
-.container { background:white; padding:30px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.2); width:90%; max-width:400px; text-align:center; }
+body { display:flex; flex-direction:column; }
+.container { background:white; padding:30px; border-radius:18px; box-shadow:0 12px 28px rgba(25,49,29,0.10); width:90%; max-width:420px; text-align:center; border:1px solid #d6e5d4; }
+.auth-wrap { width:100%; max-width:460px; margin:0 auto; }
 h1 { color:#4CAF50; margin-bottom:20px; }
 input { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc; box-sizing:border-box; }
 button { width:100%; padding:10px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer; transition:0.3s; }
@@ -33,13 +35,21 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 .back-link:hover { background:#f1f7f1; }
 </style>
 </head>
-<body>
+<body class="site-page">
 
+<header class="site-header">
+  <div class="site-header-inner">
+  <h1>Connexion</h1>
+  <p>Connecte-toi pour recenser, suivre tes progres et retrouver tes observations.</p>
+  <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
+  </div>
+</header>
+
+<main class="site-main" style="display:flex;justify-content:center;align-items:center;">
+<div class="auth-wrap">
 <div class="container">
   <!-- Connexion -->
   <div id="loginDiv">
-    <h1>Connexion</h1>
-    <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
     <input type="text" id="loginUser" placeholder="Nom d’utilisateur / Email">
     <input type="password" id="loginPass" placeholder="Mot de passe">
     <button id="loginBtn">Se connecter</button>
@@ -51,7 +61,6 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
   <!-- Création compte -->
   <div id="signupDiv" class="hidden">
     <h1>Créer un compte</h1>
-    <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
     <input type="text" id="signupUser" placeholder="Nom d’utilisateur">
     <input type="email" id="signupEmail" placeholder="Email">
     <input type="password" id="signupPass" placeholder="Mot de passe">
@@ -61,6 +70,8 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
   </div>
 
 </div>
+</div>
+</main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";

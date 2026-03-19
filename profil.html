@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Mon Profil – Hérisson</title>
+<link rel="stylesheet" href="assets/css/style.css">
 
 <style>
 html{scroll-behavior:smooth}
-body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f7f7f7;color:#111}
 .container{width:90%;max-width:1000px;margin:auto;padding:40px 0}
 h2{color:#4CAF50;text-align:center}
 h3{text-align:center;margin-top:40px}
@@ -77,11 +77,16 @@ h3{text-align:center;margin-top:40px}
 </style>
 </head>
 
-<body>
+<body class="site-page">
+
+<header class="site-header">
+<div class="site-header-inner">
+<h1>Mon Profil</h1>
+<div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
+</div>
+</header>
 
 <main class="container">
-<h1 class="page-title">Mon Profil</h1>
-<div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
 
 <section class="profile-header">
 <div class="profile-photo">
@@ -145,6 +150,10 @@ h3{text-align:center;margin-top:40px}
 </div>
 </section>
 </main>
+
+<footer class="site-footer">
+© <span id="year"></span> – Team Hérisson
+</footer>
 
 <script type="module">
 
@@ -227,6 +236,7 @@ else document.getElementById("badge-quiz").classList.add("locked");
 onAuthStateChanged(auth,async user=>{
 if(!user){window.location.href="login.html";return;}
 
+document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("userEmail").textContent=user.email;
 const userSnap=await getDoc(doc(db,"users",user.uid));
 const username=userSnap.exists() ? (userSnap.data().username || "Utilisateur") : (localStorage.getItem("username") || "Utilisateur");

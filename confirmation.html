@@ -4,17 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Observation enregistrée</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
   body {
     display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+    min-height:100vh;
     margin:0;
     font-family: Arial, sans-serif;
-    background: #f7f9f7;
     flex-direction: column;
     text-align:center;
+  }
+  .confirmation-card{
+    width:min(560px, calc(100% - 32px));
+    background:#fff;
+    border:1px solid #d6e5d4;
+    border-radius:18px;
+    box-shadow:0 12px 28px rgba(25,49,29,0.10);
+    padding:32px 24px;
   }
   h1 {
     color: #4CAF50;
@@ -64,10 +70,19 @@
   a:hover { background-color:#f1f7f1; }
 </style>
 </head>
-<body>
+<body class="site-page">
+  <header class="site-header">
+    <div class="site-header-inner">
+    <h1>Observation enregistrée</h1>
+    <div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
+    </div>
+  </header>
+  <main class="site-main" style="display:flex;justify-content:center;align-items:center;flex:1;">
+  <div class="confirmation-card">
   <div class="hedgehog">🦔</div>
   <h1>Votre recensement a été enregistré !</h1>
-  <div class="back-box"><a href="index.html">Retour à l'accueil</a></div>
   <p>Merci pour votre contribution à la protection des hérissons.</p>
+  </div>
+  </main>
 </body>
 </html>
