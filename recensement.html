@@ -9,26 +9,135 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
-body { font-family:'Arial',sans-serif; background:#f7f9f7; margin:0; padding:0; }
-
-.container {
-width:90%;
-max-width:800px;
-margin:20px auto;
-background:white;
-border-radius:10px;
-padding:20px;
-box-shadow:0 2px 8px rgba(0,0,0,0.2);
-position:relative;
+body {
+font-family:'Arial',sans-serif;
+background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
+margin:0;
+padding:0;
+color:#203224;
 }
 
-h2 { text-align:center; color:#4CAF50; margin-bottom:20px; }
+.container {
+width:min(92%, 880px);
+margin:24px auto;
+background:white;
+border-radius:22px;
+padding:26px;
+box-shadow:0 18px 38px rgba(48,84,56,0.12);
+position:relative;
+border:1px solid rgba(111,153,118,0.15);
+}
 
-form p { margin:15px 0 5px; font-weight:bold; }
+.top-actions {
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+padding:14px 18px;
+background:#f7fbf5;
+border:1px solid #dce9d8;
+border-radius:18px;
+}
+
+.left-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+.user-pill {
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-height:44px;
+padding:10px 18px;
+border-radius:999px;
+background:#eef6eb;
+border:1px solid #d6e5d4;
+color:#33523a;
+font-weight:bold;
+text-align:center;
+flex:1;
+min-width:180px;
+}
+
+.form-shell {
+padding:30px;
+}
+
+.page-eyebrow {
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:7px 12px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-size:0.92rem;
+font-weight:bold;
+letter-spacing:0.01em;
+}
+
+.page-title {
+margin:16px 0 8px;
+font-size:clamp(1.9rem, 3vw, 2.5rem);
+line-height:1.1;
+color:#234b2c;
+text-align:center;
+}
+
+.page-intro {
+max-width:620px;
+margin:0 auto 26px;
+text-align:center;
+color:#5a6f5e;
+line-height:1.6;
+}
+
+.map-panel {
+padding:16px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%);
+border:1px solid #dce9d8;
+margin-bottom:24px;
+}
+
+.map-help {
+margin:0 0 12px;
+color:#5a6f5e;
+line-height:1.5;
+}
+
+.form-section {
+margin-top:20px;
+padding:20px;
+border:1px solid #e0ebdc;
+border-radius:18px;
+background:#fcfdfb;
+}
+
+.section-label {
+display:flex;
+align-items:center;
+gap:10px;
+margin:0 0 14px;
+font-size:1.08rem;
+font-weight:bold;
+color:#234b2c;
+}
+
+.section-label span {
+font-size:1.35rem;
+}
+
+.field-grid {
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
 .field-help {
 font-size:0.92rem;
 color:#5a6f5e;
 margin:6px 0 0;
+line-height:1.5;
 }
 
 .field-actions {
@@ -60,18 +169,10 @@ margin-top:6px;
 }
 
 .location-panel {
-margin-top:12px;
 padding:18px;
 border:1px solid #d6e5d4;
-border-radius:14px;
-background:#fbfdf9;
-}
-
-.location-grid {
-display:grid;
-grid-template-columns:minmax(0, 1.3fr) minmax(240px, 0.7fr);
-gap:16px;
-align-items:end;
+border-radius:16px;
+background:white;
 }
 
 .location-field label {
@@ -85,10 +186,11 @@ color:#2f7a39;
 margin:0;
 }
 
-.location-tools {
-display:flex;
-flex-direction:column;
-gap:12px;
+.location-grid {
+display:grid;
+grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr);
+gap:16px;
+align-items:end;
 }
 
 .location-footer {
@@ -114,10 +216,19 @@ border:1px solid #d6e5d4;
 
 input, select, textarea, button {
 width:100%;
-padding:10px;
-border-radius:5px;
-border:1px solid #ccc;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #cfd9cc;
 box-sizing:border-box;
+font:inherit;
+background:white;
+transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+outline:none;
+border-color:#77a96c;
+box-shadow:0 0 0 4px rgba(119,169,108,0.12);
 }
 
 button {
@@ -126,13 +237,19 @@ color:white;
 font-weight:bold;
 border:none;
 cursor:pointer;
-margin-top:15px;
+margin-top:18px;
 transition:0.3s;
 }
 
 button:hover { background:#43a047; }
 
-#map { height:300px; border-radius:10px; margin-bottom:20px; }
+#map {
+height:340px;
+border-radius:16px;
+margin-bottom:0;
+overflow:hidden;
+box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08);
+}
 
 .icon-label {
 display:flex;
@@ -143,12 +260,17 @@ font-weight:normal;
 
 .icon-label span { font-size:1.5em; }
 
-.tree { position:absolute; font-size:2em; opacity:0.4; }
-.tree1 { top:10px; left:10px; }
-.tree2 { bottom:10px; right:20px; }
-.tree3 { top:50px; right:50px; }
-
 @media (max-width: 720px) {
+.container {
+padding:20px;
+border-radius:18px;
+}
+.form-shell {
+padding:20px;
+}
+.field-grid {
+grid-template-columns:1fr;
+}
 .location-grid {
 grid-template-columns:1fr;
 }
@@ -156,26 +278,31 @@ grid-template-columns:1fr;
 
 #preview img {
 max-width:100%;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.2);
-margin-top:10px;
+border-radius:14px;
+box-shadow:0 10px 24px rgba(41,73,49,0.16);
+margin-top:12px;
 }
 
-#logoutBtn { background:#d32f2f; }
+#logoutBtn {
+background:#d32f2f;
+width:auto;
+padding:10px 16px;
+border-radius:12px;
+margin-top:0;
+align-self:center;
+}
 #logoutBtn:hover { background:#b71c1c; }
-.top-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-.left-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
 .nav-link {
 display:inline-block;
 background:white;
-color:#333;
+color:#33523a;
 font-weight:bold;
-border:2px solid #ddd;
+border:1px solid #d6e5d4;
 padding:10px 18px;
-border-radius:8px;
+border-radius:12px;
 text-decoration:none;
 }
-.nav-link:hover { background:#f3f3f3; }
+.nav-link:hover { background:#f3f7f2; }
 
 /* Cartes */
 .choice-grid {
@@ -187,25 +314,27 @@ margin-top:10px;
 }
 
 .choice-card {
-width:100px;
-height:100px;
-border:2px solid #ccc;
-border-radius:12px;
+width:108px;
+height:108px;
+border:2px solid #d6dfd3;
+border-radius:16px;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
 cursor:pointer;
-transition:all 0.3s;
+transition:all 0.25s;
+background:white;
+overflow:hidden;
+box-shadow:0 8px 18px rgba(64,95,69,0.06);
 }
 
-/* Images des cartes remplissent tout le cadre */
 .choice-card img {
-  width: 100%;         /* largeur = largeur du parent */
-  height: 100%;        /* hauteur = hauteur du parent */
-  object-fit: cover;   /* ajuste l'image sans la déformer, recadrage si nécessaire */
-  border-radius: 12px; /* coins arrondis cohérents avec la carte */
-  display: block;      /* supprime l'espace blanc sous l'image */
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:14px;
+display:block;
 }
 
 .choice-text {
@@ -228,11 +357,56 @@ line-height:1;
 .choice-card.selected-main {
 border-color:#2196F3;
 background:rgba(33,150,243,0.1);
+box-shadow:0 12px 24px rgba(33,150,243,0.16);
 }
 
 .choice-card.selected-sub {
 border-color:#4CAF50;
 background:rgba(76,175,80,0.1);
+box-shadow:0 12px 24px rgba(76,175,80,0.18);
+}
+
+.choice-card:hover {
+transform:translateY(-2px);
+border-color:#9cb79d;
+}
+
+.upload-card {
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:8px;
+padding:24px 18px;
+border:2px dashed #8eb48d;
+border-radius:18px;
+cursor:pointer;
+background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%);
+text-align:center;
+color:#33523a;
+transition:transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.upload-card:hover {
+transform:translateY(-2px);
+border-color:#6d9d6f;
+background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%);
+}
+
+.upload-icon {
+font-size:2.2rem;
+line-height:1;
+}
+
+.upload-title {
+font-weight:bold;
+}
+
+.submit-button {
+padding:14px 20px;
+border-radius:14px;
+font-size:1rem;
+box-shadow:0 12px 22px rgba(76,175,80,0.22);
 }
 </style>
 </head>
@@ -252,26 +426,31 @@ background:rgba(76,175,80,0.1);
 <a href="cartographie.html" class="nav-link">Mes recensements</a>
 </div>
 
-<button id="logoutBtn"
-style="width:auto;padding:8px 14px;border-radius:6px;">
+<div class="user-pill" id="usernameBadge">Utilisateur connecté</div>
+
+<button id="logoutBtn">
 Se déconnecter
 </button>
 
 </div>
 
-<div class="container">
+<div class="container form-shell">
 
-<div class="tree tree1">🌳</div>
-<div class="tree tree2">🌲</div>
-<div class="tree tree3">🌳</div>
+<div style="text-align:center;">
+<div class="page-eyebrow">Signalement terrain</div>
+<h2 class="page-title">Localisation et observation</h2>
+<p class="page-intro">Indique l’endroit précis, choisis l’état observé, puis ajoute si tu veux une photo et quelques notes. L’objectif est de garder le formulaire rapide et clair sur mobile comme sur ordinateur.</p>
+</div>
 
-<h2>Localisation & Observation</h2>
-
+<div class="map-panel">
+<p class="map-help">Place le marqueur sur la carte pour lier automatiquement l’adresse et les coordonnées du signalement.</p>
 <div id="map"></div>
+</div>
 
 <form id="recensementForm">
 
-<p class="icon-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
+<section class="form-section">
+<p class="section-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
 <div class="location-panel">
 <div class="location-grid">
 <div class="location-field">
@@ -293,11 +472,20 @@ Se déconnecter
 <div id="lieuStatus" class="field-status"></div>
 </div>
 </div>
+</section>
 
-<p class="icon-label"><span>📅</span> Quand l’avez-vous observé ?</p>
+<section class="form-section">
+<p class="section-label"><span>📅</span> Quand l’avez-vous observé ?</p>
+<div class="field-grid">
+<div>
+<label for="date">Date de l’observation</label>
 <input type="date" id="date" required>
+</div>
+</div>
+</section>
 
-<p class="icon-label"><span>🦔</span> État du hérisson</p>
+<section class="form-section">
+<p class="section-label"><span>🦔</span> État du hérisson</p>
 
 <div id="etatGrid" class="choice-grid">
 
@@ -342,8 +530,10 @@ Se déconnecter
 </div>
 
 <input type="hidden" id="sousEtat">
+</section>
 
-<p class="icon-label"><span>🌍</span> Type d’environnement</p>
+<section class="form-section">
+<p class="section-label"><span>🌍</span> Type d’environnement</p>
 
 <div id="envGrid" class="choice-grid">
 
@@ -382,24 +572,30 @@ Se déconnecter
 </div>
 
 <input type="hidden" id="environnement">
+</section>
 
-<p class="icon-label"><span>📷</span> Ajouter une image</p>
+<section class="form-section">
+<p class="section-label"><span>📷</span> Ajouter une image</p>
 
 <label for="photoUpload"
-style="display:flex;flex-direction:column;align-items:center;border:2px dashed #4CAF50;padding:15px;border-radius:10px;cursor:pointer;">
-<span style="font-size:2em;">📸</span>
-<span>Cliquer pour choisir ou prendre une photo</span>
+class="upload-card">
+<span class="upload-icon">📸</span>
+<span class="upload-title">Choisir ou prendre une photo</span>
+<span>Ajoute une image si elle peut aider à valider l’observation.</span>
 </label>
 
 <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
 
 <div id="preview"></div>
+</section>
 
-<p class="icon-label"><span>📝</span> Notes supplémentaires</p>
+<section class="form-section">
+<p class="section-label"><span>📝</span> Notes supplémentaires</p>
 
 <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
+</section>
 
-<button type="submit">Envoyer</button>
+<button type="submit" class="submit-button">Envoyer le recensement</button>
 
 </form>
 </div>
@@ -430,7 +626,15 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 onAuthStateChanged(auth,user=>{
-if(!user) window.location.href="login.html";
+if(!user) {
+window.location.href="login.html";
+return;
+}
+
+const savedUsername=localStorage.getItem("username");
+const usernameBadge=document.getElementById("usernameBadge");
+const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
+usernameBadge.textContent=username;
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
@@ -578,6 +782,21 @@ etatGrid.querySelectorAll(".choice-card").forEach(card=>{
 card.addEventListener("click",()=>{
 
 const val=card.dataset.etat;
+const isSelected=card.classList.contains("selected-main");
+
+if(isSelected){
+etatInput.value="";
+card.classList.remove("selected-main");
+vivantOptions.style.display="none";
+mortOptions.style.display="none";
+sousEtatInput.value="";
+[vivantOptions,mortOptions].forEach(group=>{
+group.querySelectorAll(".choice-card")
+.forEach(c=>c.classList.remove("selected-sub"));
+});
+return;
+}
+
 etatInput.value=val;
 
 etatGrid.querySelectorAll(".choice-card")
@@ -601,6 +820,14 @@ group.querySelectorAll(".choice-card").forEach(card=>{
 card.addEventListener("click",()=>{
 
 const val=card.dataset.sousEtat;
+const isSelected=card.classList.contains("selected-sub");
+
+if(isSelected){
+sousEtatInput.value="";
+card.classList.remove("selected-sub");
+return;
+}
+
 sousEtatInput.value=val;
 
 group.querySelectorAll(".choice-card")
@@ -617,6 +844,14 @@ const envInput=document.getElementById("environnement");
 
 envGrid.querySelectorAll(".choice-card").forEach(card=>{
 card.addEventListener("click",()=>{
+
+const isSelected=card.classList.contains("selected-sub");
+
+if(isSelected){
+envInput.value="";
+card.classList.remove("selected-sub");
+return;
+}
 
 envInput.value=card.dataset.env;
 
