@@ -129,7 +129,7 @@ filtered.forEach(data => {
 
   if(data.etat === 'mort' && data.sousEtat === 'route'){
     color = '#FF0000';
-  } else if(data.etat === 'mort' && data.sousEtat === 'hors route'){
+  } else if(data.etat === 'mort' && (data.sousEtat === 'hors route' || data.sousEtat === 'hors_route')){
     color = '#FFA500';
   }
   const marker = L.circleMarker([data.latitude,data.longitude], {

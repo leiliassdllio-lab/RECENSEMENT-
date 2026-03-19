@@ -75,22 +75,27 @@ header { background:#4CAF50; padding:15px; text-align:center; color:white; }
 </footer>
 <script type="module">
   
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "TON_API_KEY",
-  authDomain: "TON_AUTH_DOMAIN",
-  projectId: "TON_PROJECT_ID",
-  storageBucket: "TON_STORAGE",
-  messagingSenderId: "TON_ID",
-  appId: "TON_APP_ID"
+  apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+  authDomain: "herisson-f80ba.firebaseapp.com",
+  projectId: "herisson-f80ba",
+  storageBucket: "herisson-f80ba.firebasestorage.app",
+  messagingSenderId: "142270421417",
+  appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+let currentUser = null;
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+});
 
 document.getElementById("year").textContent = new Date().getFullYear();
 

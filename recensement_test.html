@@ -103,6 +103,23 @@ transition:all 0.3s;
   display: block;      /* supprime l'espace blanc sous l'image */
 }
 
+.choice-text {
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:6px;
+font-weight:bold;
+color:#2f4f2f;
+text-align:center;
+padding:8px;
+}
+
+.choice-text span:first-child {
+font-size:2rem;
+line-height:1;
+}
+
 .choice-card.selected-main {
 border-color:#2196F3;
 background:rgba(33,150,243,0.1);
@@ -220,19 +237,19 @@ Se déconnecter
 </div>
 
 <div class="choice-card" data-env="champ">
-<img src="champ.png">
+<div class="choice-text"><span>🌾</span><span>Champ</span></div>
 </div>
 
 <div class="choice-card" data-env="foret">
-<img src="foret.png">
+<div class="choice-text"><span>🌲</span><span>Forêt</span></div>
 </div>
 
 <div class="choice-card" data-env="parc">
-<img src="parc.png">
+<div class="choice-text"><span>🌿</span><span>Parc</span></div>
 </div>
 
 <div class="choice-card" data-env="haie">
-<img src="haie.png">
+<div class="choice-text"><span>🪴</span><span>Haie</span></div>
 </div>
 
 </div>
