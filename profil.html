@@ -6,7 +6,7 @@
 <title>Mon Profil – Hérisson</title>
 <link rel="stylesheet" href="assets/css/style.css">
 
-<style>
+<style> 
 html{scroll-behavior:smooth}
 body{
 margin:0;
@@ -311,6 +311,7 @@ grid-template-columns:1fr;
 
 <body class="site-page">
 
+<!-- En-tete commun du profil -->
 <header class="site-header">
 <div class="site-header-inner">
 <h1>Mon Profil</h1>
@@ -321,6 +322,7 @@ grid-template-columns:1fr;
 <main class="container">
 <div class="profile-shell">
 <section class="hero-panel">
+<!-- Carte principale du profil : identite, actions et statistiques -->
 <div class="hero-intro">
 <div class="page-kicker">Espace personnel</div>
 <h2 class="page-title">Ton profil hérisson</h2>
@@ -373,6 +375,7 @@ grid-template-columns:1fr;
 </div>
 </section>
 
+<!-- Zone de suivi des badges et de leur progression -->
 <section class="badges-panel">
 <div class="badges-heading">
 <h3>Mes badges</h3>
@@ -431,6 +434,7 @@ grid-template-columns:1fr;
 
 <script type="module">
 
+// Initialisation Firebase pour lire le profil, les scores de quiz et les recensements
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import{getFirestore,collection,query,where,getDocs,doc,getDoc}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -466,6 +470,7 @@ const snapshot=await getDocs(q);
 return snapshot.size;
 }
 
+// Met a jour les badges lies au nombre de recensements
 function updateRecensementBadges(count){
 
 const badges=[1,5,10,50,100];
@@ -493,6 +498,7 @@ document.getElementById("stat-recensements").textContent=count;
 return unlocked;
 }
 
+// Charge la progression des quiz enregistree dans le document utilisateur
 async function loadQuizProgress(uid){
 const ref=doc(db,"users",uid);
 const snap=await getDoc(ref);
@@ -524,6 +530,7 @@ return completed;
 onAuthStateChanged(auth,async user=>{
 if(!user){window.location.href="login.html";return;}
 
+// Alimente l'interface du profil a partir des donnees utilisateur
 document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("userEmail").textContent=user.email;
 const userSnap=await getDoc(doc(db,"users",user.uid));

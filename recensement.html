@@ -413,6 +413,7 @@ box-shadow:0 12px 22px rgba(76,175,80,0.22);
 
 <body class="site-page">
 
+<!-- En-tete commun de la page de recensement -->
 <header class="site-header">
 <div class="site-header-inner">
 <h1>🦔 As-tu vu un Hérisson?</h1>
@@ -422,6 +423,7 @@ box-shadow:0 12px 22px rgba(76,175,80,0.22);
 
 <div class="container top-actions">
 
+<!-- Raccourcis lies au compte et a l'historique utilisateur -->
 <div class="left-actions">
 <a href="cartographie.html" class="nav-link">Mes recensements</a>
 </div>
@@ -449,6 +451,7 @@ Se déconnecter
 
 <form id="recensementForm">
 
+<!-- Bloc de localisation : carte + adresse + coordonnees liees -->
 <section class="form-section">
 <p class="section-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
 <div class="location-panel">
@@ -484,6 +487,7 @@ Se déconnecter
 </div>
 </section>
 
+<!-- Bloc de selection de l'etat du herisson -->
 <section class="form-section">
 <p class="section-label"><span>🦔</span> État du hérisson</p>
 
@@ -532,6 +536,7 @@ Se déconnecter
 <input type="hidden" id="sousEtat">
 </section>
 
+<!-- Bloc de selection de l'environnement observe -->
 <section class="form-section">
 <p class="section-label"><span>🌍</span> Type d’environnement</p>
 
@@ -574,6 +579,7 @@ Se déconnecter
 <input type="hidden" id="environnement">
 </section>
 
+<!-- Bloc d'ajout d'une image illustrative -->
 <section class="form-section">
 <p class="section-label"><span>📷</span> Ajouter une image</p>
 
@@ -589,6 +595,7 @@ class="upload-card">
 <div id="preview"></div>
 </section>
 
+<!-- Bloc libre pour les remarques complementaires -->
 <section class="form-section">
 <p class="section-label"><span>📝</span> Notes supplémentaires</p>
 
@@ -608,6 +615,7 @@ class="upload-card">
 
 <script type="module">
 
+// Initialisation Firebase pour l'authentification et l'enregistrement des recensements
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -666,6 +674,7 @@ lieuStatus.textContent=message;
 lieuStatus.style.color=isError ? "#b42318" : "#5a6f5e";
 }
 
+// Transforme la reponse de geocodage inverse en adresse plus lisible
 function formatAddress(data){
 const parts=[];
 const road=[data.house_number,data.road].filter(Boolean).join(" ").trim();
@@ -677,6 +686,7 @@ if(data.country) parts.push(data.country);
 return parts.join(", ");
 }
 
+// Convertit les coordonnees decimales au format degres / minutes / secondes
 function toDms(value,isLatitude){
 const absolute=Math.abs(value);
 const degrees=Math.floor(absolute);
@@ -690,6 +700,7 @@ const direction=isLatitude
 return `${degrees}°${minutes}'${seconds}"${direction}`;
 }
 
+// Met a jour l'affichage des coordonnees et du champ lieu a partir du marqueur
 function updateLieu(lat,lon){
 coordonneesInput.value=`${toDms(lat,true)}, ${toDms(lon,false)}`;
 if(!lieuInput.value || lieuInput.value.startsWith("Lat:") || lieuInput.value.includes(", Lon:")){
@@ -698,6 +709,7 @@ lieuInput.value=`Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
 setLieuStatus("Position mise à jour. Clique sur \"Proposer une adresse\" pour obtenir une adresse lisible.");
 }
 
+// Lie le deplacement manuel du marqueur a la mise a jour des champs
 function bindMarkerEvents(){
 marker.on("dragend",e=>{
 const p=e.target.getLatLng();
@@ -705,6 +717,7 @@ updateLieu(p.lat,p.lng);
 });
 }
 
+// Cree ou deplace le marqueur actif sur la carte
 function placeMarker(lat,lon,popupText="Point sélectionné"){
 if(marker){
 marker.setLatLng([lat,lon]).bindPopup(popupText);
@@ -719,6 +732,7 @@ marker.openPopup();
 updateLieu(lat,lon);
 }
 
+// Tente de proposer une adresse postale a partir du point choisi sur la carte
 async function suggestAddressFromMarker(){
 if(!marker){
 setLieuStatus("Place d'abord le marqueur sur la carte.", true);
@@ -769,6 +783,7 @@ placeMarker(lat,lng,"Point sélectionné sur la carte");
 setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
 });
 
+// Gestion des cartes de selection pour l'etat, le sous-etat et l'environnement
 suggestAddressBtn.addEventListener("click", suggestAddressFromMarker);
 
 const etatInput=document.getElementById("etat");
@@ -888,6 +903,7 @@ form.addEventListener("submit",async e=>{
 
 e.preventDefault();
 
+// Construit l'objet complet qui sera envoye dans Firestore
 if(!auth.currentUser)
 return window.location.href="login.html";
 

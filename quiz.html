@@ -41,6 +41,7 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
 </head>
 <body class="site-page">
 
+<!-- En-tete commun de la page quiz -->
 <header class="site-header">
   <div class="site-header-inner">
   <h1>Quiz Hérisson 🦔🌿</h1>
@@ -50,6 +51,7 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
 </header>
 
 <div class="container">
+  <!-- Ecran de selection des themes de quiz -->
   <p class="quiz-intro">Choisis un theme pour lancer un quiz et tester tes connaissances sur les herissons.</p>
   <div class="quiz-cards">
     <div class="quiz-card" onclick="selectQuiz('scientifique')">
@@ -78,6 +80,7 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
     </div>
   </div>
 
+  <!-- Zone active du quiz une fois un theme selectionne -->
   <div id="quiz-container">
     <div id="progress-container"><div id="progress-bar"></div></div>
     <h2 id="question"></h2>
@@ -91,7 +94,7 @@ footer { text-align:center; padding:15px; background:#4CAF50; color:white; }
   © <span id="year"></span> – Team hérisson
 </footer>
 <script type="module">
-  
+// Configuration Firebase pour lire / enregistrer la progression des quiz
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -116,7 +119,7 @@ onAuthStateChanged(auth, user => {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// QUIZZES
+// Banque de questions, organisee par theme
 const quizzes = {
   scientifique:[
     {question:"Le hérisson est principalement :", answers:["Herbivore","Carnivore insectivore","Omnivore strict","Granivore"], correct:1},
@@ -210,13 +213,13 @@ const quizzes = {
   // ...
 };
 
-// VARIABLES GLOBALES
+// Etat courant du quiz en cours
 let currentQuiz = null;
 let currentQuestion = 0;
 let score = 0;
 let currentQuizName = "";
 
-// SELECTION QUIZ
+// Affiche le quiz selectionne et reinitialise la progression
 function selectQuiz(name){
 
   currentQuizName = name;
@@ -232,13 +235,13 @@ function selectQuiz(name){
   updateProgress();
 }
 
-// RETOUR
+// Retourne a l'ecran de selection des themes
 function backToSelection(){
   document.getElementById("quiz-container").style.display = "none";
   document.querySelector(".quiz-cards").style.display = "flex";
 }
 
-// CHARGER QUESTION
+// Charge la question courante et genere dynamiquement les boutons de reponse
 function loadQuestion(){
   const q = currentQuiz[currentQuestion];
   document.getElementById("question").textContent = `Question ${currentQuestion+1} / ${currentQuiz.length} : ${q.question}`;
@@ -253,7 +256,7 @@ function loadQuestion(){
   });
 }
 
-// REPONSE
+// Verifie la reponse choisie, affiche le feedback puis passe a la suite
 function answerQuestion(selected){
   const q = currentQuiz[currentQuestion];
   const buttons = document.getElementById("answers").children;

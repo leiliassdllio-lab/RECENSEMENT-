@@ -366,6 +366,7 @@ margin-top:14px;
 
 <body class="site-page">
 
+<!-- En-tete commun de la page cartographie -->
 <header class="site-header">
 <div class="site-header-inner">
 <h1>Cartographie des observations de hérissons</h1>
@@ -375,6 +376,7 @@ margin-top:14px;
 
 <div class="map-page">
 <section class="map-hero">
+<!-- Intro et contexte de la page -->
 <div class="page-kicker">Observations citoyennes</div>
 <h2 class="page-title">Cartographie des signalements</h2>
 <p class="map-description">
@@ -384,6 +386,7 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 </section>
 
 <section class="overview-grid">
+  <!-- Cartes de synthese qui resumment le volume de donnees affiche -->
   <div class="overview-card">
     <span class="overview-value" id="overviewTotal">0</span>
     <span class="overview-label">Observations totales</span>
@@ -399,6 +402,7 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 </section>
 
 <section class="filters-panel">
+  <!-- Filtres utilises a la fois pour la carte et pour la liste des recensements -->
   <h2 class="filters-title">Filtres d’affichage</h2>
   <div id="controls" class="filters-grid">
     <div class="filter-group">
@@ -422,6 +426,7 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 </section>
 
 <section class="map-shell">
+  <!-- Bloc principal de la carte avec sa legende integree -->
   <div class="map-shell-head">
     <div>
       <h2>Carte interactive</h2>
@@ -444,6 +449,7 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 <div id="stats"></div>
 
 <section class="recensements-panel">
+  <!-- Liste textuelle des recensements actuellement visibles sur la carte -->
   <h2>Tous les recensements affichés</h2>
   <p class="recensements-intro">Cette liste reprend les recensements visibles sur la carte, avec leurs informations principales.</p>
   <div id="recensementsList" class="recensements-list"></div>
@@ -454,6 +460,7 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <script type="module">
+// Initialisation Firebase pour charger l'ensemble des recensements
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -472,7 +479,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 let currentUserUid = null;
 
-// Observer l'état de connexion
+// Recupere l'utilisateur connecte pour le filtre "Mes recensements"
 onAuthStateChanged(auth, user => {
   currentUserUid = user ? user.uid : null;
   displayMarkers(); // mettre à jour les marqueurs dès qu'on connaît l'utilisateur
@@ -514,6 +521,7 @@ function getStatusInfo(data){
   return { label:'Vivant', className:'badge-vivant', color:'#4CAF50' };
 }
 
+// Genere la liste detaillee des recensements sous la carte
 function renderRecensementsList(items){
   const container = document.getElementById("recensementsList");
 
@@ -542,6 +550,7 @@ function renderRecensementsList(items){
   }).join("");
 }
 
+// Charge tous les recensements disponibles depuis Firestore
 async function loadRecensements(){
   const querySnapshot = await getDocs(collection(db,"recensements"));
   querySnapshot.forEach(doc => {
@@ -553,6 +562,7 @@ async function loadRecensements(){
   displayMarkers();
 }
 
+// Met a jour simultanement la carte, les stats et la liste selon les filtres
 function displayMarkers() {
   markers.clearLayers();
   
