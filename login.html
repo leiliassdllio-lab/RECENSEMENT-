@@ -130,7 +130,7 @@ showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); log
 onAuthStateChanged(auth, async user => {
   if(!user) return;
   await syncLocalUsername(user);
-  window.location.href = "recensement_test.html";
+  window.location.href = "recensement.html";
 });
 
 // --- Récupérer email via username ---
@@ -150,7 +150,7 @@ loginBtn.addEventListener("click", async ()=>{
     if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
     const credential = await signInWithEmailAndPassword(auth,email,loginPass.value);
     await syncLocalUsername(credential.user);
-    window.location.href = "recensement_test.html"; // redirection directe après succès
+    window.location.href = "recensement.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -169,7 +169,7 @@ googleBtn.addEventListener("click", async ()=>{
     },{ merge:true });
 
     localStorage.setItem("username", username);
-    window.location.href = "recensement_test.html"; // redirection directe après succès
+    window.location.href = "recensement.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -187,7 +187,7 @@ createBtn.addEventListener("click", async ()=>{
     await setDoc(doc(db,"users",uid),{ uid, email, username });
     localStorage.setItem("username", username);
 
-    window.location.href = "recensement_test.html"; // redirection directe après création
+    window.location.href = "recensement.html"; // redirection directe après création
   }catch(e){ signupError.textContent=e.message; }
 });
 </script>
