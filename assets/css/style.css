@@ -744,3 +744,14 @@ grid-template-columns:1fr;
     padding:18px;
   }
 }
+.field-error {
+    border: 2px solid #b42318 !important; /* rouge vif */
+    background-color: #ffecec;
+}
+
+.error-message {
+    color: #b42318;
+    font-size: 0.9rem;
+    margin-top: 4px;
+    display: none;
+}
