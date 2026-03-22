@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>As-tu vu un hérisson?</title>
+
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+body {
+font-family:'Arial',sans-serif;
+background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
+margin:0;
+padding:0;
+color:#203224;
+}
+
+.container {
+width:min(92%, 880px);
+margin:24px auto;
+background:white;
+border-radius:22px;
+padding:26px;
+box-shadow:0 18px 38px rgba(48,84,56,0.12);
+position:relative;
+border:1px solid rgba(111,153,118,0.15);
+}
+
+.top-actions {
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+padding:14px 18px;
+background:#f7fbf5;
+border:1px solid #dce9d8;
+border-radius:18px;
+}
+
+.left-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+.user-pill {
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-height:44px;
+padding:10px 18px;
+border-radius:999px;
+background:#eef6eb;
+border:1px solid #d6e5d4;
+color:#33523a;
+font-weight:bold;
+text-align:center;
+flex:1;
+min-width:180px;
+}
+
+.form-shell {
+padding:30px;
+}
+
+.page-eyebrow {
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:7px 12px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-size:0.92rem;
+font-weight:bold;
+letter-spacing:0.01em;
+}
+
+.page-title {
+margin:16px 0 8px;
+font-size:clamp(1.9rem, 3vw, 2.5rem);
+line-height:1.1;
+color:#234b2c;
+text-align:center;
+}
+
+.page-intro {
+max-width:620px;
+margin:0 auto 26px;
+text-align:center;
+color:#5a6f5e;
+line-height:1.6;
+}
+
+.map-panel {
+padding:16px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%);
+border:1px solid #dce9d8;
+margin-bottom:24px;
+}
+
+.map-help {
+margin:0 0 12px;
+color:#5a6f5e;
+line-height:1.5;
+}
+
+.form-section {
+margin-top:20px;
+padding:20px;
+border:1px solid #e0ebdc;
+border-radius:18px;
+background:#fcfdfb;
+}
+
+.section-label {
+display:flex;
+align-items:center;
+gap:10px;
+margin:0 0 14px;
+font-size:1.08rem;
+font-weight:bold;
+color:#234b2c;
+}
+
+.section-label span {
+font-size:1.35rem;
+}
+
+.field-grid {
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.field-help {
+font-size:0.92rem;
+color:#5a6f5e;
+margin:6px 0 0;
+line-height:1.5;
+}
+
+.field-actions {
+display:flex;
+justify-content:center;
+margin-top:14px;
+}
+
+.field-button {
+width:auto;
+margin-top:0;
+padding:10px 14px;
+border-radius:8px;
+background:#eef5ea;
+color:#2f7a39;
+border:1px solid #cfe0cd;
+font-weight:bold;
+}
+
+.field-button:hover {
+background:#e2efdf;
+}
+
+.field-status {
+min-height:1.2rem;
+font-size:0.9rem;
+color:#5a6f5e;
+margin-top:6px;
+}
+
+.location-panel {
+padding:18px;
+border:1px solid #d6e5d4;
+border-radius:16px;
+background:white;
+}
+
+.location-field label {
+display:block;
+font-weight:bold;
+margin-bottom:8px;
+color:#2f7a39;
+}
+
+.location-field input {
+margin:0;
+}
+
+.location-grid {
+display:grid;
+grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr);
+gap:16px;
+align-items:end;
+}
+
+.location-footer {
+display:flex;
+flex-direction:column;
+gap:12px;
+margin-top:14px;
+padding-top:14px;
+border-top:1px solid #dfead9;
+}
+
+.location-footer .field-help {
+margin:0;
+}
+
+.location-footer .field-status {
+margin-top:0;
+padding:10px 12px;
+border-radius:10px;
+background:#f3f8ef;
+border:1px solid #d6e5d4;
+}
+
+input, select, textarea, button {
+width:100%;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #cfd9cc;
+box-sizing:border-box;
+font:inherit;
+background:white;
+transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+outline:none;
+border-color:#77a96c;
+box-shadow:0 0 0 4px rgba(119,169,108,0.12);
+}
+
+button {
+background:#4CAF50;
+color:white;
+font-weight:bold;
+border:none;
+cursor:pointer;
+margin-top:18px;
+transition:0.3s;
+}
+
+button:hover { background:#43a047; }
+
+#map {
+height:340px;
+border-radius:16px;
+margin-bottom:0;
+overflow:hidden;
+box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08);
+}
+
+.icon-label {
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:normal;
+}
+
+.icon-label span { font-size:1.5em; }
+
+@media (max-width: 720px) {
+.container {
+padding:20px;
+border-radius:18px;
+}
+.form-shell {
+padding:20px;
+}
+.field-grid {
+grid-template-columns:1fr;
+}
+.location-grid {
+grid-template-columns:1fr;
+}
+}
+
+#preview img {
+max-width:100%;
+border-radius:14px;
+box-shadow:0 10px 24px rgba(41,73,49,0.16);
+margin-top:12px;
+}
+
+#logoutBtn {
+background:#d32f2f;
+width:auto;
+padding:10px 16px;
+border-radius:12px;
+margin-top:0;
+align-self:center;
+}
+#logoutBtn:hover { background:#b71c1c; }
+.nav-link {
+display:inline-block;
+background:white;
+color:#33523a;
+font-weight:bold;
+border:1px solid #d6e5d4;
+padding:10px 18px;
+border-radius:12px;
+text-decoration:none;
+}
+.nav-link:hover { background:#f3f7f2; }
+
+/* Cartes */
+.choice-grid {
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+justify-content:center;
+margin-top:10px;
+}
+
+.choice-card {
+width:108px;
+height:108px;
+border:2px solid #d6dfd3;
+border-radius:16px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+transition:all 0.25s;
+background:white;
+overflow:hidden;
+box-shadow:0 8px 18px rgba(64,95,69,0.06);
+}
+
+.choice-card img {
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:14px;
+display:block;
+}
+
+.choice-text {
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:6px;
+font-weight:bold;
+color:#2f4f2f;
+text-align:center;
+padding:8px;
+}
+
+.choice-text span:first-child {
+font-size:2rem;
+line-height:1;
+}
+
+.choice-card.selected-main {
+border-color:#2196F3;
+background:rgba(33,150,243,0.1);
+box-shadow:0 12px 24px rgba(33,150,243,0.16);
+}
+
+.choice-card.selected-sub {
+border-color:#4CAF50;
+background:rgba(76,175,80,0.1);
+box-shadow:0 12px 24px rgba(76,175,80,0.18);
+}
+
+.choice-card:hover {
+transform:translateY(-2px);
+border-color:#9cb79d;
+}
+
+.upload-card {
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:8px;
+padding:24px 18px;
+border:2px dashed #8eb48d;
+border-radius:18px;
+cursor:pointer;
+background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%);
+text-align:center;
+color:#33523a;
+transition:transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.upload-card:hover {
+transform:translateY(-2px);
+border-color:#6d9d6f;
+background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%);
+}
+
+.upload-icon {
+font-size:2.2rem;
+line-height:1;
+}
+
+.upload-title {
+font-weight:bold;
+}
+
+.submit-button {
+padding:14px 20px;
+border-radius:14px;
+font-size:1rem;
+box-shadow:0 12px 22px rgba(76,175,80,0.22);
+}
+
+/* --- Validation obligatoire --- */
+.field-error {
+    border: 2px solid #b42318 !important;
+    background-color: #fff6f6;
+}
+.label-required::after {
+    content: " *";
+    color: #b42318;
+}
+</style>
+</head>
+
+<body class="site-page">
+
+<header class="site-header">
+<div class="site-header-inner">
+<h1>🦔 As-tu vu un Hérisson?</h1>
+<div class="back-box"><a href="index.html" class="back-link">Retour à l'accueil</a></div>
+</div>
+</header>
+
+<div class="container top-actions">
+<div class="left-actions">
+<a href="cartographie.html" class="nav-link">Mes recensements</a>
+</div>
+<div class="user-pill" id="usernameBadge">Utilisateur connecté</div>
+<button id="logoutBtn">Se déconnecter</button>
+</div>
+
+<div class="container form-shell">
+<div style="text-align:center;">
+<div class="page-eyebrow">Signalement terrain</div>
+<h2 class="page-title">Localisation et observation</h2>
+<p class="page-intro">Indique l’endroit précis, choisis l’état observé, puis ajoute si tu veux une photo et quelques notes. L’objectif est de garder le formulaire rapide et clair sur mobile comme sur ordinateur.</p>
+</div>
+
+<div class="map-panel">
+<p class="map-help">Place le marqueur sur la carte pour lier automatiquement l’adresse et les coordonnées du signalement.</p>
+<div id="map"></div>
+</div>
+
+<form id="recensementForm">
+
+<!-- Bloc localisation -->
+<section class="form-section">
+<p class="section-label"><span>📍</span> Où avez-vous vu le hérisson ?</p>
+<div class="location-panel">
+<div class="location-grid">
+<div class="location-field">
+<label for="lieu" class="label-required">Adresse</label>
+<input type="text" id="lieu" placeholder="Ex. Avenue Franklin Roosevelt 50, 1050 Bruxelles" autocomplete="street-address">
+</div>
+<div class="location-tools">
+<div class="location-field">
+<label for="coordonnees">Coordonnées géographiques</label>
+<input type="text" id="coordonnees" readonly placeholder="50°50'48.1&quot;N, 4°21'09.0&quot;E">
+</div>
+</div>
+</div>
+<div class="location-footer">
+<p class="field-help">Les deux champs sont liés au marqueur sur la carte. Clique sur la carte ou déplace le marqueur pour mettre à jour la position.</p>
+<div class="field-actions">
+<button type="button" id="suggestAddressBtn" class="field-button">Proposer une adresse</button>
+</div>
+<div id="lieuStatus" class="field-status"></div>
+</div>
+</div>
+</section>
+
+<!-- Bloc date -->
+<section class="form-section">
+<p class="section-label"><span>📅</span> Quand l’avez-vous observé ?</p>
+<div class="field-grid">
+<div>
+<label for="date" class="label-required">Date de l’observation</label>
+<input type="date" id="date">
+</div>
+</div>
+</section>
+
+<!-- Bloc état hérisson -->
+<section class="form-section">
+<p class="section-label"><span>🦔</span> État du hérisson</p>
+<div id="etatGrid" class="choice-grid label-required">
+<div class="choice-card" data-etat="vivant"><img src="assets/images/observations/vivant.png"></div>
+<div class="choice-card" data-etat="mort"><img src="assets/images/observations/mort.png"></div>
+</div>
+<input type="hidden" id="etat">
+<div id="vivantOptions" class="choice-grid" style="display:none">
+<div class="choice-card" data-sous-etat="sain"><img src="assets/images/observations/bonne-sante.png"></div>
+<div class="choice-card" data-sous-etat="blesse"><img src="assets/images/observations/blesse.png"></div>
+<div class="choice-card" data-sous-etat="malade"><img src="assets/images/observations/malade.png"></div>
+</div>
+<div id="mortOptions" class="choice-grid" style="display:none">
+<div class="choice-card" data-sous-etat="route"><img src="assets/images/observations/sur-route.png"></div>
+<div class="choice-card" data-sous-etat="hors_route"><img src="assets/images/observations/hors-route.png"></div>
+</div>
+<input type="hidden" id="sousEtat">
+
+</section>
+
+<!-- Bloc environnement -->
+<section class="form-section">
+<p class="section-label"><span>🌍</span> Type d’environnement</p>
+<div id="envGrid" class="choice-grid label-required">
+<div class="choice-card" data-env="route"><img src="assets/images/environment/route.png"></div>
+<div class="choice-card" data-env="voie_ferree"><img src="assets/images/environment/rail.png"></div>
+<div class="choice-card" data-env="urbain"><img src="assets/images/environment/urbain.png"></div>
+<div class="choice-card" data-env="jardin"><img src="assets/images/environment/jardin.png"></div>
+<div class="choice-card" data-env="champ"><div class="choice-text"><span>🌾</span><span>Champ</span></div></div>
+<div class="choice-card" data-env="foret"><div class="choice-text"><span>🌲</span><span>Forêt</span></div></div>
+<div class="choice-card" data-env="parc"><div class="choice-text"><span>🌿</span><span>Parc</span></div></div>
+<div class="choice-card" data-env="haie"><div class="choice-text"><span>🪴</span><span>Haie</span></div></div>
+</div>
+<input type="hidden" id="environnement">
+</section>
+
+<!-- Bloc image -->
+<section class="form-section">
+<p class="section-label"><span>📷</span> Ajouter une image</p>
+<label for="photoUpload" class="upload-card">
+<span class="upload-icon">📸</span>
+<span class="upload-title">Choisir ou prendre une photo</span>
+<input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
+</label>
+<div id="preview"></div>
+</section>
+
+<!-- Notes -->
+<section class="form-section">
+<p class="section-label"><span>📝</span> Notes supplémentaires</p>
+<textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
+</section>
+
+<button type="submit" class="submit-button">Envoyer le recensement</button>
+</form>
+</div>
+
+<footer class="site-footer">
+© <span id="year"></span> – Team Hérisson
+</footer>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script type="module">
+
+// --- Firebase + auth + map + cartes choix existants ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+authDomain:"herisson-f80ba.firebaseapp.com",
+projectId:"herisson-f80ba",
+storageBucket:"herisson-f80ba.firebasestorage.app",
+messagingSenderId:"142270421417",
+appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,user=>{
+if(!user) { window.location.href="login.html"; return; }
+const savedUsername=localStorage.getItem("username");
+const usernameBadge=document.getElementById("usernameBadge");
+const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
+usernameBadge.textContent=username;
+});
+
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+await signOut(auth);
+localStorage.removeItem("username");
+window.location.href="login.html";
+});
+
+const dateInput=document.getElementById("date");
+const today=new Date();
