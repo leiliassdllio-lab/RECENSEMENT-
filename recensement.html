@@ -957,6 +957,98 @@ alert("Impossible d'enregistrer le recensement.");
 }
 
 });
+// --- VALIDATION CHAMPS OBLIGATOIRES AVANT SOUMISSION ---
+function scrollToField(field) {
+    field.scrollIntoView({ behavior: "smooth", block: "center" });
+    field.focus();
+}
+
+// Liste des champs obligatoires (sauf notes)
+const requiredFields = [
+    document.getElementById("lieu"),
+    dateInput, // ton champ date
+    etatInput,
+    sousEtatInput,
+    envInput
+];
+
+// Fonction pour vérifier si le formulaire est complet
+function validateForm() {
+    let firstEmpty = null;
+
+    requiredFields.forEach(field => {
+        if (!field.value || field.value.trim() === "") {
+            field.classList.add("field-error");
+            if (!field.previousElementSibling || !field.previousElementSibling.classList.contains("label-required")) {
+                const label = field.closest("div")?.querySelector("label");
+                if (label) label.classList.add("label-required");
+            }
+            if (!firstEmpty) firstEmpty = field;
+        } else {
+            field.classList.remove("field-error");
+            const label = field.closest("div")?.querySelector("label");
+            if (label) label.classList.remove("label-required");
+        }
+    });
+
+    if (firstEmpty) {
+        scrollToField(firstEmpty);
+        return false; // empêche l'envoi
+    }
+
+    return true; // tout est rempli
+}
+
+// Ajout d'écouteurs pour retirer la bordure rouge dès que l'utilisateur complète le champ
+requiredFields.forEach(field => {
+    field.addEventListener("input", () => {
+        if (field.value.trim() !== "") {
+            field.classList.remove("field-error");
+            const label = field.closest("div")?.querySelector("label");
+            if (label) label.classList.remove("label-required");
+        }
+    });
+});
+
+// Modification du submit pour intégrer la validation
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (!validateForm()) return; // si formulaire incomplet, stop
+
+    // --- Ton code existant pour envoyer dans Firestore ---
+    if(!auth.currentUser)
+        return window.location.href="login.html";
+
+    const recensement={
+        uid:auth.currentUser.uid,
+        username:localStorage.getItem("username") || "Inconnu",
+        email:auth.currentUser.email || "Non renseigné",
+        lieu:document.getElementById("lieu").value,
+        date:dateInput.value,
+        notes:document.getElementById("notes").value,
+        etat:document.getElementById("etat").value,
+        sousEtat:document.getElementById("sousEtat").value,
+        environnement:document.getElementById("environnement").value,
+        latitude:marker ? marker.getLatLng().lat : null,
+        longitude:marker ? marker.getLatLng().lng : null
+    };
+
+    try{
+        await addDoc(collection(db,"recensements"),recensement);
+
+        form.reset();
+        previewDiv.innerHTML="";
+
+        if(marker) marker.setLatLng(map.getCenter());
+
+        window.location.href="confirmation.html";
+
+    } catch(err){
+        console.error(err);
+        alert("Impossible d'enregistrer le recensement.");
+    }
+});
 
 </script>
 
