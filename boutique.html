@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boutique Hérisson</title>
+
+<style>
+body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135deg,#0f172a,#1e293b); color:white; display:flex; height:100vh; }
+#header { position:absolute; top:10px; left:20px; font-size:20px; background:rgba(0,0,0,0.4); padding:8px 15px; border-radius:10px; }
+#character { width:50%; display:flex; justify-content:center; align-items:center; position:relative; }
+.layer { position:absolute; width:220px; transition:0.2s; }
+#base{z-index:1;} #pants{z-index:2;} #accessory{z-index:3;}
+#shop { width:50%; background:rgba(30,41,59,0.95); padding:20px; box-shadow:-5px 0 20px rgba(0,0,0,0.3);} 
+.tabs { display:flex; gap:10px; margin-bottom:20px; }
+.tab { flex:1; text-align:center; padding:12px; background:#334155; cursor:pointer; border-radius:8px; transition:0.2s; }
+.tab:hover { background:#475569; }
+.tab.active { background:#ff4c4c; }
+.items { display:none; grid-template-columns:repeat(3,1fr); gap:15px; }
+.items.active { display:grid; }
+.item { background:#1e293b; padding:10px; text-align:center; border-radius:10px; cursor:pointer; transition:0.2s; border:1px solid transparent; position:relative; }
+.item:hover { transform:scale(1.05); border:1px solid #ff4c4c; }
+.price { margin-top:5px; font-size:14px; color:#facc15; }
+.locked { opacity:0.4; }
+.owned::after { content:"✔"; position:absolute; top:5px; right:8px; color:#4ade80; }
+</style>
+</head>
+<body>
+
+<div id="header">💰 Coins: <span id="coins">100</span></div>
+
+<div id="character">
+  <img id="base" class="layer" src="https://i.imgur.com/8QfQZ6F.png">
+  <img id="pants" class="layer">
+  <img id="accessory" class="layer">
+</div>
+
+<div id="shop">
+
+<div class="tabs">
+  <div class="tab active" onclick="openTab('skins')">Skins</div>
+  <div class="tab" onclick="openTab('pantsTab')">Pantalons</div>
+  <div class="tab" onclick="openTab('accessories')">Accessoires</div>
+</div>
+
+<div id="skins" class="items active">
+  <div class="item" data-id="skin0" onclick="handleItem('skin','https://i.imgur.com/8QfQZ6F.png',0,this)">
+    Normal<div class="price">Gratuit</div>
+  </div>
+
+  <div class="item" data-id="skin1" onmouseover="preview('base','https://i.imgur.com/YOUR_IMAGE.png')" onmouseout="resetPreview()" onclick="handleItem('skin','https://i.imgur.com/YOUR_IMAGE.png',50,this)">
+    Skin Rouge<div class="price">50</div>
+  </div>
+</div>
+
+<div id="pantsTab" class="items">
+  <div class="item" data-id="pants1" onmouseover="preview('pants','https://i.imgur.com/YOUR_PANTS.png')" onmouseout="resetPreview()" onclick="handleItem('pants','https://i.imgur.com/YOUR_PANTS.png',30,this)">
+    Jean<div class="price">30</div>
+  </div>
+</div>
+
+<div id="accessories" class="items">
+  <div class="item" data-id="acc1" onmouseover="preview('accessory','https://i.imgur.com/YOUR_ACC.png')" onmouseout="resetPreview()" onclick="handleItem('accessory','https://i.imgur.com/YOUR_ACC.png',20,this)">
+    Lunettes<div class="price">20</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let coins = parseInt(localStorage.getItem("coins")) || 100;
+let owned = JSON.parse(localStorage.getItem("owned")) || {};
+let equipped = JSON.parse(localStorage.getItem("equipped")) || {};
+
+updateCoins();
+initOwnedUI();
+loadEquipped();
+
+function updateCoins(){ document.getElementById("coins").textContent = coins; localStorage.setItem("coins",coins);} 
+
+function save(){ localStorage.setItem("owned",JSON.stringify(owned)); localStorage.setItem("equipped",JSON.stringify(equipped)); }
+
+function openTab(tabName){ document.querySelectorAll('.items').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active')); document.getElementById(tabName).classList.add('active'); event.target.classList.add('active'); }
+
+function handleItem(type,src,price,el){
+  const id = el.dataset.id;
+
+  if(!owned[id]){
+    if(coins < price){ alert("Pas assez de coins"); return; }
+    coins -= price;
+    owned[id] = true;
+  }
+
+  equipped[type] = src;
+  applyEquip(type,src);
+
+  updateCoins();
+  save();
+  initOwnedUI();
+}
+
+function applyEquip(type,src){ document.getElementById(type==='skin'?'base':type).src = src; }
+
+function initOwnedUI(){ document.querySelectorAll('.item').forEach(el=>{ const id=el.dataset.id; if(owned[id]) el.classList.add('owned'); }); }
+
+function loadEquipped(){ if(equipped.skin) applyEquip('skin',equipped.skin); if(equipped.pants) applyEquip('pants',equipped.pants); if(equipped.accessory) applyEquip('accessory',equipped.accessory); }
+
+// PREVIEW
+let previewBackup = {};
+function preview(type,src){ const id = (type==='base')?'base':type; previewBackup[id] = document.getElementById(id).src; document.getElementById(id).src = src; }
+function resetPreview(){ for(let k in previewBackup){ document.getElementById(k).src = previewBackup[k]; } }
+
+</script>
+
+</body>
+</html>
