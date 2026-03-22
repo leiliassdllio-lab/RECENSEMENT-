@@ -460,13 +460,13 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <script type="module">
-// Initialisation Firebase pour charger l'ensemble des recensements
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
+/* ✅ CORRIGÉ */
 const firebaseConfig = {
-  const firebaseConfig = {
   apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
   authDomain: "herisson-f80ba.firebaseapp.com",
   projectId: "herisson-f80ba",
@@ -474,17 +474,18 @@ const firebaseConfig = {
   messagingSenderId: "142270421417",
   appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
 };
-};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-let currentUserUid = null;
 
-// Recupere l'utilisateur connecte pour le filtre "Mes recensements"
+let currentUserUid = null;
+let allRecensements = [];
+let markersMap = new Map(); // 🔥 liaison ID → marker
+
 onAuthStateChanged(auth, user => {
   currentUserUid = user ? user.uid : null;
-  displayMarkers(); // mettre à jour les marqueurs dès qu'on connaît l'utilisateur
+  displayMarkers();
 });
 
 const belgiqueBounds = [[49.5, 2.5], [51.6, 6.4]];
@@ -509,15 +510,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',{
 const markers = L.markerClusterGroup();
 map.addLayer(markers);
 
-let allRecensements = [];
+/* ---------- UTILITAIRES ---------- */
 
 function escapeHtml(value){
   return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replaceAll(">", "&gt;");
 }
 
 function formatText(value,fallback="Non renseigné"){
@@ -525,150 +524,163 @@ function formatText(value,fallback="Non renseigné"){
   return text ? text : fallback;
 }
 
-function buildPopupContent(data){
-  const popup = document.createElement("div");
-  const lines = [
-    ["Observation de hérisson", null],
-    ["Date", formatText(data.date, "Date non renseignée")],
-    ["État", formatText(data.etat, "N/A")],
-    ["Sous-état", formatText(data.sousEtat, "N/A")],
-    ["Utilisateur", formatText(data.username, "Inconnu")]
-  ];
-
-  if(data.notes){
-    lines.push(["Notes", formatText(data.notes)]);
-  }
-
-  lines.forEach(([label,value],index) => {
-    if(index === 0){
-      const title = document.createElement("strong");
-      title.textContent = label;
-      popup.appendChild(title);
-      popup.appendChild(document.createElement("br"));
-      return;
-    }
-
-    const strong = document.createElement("strong");
-    strong.textContent = `${label} :`;
-    popup.appendChild(strong);
-    popup.append(` ${value}`);
-    popup.appendChild(document.createElement("br"));
-  });
-
-  return popup;
-}
-
 function getStatusInfo(data){
   if(data.etat === 'mort' && data.sousEtat === 'route'){
     return { label:'Mort sur route', className:'badge-mort-route', color:'#FF0000' };
   }
-
   if(data.etat === 'mort' && (data.sousEtat === 'hors route' || data.sousEtat === 'hors_route')){
     return { label:'Mort hors route', className:'badge-mort-hors-route', color:'#FFA500' };
   }
-
   return { label:'Vivant', className:'badge-vivant', color:'#4CAF50' };
 }
 
-// Genere la liste detaillee des recensements sous la carte
+/* ---------- POPUP ---------- */
+
+function buildPopupContent(data){
+  return `
+    <strong>Observation de hérisson</strong><br>
+    Date : ${formatText(data.date)}<br>
+    État : ${formatText(data.etat)}<br>
+    Sous-état : ${formatText(data.sousEtat)}<br>
+    Utilisateur : ${formatText(data.username)}
+  `;
+}
+
+/* ---------- FOCUS CARTE ---------- */
+
+function focusOnMarker(id){
+  const marker = markersMap.get(id);
+  if(!marker) return;
+
+  const latLng = marker.getLatLng();
+
+  map.setView(latLng, 12, { animate:true });
+
+  setTimeout(()=>{
+    marker.openPopup();
+  },300);
+
+  // 🔥 petit effet visuel
+  marker.setStyle({ radius: 10 });
+  setTimeout(()=> marker.setStyle({ radius:7 }), 800);
+}
+
+/* ---------- LISTE ---------- */
+
 function renderRecensementsList(items){
   const container = document.getElementById("recensementsList");
 
   if(!items.length){
-    container.innerHTML = `<div class="empty-state">Aucun recensement ne correspond aux filtres sélectionnés.</div>`;
+    container.innerHTML = `<div class="empty-state">Aucun recensement trouvé</div>`;
     return;
   }
 
-  container.innerHTML = items.map(data => {
+  container.innerHTML = items.map(data=>{
     const status = getStatusInfo(data);
-    const username = escapeHtml(formatText(data.username, "Inconnu"));
-    const lieu = escapeHtml(formatText(data.lieu, "Non renseignée"));
-    const environnement = escapeHtml(formatText(data.environnement, "Non renseigné"));
-    const date = escapeHtml(formatText(data.date, "Date non renseignée"));
-    const notes = String(data.notes ?? "").trim();
-    const notesBlock = notes
-      ? `<div><strong>Notes :</strong> ${escapeHtml(notes)}</div>`
-      : "";
 
     return `
       <article class="recensement-card">
         <div class="recensement-head">
           <span class="recensement-badge ${status.className}">${status.label}</span>
-          <span class="recensement-date">${date}</span>
         </div>
+
         <div class="recensement-meta">
-          <div><strong>Utilisateur :</strong> ${username}</div>
-          <div><strong>Adresse :</strong> ${lieu}</div>
-          <div><strong>Environnement :</strong> ${environnement}</div>
-          <div><strong>Coordonnées :</strong> ${data.latitude?.toFixed?.(5) ?? 'N/A'}, ${data.longitude?.toFixed?.(5) ?? 'N/A'}</div>
-          ${notesBlock}
+          <div><strong>Utilisateur :</strong> ${escapeHtml(data.username)}</div>
+          <div><strong>Coordonnées :</strong> ${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</div>
         </div>
+
+        <button class="focus-btn" data-id="${data.id}">
+          Voir sur la carte
+        </button>
       </article>
     `;
   }).join("");
+
+  // 🔥 action bouton
+  document.querySelectorAll(".focus-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      focusOnMarker(btn.dataset.id);
+    });
+  });
 }
 
-// Charge tous les recensements disponibles depuis Firestore
+/* ---------- FIREBASE ---------- */
+
 async function loadRecensements(){
   const querySnapshot = await getDocs(collection(db,"recensements"));
-  querySnapshot.forEach(doc => {
+
+  querySnapshot.forEach(doc=>{
     const data = doc.data();
     if(data.latitude && data.longitude){
+      data.id = doc.id; // 🔥 IMPORTANT
       allRecensements.push(data);
     }
   });
+
   displayMarkers();
 }
 
-// Met a jour simultanement la carte, les stats et la liste selon les filtres
-function displayMarkers() {
+/* ---------- AFFICHAGE ---------- */
+
+function displayMarkers(){
   markers.clearLayers();
-  
+  markersMap.clear();
+
   const region = document.querySelector('input[name="region"]:checked').value;
   const myRecensements = document.getElementById('myRecensements').checked;
-  const regionLabel = region === "wallonie" ? "Wallonie" : region === "flandre" ? "Flandre" : "Belgique";
-  
+
   let filtered = allRecensements;
 
-  // Filtrer par région
   if(region === 'wallonie'){
     filtered = filtered.filter(d => isInside(d.latitude,d.longitude, wallonieBounds));
   } else if(region === 'flandre'){
     filtered = filtered.filter(d => isInside(d.latitude,d.longitude, flandreBounds));
   }
 
-  // Filtrer par Mes recensements si coché
   if(myRecensements && currentUserUid){
     filtered = filtered.filter(d => d.uid === currentUserUid);
   }
-filtered.forEach(data => {
-  const status = getStatusInfo(data);
-  const color = status.color;
-  const marker = L.circleMarker([data.latitude,data.longitude], {
-    color: color,
-    fillColor: color,
-    radius:7,
-    weight:1.5,
-    fillOpacity:0.85
-  });
+
+  filtered.forEach(data=>{
+    const status = getStatusInfo(data);
+
+    const marker = L.circleMarker([data.latitude,data.longitude],{
+      color: status.color,
+      fillColor: status.color,
+      radius:7,
+      fillOpacity:0.85
+    });
+
     marker.bindPopup(buildPopupContent(data));
+
+    // 🔥 stockage
+    markersMap.set(data.id, marker);
+
+    // 🔥 clic marker = centrage
+    marker.on("click", ()=>{
+      map.setView([data.latitude,data.longitude], 12);
+    });
+
     markers.addLayer(marker);
   });
 
   document.getElementById("stats").textContent = `${filtered.length} observations affichées`;
   document.getElementById("overviewTotal").textContent = allRecensements.length;
   document.getElementById("overviewFiltered").textContent = filtered.length;
-  document.getElementById("overviewRegion").textContent = regionLabel;
+
   renderRecensementsList(filtered);
 }
 
-// Écouteurs pour filtrer
-document.querySelectorAll('input[name="region"], #myRecensements').forEach(el => {
-  el.addEventListener('change', displayMarkers);
-});
+/* ---------- EVENTS ---------- */
+
+document.querySelectorAll('input[name="region"], #myRecensements')
+.forEach(el => el.addEventListener('change', displayMarkers));
 
 loadRecensements();
+
 </script>
+
+
 
 </body>
 </html>
