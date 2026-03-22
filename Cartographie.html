@@ -547,22 +547,22 @@ function buildPopupContent(data){
 }
 
 /* ---------- FOCUS CARTE ---------- */
-
 function focusOnMarker(id){
   const marker = markersMap.get(id);
   if(!marker) return;
 
-  const latLng = marker.getLatLng();
+  // scroll automatique vers la carte
+  document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-  map.setView(latLng, 12, { animate:true });
-
-  setTimeout(()=>{
+  // zoom pour dégroupper le marker si nécessaire
+  markers.zoomToShowLayer(marker, function(){
+    map.setView(marker.getLatLng(), Math.max(map.getZoom(), 12), { animate:true });
     marker.openPopup();
-  },300);
 
-  // 🔥 petit effet visuel
-  marker.setStyle({ radius: 10 });
-  setTimeout(()=> marker.setStyle({ radius:7 }), 800);
+    // effet visuel sur le marker
+    marker.setStyle({ radius: 10 });
+    setTimeout(()=> marker.setStyle({ radius:7 }), 800);
+  });
 }
 
 /* ---------- LISTE ---------- */
