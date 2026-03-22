@@ -623,7 +623,7 @@ class="upload-card">
 
 // Initialisation Firebase pour l'authentification et l'enregistrement des recensements
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -638,7 +638,19 @@ appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+async function addCoinsToUser(uid, amount) {
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
 
+  if (!userSnap.exists()) {
+    await setDoc(userRef, { coins: amount });
+  } else {
+    const currentCoins = userSnap.data().coins || 0;
+    await updateDoc(userRef, {
+      coins: currentCoins + amount
+    });
+  }
+}
 onAuthStateChanged(auth,user=>{
 if(!user) {
 window.location.href="login.html";
@@ -936,7 +948,10 @@ longitude:marker ? marker.getLatLng().lng : null
 try{
 
 await addDoc(collection(db,"recensements"),recensement);
-
+await addCoinsToUser(auth.currentUser.uid, 50);
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+coins += 50;
+localStorage.setItem("coins", coins);
 form.reset();
 previewDiv.innerHTML="";
 
