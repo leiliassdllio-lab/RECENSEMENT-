@@ -9,405 +9,58 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
-body {
-font-family:'Arial',sans-serif;
-background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
-margin:0;
-padding:0;
-color:#203224;
-}
-
-.container {
-width:min(92%, 880px);
-margin:24px auto;
-background:white;
-border-radius:22px;
-padding:26px;
-box-shadow:0 18px 38px rgba(48,84,56,0.12);
-position:relative;
-border:1px solid rgba(111,153,118,0.15);
-}
-
-.top-actions {
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-padding:14px 18px;
-background:#f7fbf5;
-border:1px solid #dce9d8;
-border-radius:18px;
-}
-
+/* === Garde exactement ton CSS précédent === */
+body { font-family:'Arial',sans-serif; background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%); margin:0; padding:0; color:#203224; }
+.container { width:min(92%, 880px); margin:24px auto; background:white; border-radius:22px; padding:26px; box-shadow:0 18px 38px rgba(48,84,56,0.12); position:relative; border:1px solid rgba(111,153,118,0.15); }
+.top-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; background:#f7fbf5; border:1px solid #dce9d8; border-radius:18px; }
 .left-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-
-.user-pill {
-display:inline-flex;
-align-items:center;
-justify-content:center;
-min-height:44px;
-padding:10px 18px;
-border-radius:999px;
-background:#eef6eb;
-border:1px solid #d6e5d4;
-color:#33523a;
-font-weight:bold;
-text-align:center;
-flex:1;
-min-width:180px;
-}
-
-.form-shell {
-padding:30px;
-}
-
-.page-eyebrow {
-display:inline-flex;
-align-items:center;
-gap:8px;
-padding:7px 12px;
-border-radius:999px;
-background:#eef6eb;
-color:#2f7a39;
-font-size:0.92rem;
-font-weight:bold;
-letter-spacing:0.01em;
-}
-
-.page-title {
-margin:16px 0 8px;
-font-size:clamp(1.9rem, 3vw, 2.5rem);
-line-height:1.1;
-color:#234b2c;
-text-align:center;
-}
-
-.page-intro {
-max-width:620px;
-margin:0 auto 26px;
-text-align:center;
-color:#5a6f5e;
-line-height:1.6;
-}
-
-.map-panel {
-padding:16px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%);
-border:1px solid #dce9d8;
-margin-bottom:24px;
-}
-
-.map-help {
-margin:0 0 12px;
-color:#5a6f5e;
-line-height:1.5;
-}
-
-.form-section {
-margin-top:20px;
-padding:20px;
-border:1px solid #e0ebdc;
-border-radius:18px;
-background:#fcfdfb;
-}
-
-.section-label {
-display:flex;
-align-items:center;
-gap:10px;
-margin:0 0 14px;
-font-size:1.08rem;
-font-weight:bold;
-color:#234b2c;
-}
-
-.section-label span {
-font-size:1.35rem;
-}
-
-.field-grid {
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
-
-.field-help {
-font-size:0.92rem;
-color:#5a6f5e;
-margin:6px 0 0;
-line-height:1.5;
-}
-
-.field-actions {
-display:flex;
-justify-content:center;
-margin-top:14px;
-}
-
-.field-button {
-width:auto;
-margin-top:0;
-padding:10px 14px;
-border-radius:8px;
-background:#eef5ea;
-color:#2f7a39;
-border:1px solid #cfe0cd;
-font-weight:bold;
-}
-
-.field-button:hover {
-background:#e2efdf;
-}
-
-.field-status {
-min-height:1.2rem;
-font-size:0.9rem;
-color:#5a6f5e;
-margin-top:6px;
-}
-
-.location-panel {
-padding:18px;
-border:1px solid #d6e5d4;
-border-radius:16px;
-background:white;
-}
-
-.location-field label {
-display:block;
-font-weight:bold;
-margin-bottom:8px;
-color:#2f7a39;
-}
-
-.location-field input {
-margin:0;
-}
-
-.location-grid {
-display:grid;
-grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr);
-gap:16px;
-align-items:end;
-}
-
-.location-footer {
-display:flex;
-flex-direction:column;
-gap:12px;
-margin-top:14px;
-padding-top:14px;
-border-top:1px solid #dfead9;
-}
-
-.location-footer .field-help {
-margin:0;
-}
-
-.location-footer .field-status {
-margin-top:0;
-padding:10px 12px;
-border-radius:10px;
-background:#f3f8ef;
-border:1px solid #d6e5d4;
-}
-
-input, select, textarea, button {
-width:100%;
-padding:12px 14px;
-border-radius:12px;
-border:1px solid #cfd9cc;
-box-sizing:border-box;
-font:inherit;
-background:white;
-transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-outline:none;
-border-color:#77a96c;
-box-shadow:0 0 0 4px rgba(119,169,108,0.12);
-}
-
-button {
-background:#4CAF50;
-color:white;
-font-weight:bold;
-border:none;
-cursor:pointer;
-margin-top:18px;
-transition:0.3s;
-}
-
+.user-pill { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 18px; border-radius:999px; background:#eef6eb; border:1px solid #d6e5d4; color:#33523a; font-weight:bold; text-align:center; flex:1; min-width:180px; }
+.form-shell { padding:30px; }
+.page-eyebrow { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; background:#eef6eb; color:#2f7a39; font-size:0.92rem; font-weight:bold; letter-spacing:0.01em; }
+.page-title { margin:16px 0 8px; font-size:clamp(1.9rem, 3vw, 2.5rem); line-height:1.1; color:#234b2c; text-align:center; }
+.page-intro { max-width:620px; margin:0 auto 26px; text-align:center; color:#5a6f5e; line-height:1.6; }
+.map-panel { padding:16px; border-radius:18px; background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%); border:1px solid #dce9d8; margin-bottom:24px; }
+.map-help { margin:0 0 12px; color:#5a6f5e; line-height:1.5; }
+.form-section { margin-top:20px; padding:20px; border:1px solid #e0ebdc; border-radius:18px; background:#fcfdfb; }
+.section-label { display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:1.08rem; font-weight:bold; color:#234b2c; }
+.section-label span { font-size:1.35rem; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field-help { font-size:0.92rem; color:#5a6f5e; margin:6px 0 0; line-height:1.5; }
+.field-actions { display:flex; justify-content:center; margin-top:14px; }
+.field-button { width:auto; margin-top:0; padding:10px 14px; border-radius:8px; background:#eef5ea; color:#2f7a39; border:1px solid #cfe0cd; font-weight:bold; }
+.field-button:hover { background:#e2efdf; }
+.field-status { min-height:1.2rem; font-size:0.9rem; color:#5a6f5e; margin-top:6px; }
+.location-panel { padding:18px; border:1px solid #d6e5d4; border-radius:16px; background:white; }
+.location-field label { display:block; font-weight:bold; margin-bottom:8px; color:#2f7a39; }
+.location-field input { margin:0; }
+.location-grid { display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr); gap:16px; align-items:end; }
+.location-footer { display:flex; flex-direction:column; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid #dfead9; }
+.location-footer .field-help { margin:0; }
+.location-footer .field-status { margin-top:0; padding:10px 12px; border-radius:10px; background:#f3f8ef; border:1px solid #d6e5d4; }
+input, select, textarea, button { width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cfd9cc; box-sizing:border-box; font:inherit; background:white; transition:border-color 0.2s, box-shadow 0.2s, background 0.2s; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:#77a96c; box-shadow:0 0 0 4px rgba(119,169,108,0.12); }
+button { background:#4CAF50; color:white; font-weight:bold; border:none; cursor:pointer; margin-top:18px; transition:0.3s; }
 button:hover { background:#43a047; }
-
-#map {
-height:340px;
-border-radius:16px;
-margin-bottom:0;
-overflow:hidden;
-box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08);
-}
-
-.icon-label {
-display:flex;
-align-items:center;
-gap:10px;
-font-weight:normal;
-}
-
-.icon-label span { font-size:1.5em; }
-
-@media (max-width: 720px) {
-.container {
-padding:20px;
-border-radius:18px;
-}
-.form-shell {
-padding:20px;
-}
-.field-grid {
-grid-template-columns:1fr;
-}
-.location-grid {
-grid-template-columns:1fr;
-}
-}
-
-#preview img {
-max-width:100%;
-border-radius:14px;
-box-shadow:0 10px 24px rgba(41,73,49,0.16);
-margin-top:12px;
-}
-
-#logoutBtn {
-background:#d32f2f;
-width:auto;
-padding:10px 16px;
-border-radius:12px;
-margin-top:0;
-align-self:center;
-}
+#map { height:340px; border-radius:16px; margin-bottom:0; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08); }
+#preview img { max-width:100%; border-radius:14px; box-shadow:0 10px 24px rgba(41,73,49,0.16); margin-top:12px; }
+#logoutBtn { background:#d32f2f; width:auto; padding:10px 16px; border-radius:12px; margin-top:0; align-self:center; }
 #logoutBtn:hover { background:#b71c1c; }
-.nav-link {
-display:inline-block;
-background:white;
-color:#33523a;
-font-weight:bold;
-border:1px solid #d6e5d4;
-padding:10px 18px;
-border-radius:12px;
-text-decoration:none;
-}
+.nav-link { display:inline-block; background:white; color:#33523a; font-weight:bold; border:1px solid #d6e5d4; padding:10px 18px; border-radius:12px; text-decoration:none; }
 .nav-link:hover { background:#f3f7f2; }
-
-/* Cartes */
-.choice-grid {
-display:flex;
-flex-wrap:wrap;
-gap:15px;
-justify-content:center;
-margin-top:10px;
-}
-
-.choice-card {
-width:108px;
-height:108px;
-border:2px solid #d6dfd3;
-border-radius:16px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-transition:all 0.25s;
-background:white;
-overflow:hidden;
-box-shadow:0 8px 18px rgba(64,95,69,0.06);
-}
-
-.choice-card img {
-width:100%;
-height:100%;
-object-fit:cover;
-border-radius:14px;
-display:block;
-}
-
-.choice-text {
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:6px;
-font-weight:bold;
-color:#2f4f2f;
-text-align:center;
-padding:8px;
-}
-
-.choice-text span:first-child {
-font-size:2rem;
-line-height:1;
-}
-
-.choice-card.selected-main {
-border-color:#2196F3;
-background:rgba(33,150,243,0.1);
-box-shadow:0 12px 24px rgba(33,150,243,0.16);
-}
-
-.choice-card.selected-sub {
-border-color:#4CAF50;
-background:rgba(76,175,80,0.1);
-box-shadow:0 12px 24px rgba(76,175,80,0.18);
-}
-
-.choice-card:hover {
-transform:translateY(-2px);
-border-color:#9cb79d;
-}
-
-.upload-card {
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:8px;
-padding:24px 18px;
-border:2px dashed #8eb48d;
-border-radius:18px;
-cursor:pointer;
-background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%);
-text-align:center;
-color:#33523a;
-transition:transform 0.2s, border-color 0.2s, background 0.2s;
-}
-
-.upload-card:hover {
-transform:translateY(-2px);
-border-color:#6d9d6f;
-background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%);
-}
-
-.upload-icon {
-font-size:2.2rem;
-line-height:1;
-}
-
-.upload-title {
-font-weight:bold;
-}
-
-.submit-button {
-padding:14px 20px;
-border-radius:14px;
-font-size:1rem;
-box-shadow:0 12px 22px rgba(76,175,80,0.22);
-}
+/* === Cartes & choix === */
+.choice-grid { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin-top:10px; }
+.choice-card { width:108px; height:108px; border:2px solid #d6dfd3; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s; background:white; overflow:hidden; box-shadow:0 8px 18px rgba(64,95,69,0.06); }
+.choice-card img { width:100%; height:100%; object-fit:cover; border-radius:14px; display:block; }
+.choice-text { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-weight:bold; color:#2f4f2f; text-align:center; padding:8px; }
+.choice-text span:first-child { font-size:2rem; line-height:1; }
+.choice-card.selected-main { border-color:#2196F3; background:rgba(33,150,243,0.1); box-shadow:0 12px 24px rgba(33,150,243,0.16); }
+.choice-card.selected-sub { border-color:#4CAF50; background:rgba(76,175,80,0.1); box-shadow:0 12px 24px rgba(76,175,80,0.18); }
+.choice-card:hover { transform:translateY(-2px); border-color:#9cb79d; }
+.upload-card { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:24px 18px; border:2px dashed #8eb48d; border-radius:18px; cursor:pointer; background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%); text-align:center; color:#33523a; transition:transform 0.2s, border-color 0.2s, background 0.2s; }
+.upload-card:hover { transform:translateY(-2px); border-color:#6d9d6f; background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%); }
+.upload-icon { font-size:2.2rem; line-height:1; }
+.upload-title { font-weight:bold; }
+.submit-button { padding:14px 20px; border-radius:14px; font-size:1rem; box-shadow:0 12px 22px rgba(76,175,80,0.22); }
 </style>
 </head>
 
@@ -608,38 +261,19 @@ class="upload-card">
 </div>
 
 <footer class="site-footer">
-© <span id="year"></span> – Team Hérisson
+© <span id="year"></span> – Les Six Pics
 </footer>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js"></script>
-  
+
 <script type="module">
-  console.log("Module chargé ✅");
-import { addRecensementBonus } from './boutique.js';
-
-// ======== IA: chargement du modèle ==========
-let model;
-async function loadModel(){
-  model = await mobilenet.load();
-  console.log("Modèle IA (Mobilenet) prêt !");
-}
-loadModel();
-
-async function isHedgehog(img){
-  if(!model) return false;
-  const predictions = await model.classify(img);
-  return predictions.some(p => {
-    const name = p.className.toLowerCase();
-    return name.includes("hedgehog") || name.includes("porcupine");
-  });
-}
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
+ 
 const firebaseConfig = {
   apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
   authDomain: "herisson-f80ba.firebaseapp.com",
@@ -653,6 +287,32 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+onAuthStateChanged(auth,user=>{
+  if(!user){ window.location.href="login.html"; return; }
+  const savedUsername=localStorage.getItem("username");
+  document.getElementById("usernameBadge").textContent = savedUsername || user.displayName || user.email || "Utilisateur connecté";
+});
+
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+  await signOut(auth);
+  localStorage.removeItem("username");
+  window.location.href="login.html";
+});
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// ==== Chargement du modèle MobileNet pour IA ====
+let model;
+async function loadModel(){
+  model = await mobilenet.load();
+  console.log("Modèle IA prêt !");
+}
+loadModel();
+
+async function isHedgehog(img){
+  if(!model) return false;
+  const predictions = await model.classify(img);
+  return predictions.some(p => p.className.toLowerCase().includes("hedgehog") || p.className.toLowerCase().includes("porcupine"));
+}
 // Auth + user badge
 onAuthStateChanged(auth, user => {
   if (!user) {
@@ -864,69 +524,57 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======== Upload d'image + Validation IA ==========
-const photoInput = document.getElementById("photoUpload");
-const previewDiv = document.getElementById("preview");
+photoInput.addEventListener("change", async () => {
+  const file = photoInput.files[0];
+  if (!file) return;
 
-photoInput.addEventListener("change", function() {
-  const file = this.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewDiv.innerHTML = `<img src="${e.target.result}">`;
-    };
-    reader.readAsDataURL(file);
-  }
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+
+  img.onload = async () => {
+    previewDiv.innerHTML = `<img src="${img.src}">`;
+
+    const hedgehogDetected = await isHedgehog(img);
+
+    if (hedgehogDetected) {
+      console.log("Hérisson détecté ✅");
+    } else {
+      console.warn("Aucun hérisson détecté ⚠️");
+    }
+  };
 });
 
 // ======== Soumission du formulaire ==========
-const form = document.getElementById("recensementForm");
-
-form.addEventListener("submit", async e => {
+const form=document.getElementById("recensementForm");
+form.addEventListener("submit", async e=>{
   e.preventDefault();
-  if (!auth.currentUser) return window.location.href = "login.html";
-  const img = previewDiv.querySelector("img");
-  if (!img) {
-    alert("Ajoute une photo !");
-    return;
-  }
-  if (!model) {
-    alert("IA en cours de chargement...");
-    return;
-  }
+  if(!auth.currentUser) return window.location.href="login.html";
 
-  const ok = await isHedgehog(img);
-  if (!ok) {
-    alert("❌ Ce n'est pas un hérisson !");
-    return;
-  }
-
-  const recensement = {
+  const recensement={
     uid: auth.currentUser.uid,
     username: localStorage.getItem("username") || "Inconnu",
     email: auth.currentUser.email || "Non renseigné",
     lieu: document.getElementById("lieu").value,
-    date: dateInput.value,
+    date: document.getElementById("date").value,
     notes: document.getElementById("notes").value,
     etat: document.getElementById("etat").value,
     sousEtat: document.getElementById("sousEtat").value,
     environnement: document.getElementById("environnement").value,
-    latitude: marker ? marker.getLatLng().lat : null,
-    longitude: marker ? marker.getLatLng().lng : null
+    latitude: window.marker ? window.marker.getLatLng().lat : null,
+    longitude: window.marker ? window.marker.getLatLng().lng : null
   };
 
-  try {
-    await addDoc(collection(db, "recensements"), recensement);
-    await addRecensementBonus(50);
+  try{
+    await addDoc(collection(db,"recensements"), recensement);
     form.reset();
-    previewDiv.innerHTML = "";
-    if (marker) marker.setLatLng(map.getCenter());
-    window.location.href = "confirmation.html";
-  } catch (err) {
+    previewDiv.innerHTML="";
+    if(window.marker) window.marker.setLatLng([50.8467,4.3525]); // reset marker centre
+    window.location.href="confirmation.html";
+  }catch(err){
     console.error(err);
     alert("Impossible d'enregistrer le recensement.");
   }
 });
 </script>
-
 </body>
 </html>
