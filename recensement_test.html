@@ -62,6 +62,9 @@ button:hover { background:#43a047; }
 .upload-icon { font-size:2.2rem; line-height:1; }
 .upload-title { font-weight:bold; }
 .submit-button { padding:14px 20px; border-radius:14px; font-size:1rem; box-shadow:0 12px 22px rgba(76,175,80,0.22); }
+.form-status-message { display:none; margin-top:18px; padding:12px 14px; border-radius:12px; border:1px solid #d6e5d4; background:#f3f8ef; color:#33523a; line-height:1.5; }
+.form-status-message.is-visible { display:block; }
+.form-status-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
 </style>
 </head>
 
@@ -256,6 +259,8 @@ class="upload-card">
 <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
 </section>
 
+<div id="formStatusMessage" class="form-status-message" aria-live="polite"></div>
+
 <button type="submit" class="submit-button">Envoyer le recensement</button>
 
 </form>
@@ -303,19 +308,24 @@ document.getElementById("year").textContent = new Date().getFullYear();
 
 // ==== Chargement du modèle MobileNet pour IA ====
 let model;
+const modelReady = loadModel();
+
 async function loadModel(){
-  model = await mobilenet.load();
-  console.log("Modèle IA prêt !");
+  try{
+    model = await mobilenet.load();
+    console.log("Modèle IA prêt !");
+    return model;
+  }catch(error){
+    console.error("Impossible de charger le modèle IA.", error);
+    return null;
+  }
 }
-loadModel();
-if (model) {
-  console.log("Le modèle est chargé ✅");
-} else {
-  console.log("Le modèle n’est pas encore chargé ❌");
-}
+
 async function isHedgehog(img){
-  if(!model) return false;
-  const predictions = await model.classify(img);
+  const loadedModel = model || await modelReady;
+  if(!loadedModel) return false;
+
+  const predictions = await loadedModel.classify(img);
   return predictions.some(p => p.className.toLowerCase().includes("hedgehog") || p.className.toLowerCase().includes("porcupine"));
 }
 // Auth + user badge
@@ -416,7 +426,7 @@ async function suggestAddressFromMarker() {
   const { lat, lng } = marker.getLatLng();
   setLieuStatus("Recherche d'une adresse...");
   try {
-    const response = await fetch(`[nominatim.openstreetmap.org](https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1)`, { headers: { "Accept": "application/json" } });
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`, { headers: { "Accept": "application/json" } });
     if (!response.ok) throw new Error("Adresse introuvable");
     const data = await response.json();
     const formatted = formatAddress(data.address || {});
@@ -447,9 +457,49 @@ map.on("click", e => {
   const { lat, lng } = e.latlng;
   placeMarker(lat, lng, "Point sélectionné sur la carte");
   setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
+  setFormStatus("");
 });
 
 // ======== Sélections (état, sous-état, environnement) ==========
+const formStatusMessage = document.getElementById("formStatusMessage");
+
+function setFormStatus(message, isError = false) {
+  if (!message) {
+    formStatusMessage.textContent = "";
+    formStatusMessage.classList.remove("is-visible", "is-error");
+    return;
+  }
+
+  formStatusMessage.textContent = message;
+  formStatusMessage.classList.add("is-visible");
+  formStatusMessage.classList.toggle("is-error", isError);
+}
+
+function validateRecensementForm() {
+  const missingFields = [];
+
+  if (!document.getElementById("etat").value) {
+    missingFields.push("sélectionner l'état du hérisson");
+  }
+
+  if (!document.getElementById("environnement").value) {
+    missingFields.push("choisir un environnement");
+  }
+
+  if (!marker) {
+    missingFields.push("placer un point précis sur la carte");
+  }
+
+  if (missingFields.length) {
+    setFormStatus(`Impossible d'envoyer le recensement pour l'instant. Merci de ${missingFields.join(", ")}.`, true);
+    formStatusMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    return false;
+  }
+
+  setFormStatus("");
+  return true;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const etatInput = document.getElementById("etat");
@@ -476,6 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
         [vivantOptions, mortOptions].forEach(group => {
           group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
         });
+        setFormStatus("");
         return;
       }
 
@@ -487,6 +538,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sousEtatInput.value = "";
       vivantOptions.style.display = val === "vivant" ? "flex" : "none";
       mortOptions.style.display = val === "mort" ? "flex" : "none";
+      setFormStatus("");
     });
   });
 
@@ -500,6 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isSelected) {
           sousEtatInput.value = "";
           card.classList.remove("selected-sub");
+          setFormStatus("");
           return;
         }
 
@@ -507,6 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
         card.classList.add("selected-sub");
+        setFormStatus("");
       });
     });
   });
@@ -519,6 +573,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isSelected) {
         envInput.value = "";
         card.classList.remove("selected-sub");
+        setFormStatus("");
         return;
       }
 
@@ -526,6 +581,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
       card.classList.add("selected-sub");
+      setFormStatus("");
     });
   });
 
@@ -540,27 +596,42 @@ photoInput.addEventListener("change", async () => {
   if (!file) return;
 
   const img = new Image();
-  img.src = URL.createObjectURL(file);
+  const objectUrl = URL.createObjectURL(file);
 
   img.onload = async () => {
-    // Affiche l'image dans la div preview
-    previewDiv.innerHTML = `<img src="${img.src}" alt="Prévisualisation">`;
+    try {
+      // Affiche l'image dans la div preview
+      previewDiv.innerHTML = `<img src="${objectUrl}" alt="Prévisualisation">`;
 
-    // Vérifie si c'est un hérisson
-    const hedgehogDetected = await isHedgehog(img);
+      // Vérifie si c'est un hérisson
+      const hedgehogDetected = await isHedgehog(img);
 
-    if (hedgehogDetected) {
-      console.log("Hérisson détecté ✅");
-    } else {
-      console.warn("Aucun hérisson détecté ⚠️");
+      if (hedgehogDetected) {
+        console.log("Hérisson détecté ✅");
+      } else {
+        console.warn("Aucun hérisson détecté ⚠️");
+      }
+    } catch (error) {
+      console.error("Impossible d'analyser l'image.", error);
+    } finally {
+      URL.revokeObjectURL(objectUrl);
     }
   };
+
+  img.onerror = () => {
+    console.error("Impossible de charger l'image sélectionnée.");
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  img.src = objectUrl;
 });
 // ======== Soumission du formulaire ==========
 const form=document.getElementById("recensementForm");
 form.addEventListener("submit", async e=>{
   e.preventDefault();
   if(!auth.currentUser) return window.location.href="login.html";
+
+  if(!validateRecensementForm()) return;
 
   const recensement={
     uid: auth.currentUser.uid,
@@ -572,15 +643,16 @@ form.addEventListener("submit", async e=>{
     etat: document.getElementById("etat").value,
     sousEtat: document.getElementById("sousEtat").value,
     environnement: document.getElementById("environnement").value,
-    latitude: window.marker ? window.marker.getLatLng().lat : null,
-    longitude: window.marker ? window.marker.getLatLng().lng : null
+    latitude: marker ? marker.getLatLng().lat : null,
+    longitude: marker ? marker.getLatLng().lng : null
   };
 
   try{
     await addDoc(collection(db,"recensements"), recensement);
     form.reset();
     previewDiv.innerHTML="";
-    if(window.marker) window.marker.setLatLng([50.8467,4.3525]); // reset marker centre
+    setFormStatus("");
+    if(marker) marker.setLatLng([50.8467,4.3525]); // reset marker centre
     window.location.href="confirmation.html";
   }catch(err){
     console.error(err);
