@@ -308,7 +308,11 @@ async function loadModel(){
   console.log("Modèle IA prêt !");
 }
 loadModel();
-
+if (model) {
+  console.log("Le modèle est chargé ✅");
+} else {
+  console.log("Le modèle n’est pas encore chargé ❌");
+}
 async function isHedgehog(img){
   if(!model) return false;
   const predictions = await model.classify(img);
@@ -528,6 +532,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======== Upload d'image + Validation IA ==========
+const photoInput = document.getElementById("photoUpload");
+const previewDiv = document.getElementById("preview");
+
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   if (!file) return;
@@ -536,8 +543,10 @@ photoInput.addEventListener("change", async () => {
   img.src = URL.createObjectURL(file);
 
   img.onload = async () => {
-    previewDiv.innerHTML = `<img src="${img.src}">`;
+    // Affiche l'image dans la div preview
+    previewDiv.innerHTML = `<img src="${img.src}" alt="Prévisualisation">`;
 
+    // Vérifie si c'est un hérisson
     const hedgehogDetected = await isHedgehog(img);
 
     if (hedgehogDetected) {
@@ -547,7 +556,6 @@ photoInput.addEventListener("change", async () => {
     }
   };
 });
-
 // ======== Soumission du formulaire ==========
 const form=document.getElementById("recensementForm");
 form.addEventListener("submit", async e=>{
