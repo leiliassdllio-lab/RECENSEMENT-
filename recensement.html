@@ -616,7 +616,8 @@ class="upload-card">
 <footer class="site-footer">
 © <span id="year"></span> – Team Hérisson
 </footer>
-
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script type="module">
@@ -1041,7 +1042,30 @@ requiredFields.forEach(field => {
         }
     });
 });
+// Import TensorFlow et MobileNet
+import * as mobilenet from 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
+import '@tensorflow/tfjs';
 
+// Variable pour le modèle
+let model;
+
+// Charger le modèle au démarrage
+async function loadModel() {
+    model = await mobilenet.load();
+    console.log("Modèle MobileNet chargé");
+}
+
+loadModel();
+
+// Fonction pour classifier une image HTML
+async function classifyImage(imgElement) {
+    if (!model) {
+        console.error("Modèle non chargé");
+        return null;
+    }
+    const predictions = await model.classify(imgElement);
+    return predictions; // Tableau [{className, probability}, ...]
+}
 // Modification du submit pour intégrer la validation
 form.addEventListener("submit", async e => {
     e.preventDefault();
