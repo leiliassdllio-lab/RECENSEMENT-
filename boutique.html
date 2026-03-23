@@ -37,9 +37,9 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
 
 <div id="shop">
 <div class="tabs">
-  <div class="tab active" onclick="openTab('skins')">Skins</div>
-  <div class="tab" onclick="openTab('pantsTab')">Pantalons</div>
-  <div class="tab" onclick="openTab('accessories')">Accessoires</div>
+  <div class="tab active" onclick="openTab(event,'skins')">Skins</div>
+  <div class="tab" onclick="openTab(event,'pantsTab')">Pantalons</div>
+  <div class="tab" onclick="openTab(event,'accessories')">Accessoires</div>
 </div>
 
 <div id="skins" class="items active">
@@ -115,11 +115,11 @@ onAuthStateChanged(auth, async user => {
 });
 
 // --- Fonction boutique ---
-function openTab(tabName){
-  document.querySelectorAll('.items').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById(tabName).classList.add('active');
-  event.target.classList.add('active');
+function openTab(evt, tabName){
+    document.querySelectorAll('.items').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active'); // ici on utilise l'événement
 }
 
 function handleItem(type, src, price, el){
