@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -247,9 +248,7 @@ class="upload-card">
 
 <div id="preview"></div>
 </section>
-<div id="modelStatus" class="field-status" style="text-align:center; font-weight:bold;">
-  Chargement du modèle IA...
-</div>
+
 <!-- Bloc libre pour les remarques complementaires -->
 <section class="form-section">
 <p class="section-label"><span>📝</span> Notes supplémentaires</p>
@@ -526,51 +525,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======== Upload d'image + Validation IA ==========
-const photoInput = document.getElementById("photoUpload");
-const previewDiv = document.getElementById("preview");
-const modelStatusDiv = document.createElement("div"); // indicateur visuel
-modelStatusDiv.className = "field-status";
-modelStatusDiv.style.textAlign = "center";
-modelStatusDiv.style.fontWeight = "bold";
-modelStatusDiv.textContent = "Chargement du modèle IA...";
-photoInput.parentElement.before(modelStatusDiv); // ajoute avant le label upload
-
-let model;
-let hedgehogDetected = false; // état global pour savoir si un hérisson est détecté
-
-// ==== Chargement du modèle avec mise à jour de l'UI ====
-async function loadModel() {
-  try {
-    modelStatusDiv.textContent = "Chargement du modèle IA...";
-    modelStatusDiv.style.color = "#5a6f5e";
-    model = await mobilenet.load();
-    console.log("Modèle IA prêt !");
-    modelStatusDiv.textContent = "✅ Modèle IA chargé ! Vous pouvez ajouter une image.";
-    modelStatusDiv.style.color = "#2f7a39"; // vert
-    photoInput.disabled = false; // active l'input après chargement
-  } catch (err) {
-    console.error("Erreur lors du chargement du modèle :", err);
-    modelStatusDiv.textContent = "❌ Échec du chargement du modèle IA.";
-    modelStatusDiv.style.color = "#b42318"; // rouge
-    photoInput.disabled = true;
-  }
-}
-
-// désactive l'input tant que le modèle n'est pas prêt
-photoInput.disabled = true;
-loadModel();
-
-// ==== Fonction de détection hérisson ====
-async function isHedgehog(img) {
-  if (!model) return false;
-  const predictions = await model.classify(img);
-  return predictions.some(
-    p => p.className.toLowerCase().includes("hedgehog") || 
-         p.className.toLowerCase().includes("porcupine")
-  );
-}
-
-// ==== Upload + détection ====
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   if (!file) return;
@@ -581,33 +535,23 @@ photoInput.addEventListener("change", async () => {
   img.onload = async () => {
     previewDiv.innerHTML = `<img src="${img.src}">`;
 
-    hedgehogDetected = await isHedgehog(img); // mise à jour du flag
+    const hedgehogDetected = await isHedgehog(img);
 
     if (hedgehogDetected) {
       console.log("Hérisson détecté ✅");
-      modelStatusDiv.textContent = "Hérisson détecté ✅";
-      modelStatusDiv.style.color = "#2f7a39";
     } else {
       console.warn("Aucun hérisson détecté ⚠️");
-      modelStatusDiv.textContent = "⚠️ Aucun hérisson détecté.";
-      modelStatusDiv.style.color = "#b42318";
-      alert("Attention : l'image ne semble pas contenir de hérisson.");
     }
   };
 });
 
-// Soumission du formulaire
-form.addEventListener("submit", async e => {
+// ======== Soumission du formulaire ==========
+const form=document.getElementById("recensementForm");
+form.addEventListener("submit", async e=>{
   e.preventDefault();
-  if (!auth.currentUser) return window.location.href="login.html";
+  if(!auth.currentUser) return window.location.href="login.html";
 
-  // Vérification IA avant soumission
-  if (!hedgehogDetected) {
-    alert("Impossible de soumettre : aucune image de hérisson détectée.");
-    return;
-  }
-
-  const recensement = {
+  const recensement={
     uid: auth.currentUser.uid,
     username: localStorage.getItem("username") || "Inconnu",
     email: auth.currentUser.email || "Non renseigné",
@@ -621,13 +565,13 @@ form.addEventListener("submit", async e => {
     longitude: window.marker ? window.marker.getLatLng().lng : null
   };
 
-  try {
+  try{
     await addDoc(collection(db,"recensements"), recensement);
     form.reset();
-    previewDiv.innerHTML = "";
-    if (window.marker) window.marker.setLatLng([50.8467,4.3525]);
+    previewDiv.innerHTML="";
+    if(window.marker) window.marker.setLatLng([50.8467,4.3525]); // reset marker centre
     window.location.href="confirmation.html";
-  } catch(err) {
+  }catch(err){
     console.error(err);
     alert("Impossible d'enregistrer le recensement.");
   }
