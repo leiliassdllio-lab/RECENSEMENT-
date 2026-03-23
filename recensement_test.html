@@ -65,6 +65,11 @@ button:hover { background:#43a047; }
 .form-status-message { display:none; margin-top:18px; padding:12px 14px; border-radius:12px; border:1px solid #d6e5d4; background:#f3f8ef; color:#33523a; line-height:1.5; }
 .form-status-message.is-visible { display:block; }
 .form-status-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
+.photo-analysis-message { display:none; margin-top:12px; padding:12px 14px; border-radius:12px; border:1px solid #d6e5d4; background:#f3f8ef; color:#33523a; line-height:1.5; font-weight:bold; }
+.photo-analysis-message.is-visible { display:block; }
+.photo-analysis-message.is-success { background:#edf8ee; border-color:#b9dec0; color:#1f6f2d; }
+.photo-analysis-message.is-warning { background:#fff7ed; border-color:#f3d3a1; color:#9a4d00; }
+.photo-analysis-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
 </style>
 </head>
 
@@ -250,6 +255,7 @@ class="upload-card">
 <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
 
 <div id="preview"></div>
+<div id="photoAnalysisMessage" class="photo-analysis-message" aria-live="polite"></div>
 </section>
 
 <!-- Bloc libre pour les remarques complementaires -->
@@ -590,13 +596,34 @@ document.addEventListener("DOMContentLoaded", () => {
 // ======== Upload d'image + Validation IA ==========
 const photoInput = document.getElementById("photoUpload");
 const previewDiv = document.getElementById("preview");
+const photoAnalysisMessage = document.getElementById("photoAnalysisMessage");
+
+function setPhotoAnalysisMessage(message, tone = "") {
+  if (!message) {
+    photoAnalysisMessage.textContent = "";
+    photoAnalysisMessage.classList.remove("is-visible", "is-success", "is-warning", "is-error");
+    return;
+  }
+
+  photoAnalysisMessage.textContent = message;
+  photoAnalysisMessage.classList.add("is-visible");
+  photoAnalysisMessage.classList.remove("is-success", "is-warning", "is-error");
+
+  if (tone) {
+    photoAnalysisMessage.classList.add(tone);
+  }
+}
 
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
-  if (!file) return;
+  if (!file) {
+    setPhotoAnalysisMessage("");
+    return;
+  }
 
   const img = new Image();
   const objectUrl = URL.createObjectURL(file);
+  setPhotoAnalysisMessage("Analyse de l'image en cours...", "is-warning");
 
   img.onload = async () => {
     try {
@@ -608,11 +635,14 @@ photoInput.addEventListener("change", async () => {
 
       if (hedgehogDetected) {
         console.log("Hérisson détecté ✅");
+        setPhotoAnalysisMessage("Hérisson détecté sur l'image.", "is-success");
       } else {
         console.warn("Aucun hérisson détecté ⚠️");
+        setPhotoAnalysisMessage("Aucun hérisson détecté sur l'image.", "is-warning");
       }
     } catch (error) {
       console.error("Impossible d'analyser l'image.", error);
+      setPhotoAnalysisMessage("Impossible d'analyser l'image pour le moment.", "is-error");
     } finally {
       URL.revokeObjectURL(objectUrl);
     }
@@ -620,6 +650,7 @@ photoInput.addEventListener("change", async () => {
 
   img.onerror = () => {
     console.error("Impossible de charger l'image sélectionnée.");
+    setPhotoAnalysisMessage("Impossible de charger l'image sélectionnée.", "is-error");
     URL.revokeObjectURL(objectUrl);
   };
 
