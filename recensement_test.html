@@ -340,8 +340,11 @@ document.getElementById("year").textContent = today.getFullYear();
 
 // ======== Carte Leaflet ===========
 const map = L.map("map").setView([50.8467, 4.3525], 13);
-L.tileLayer('[{s}.tile.openstreetmap.fr](https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png)', { attribution: '© OpenStreetMap contributors' }).addTo(map);
-
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    subdomains: ['a','b','c']
+}).addTo(map);
+ 
 let marker;
 const lieuInput = document.getElementById("lieu");
 const coordonneesInput = document.getElementById("coordonnees");
