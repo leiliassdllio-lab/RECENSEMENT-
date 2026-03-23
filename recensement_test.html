@@ -615,383 +615,302 @@ class="upload-card">
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js"></script>
   
+<script src="[unpkg.com](https://unpkg.com/leaflet/dist/leaflet.js)"></script>
+<script src="[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0/dist/tf.min.js)"></script>
+<script src="[cdn.jsdelivr.net](https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js)"></script>
+
 <script type="module">
-import { addRecensementBonus } from './boutique.js';  
-import * as mobilenet from 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js';
+import { addRecensementBonus } from './boutique.js';
 
+// ======== IA: chargement du modèle ==========
 let model;
-
-// Charger le modèle IA
 async function loadModel(){
   model = await mobilenet.load();
-  console.log("IA prête");
+  console.log("Modèle IA (Mobilenet) prêt !");
 }
-
 loadModel();
+
 async function isHedgehog(img){
   if(!model) return false;
-
   const predictions = await model.classify(img);
-
   return predictions.some(p => {
     const name = p.className.toLowerCase();
-
-    return (
-      name.includes("hedgehog") ||
-      name.includes("porcupine") ||
-    );
+    return name.includes("hedgehog") || name.includes("porcupine");
   });
 }
 
-// Initialisation Firebase pour l'authentification et l'enregistrement des recensements
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+// ======== Firebase et carte ===========
+import { initializeApp } from "[gstatic.com](https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js)";
+import { getFirestore, collection, addDoc } from "[gstatic.com](https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js)";
+import { getAuth, onAuthStateChanged, signOut } from "[gstatic.com](https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js)";
 
 const firebaseConfig = {
-apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
-authDomain:"herisson-f80ba.firebaseapp.com",
-projectId:"herisson-f80ba",
-storageBucket:"herisson-f80ba.firebasestorage.app",
-messagingSenderId:"142270421417",
-appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
+  apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+  authDomain: "herisson-f80ba.firebaseapp.com",
+  projectId: "herisson-f80ba",
+  storageBucket: "herisson-f80ba.firebasestorage.app",
+  messagingSenderId: "142270421417",
+  appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth,user=>{
-if(!user) {
-window.location.href="login.html";
-return;
-}
-
-const savedUsername=localStorage.getItem("username");
-const usernameBadge=document.getElementById("usernameBadge");
-const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
-usernameBadge.textContent=username;
+// Auth + user badge
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  const savedUsername = localStorage.getItem("username");
+  const usernameBadge = document.getElementById("usernameBadge");
+  const username = savedUsername || user.displayName || user.email || "Utilisateur connecté";
+  usernameBadge.textContent = username;
 });
 
-document.getElementById("logoutBtn").addEventListener("click",async()=>{
-await signOut(auth);
-localStorage.removeItem("username");
-window.location.href="login.html";
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  localStorage.removeItem("username");
+  window.location.href = "login.html";
 });
 
-const dateInput=document.getElementById("date");
-const today=new Date();
-dateInput.value=today.toISOString().slice(0,10);
-document.getElementById("year").textContent=today.getFullYear();
+// Date et année
+const dateInput = document.getElementById("date");
+const today = new Date();
+dateInput.value = today.toISOString().slice(0, 10);
+document.getElementById("year").textContent = today.getFullYear();
 
-const map=L.map("map").setView([50.8467,4.3525],13);
-
-L.tileLayer(
-'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-{ attribution:'© OpenStreetMap contributors'}
-).addTo(map);
+// ======== Carte Leaflet ===========
+const map = L.map("map").setView([50.8467, 4.3525], 13);
+L.tileLayer('[{s}.tile.openstreetmap.fr](https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png)', { attribution: '© OpenStreetMap contributors' }).addTo(map);
 
 let marker;
-const lieuInput=document.getElementById("lieu");
-const coordonneesInput=document.getElementById("coordonnees");
-const lieuStatus=document.getElementById("lieuStatus");
-const suggestAddressBtn=document.getElementById("suggestAddressBtn");
+const lieuInput = document.getElementById("lieu");
+const coordonneesInput = document.getElementById("coordonnees");
+const lieuStatus = document.getElementById("lieuStatus");
+const suggestAddressBtn = document.getElementById("suggestAddressBtn");
 
-function setLieuStatus(message,isError=false){
-lieuStatus.textContent=message;
-lieuStatus.style.color=isError ? "#b42318" : "#5a6f5e";
+function setLieuStatus(message, isError = false) {
+  lieuStatus.textContent = message;
+  lieuStatus.style.color = isError ? "#b42318" : "#5a6f5e";
 }
 
-// Transforme la reponse de geocodage inverse en adresse plus lisible
-function formatAddress(data){
-const parts=[];
-const road=[data.house_number,data.road].filter(Boolean).join(" ").trim();
-const locality=data.city || data.town || data.village || data.hamlet || data.municipality;
-const postalLocality=[data.postcode,locality].filter(Boolean).join(" ").trim();
-if(road) parts.push(road);
-if(postalLocality) parts.push(postalLocality);
-if(data.country) parts.push(data.country);
-return parts.join(", ");
+function formatAddress(data) {
+  const parts = [];
+  const road = [data.house_number, data.road].filter(Boolean).join(" ").trim();
+  const locality = data.city || data.town || data.village || data.hamlet || data.municipality;
+  const postalLocality = [data.postcode, locality].filter(Boolean).join(" ").trim();
+  if (road) parts.push(road);
+  if (postalLocality) parts.push(postalLocality);
+  if (data.country) parts.push(data.country);
+  return parts.join(", ");
 }
 
-// Convertit les coordonnees decimales au format degres / minutes / secondes
-function toDms(value,isLatitude){
-const absolute=Math.abs(value);
-const degrees=Math.floor(absolute);
-const minutesFloat=(absolute-degrees)*60;
-const minutes=Math.floor(minutesFloat);
-const seconds=((minutesFloat-minutes)*60).toFixed(1);
-const direction=isLatitude
-? (value >= 0 ? "N" : "S")
-: (value >= 0 ? "E" : "W");
-
-return `${degrees}°${minutes}'${seconds}"${direction}`;
+function toDms(value, isLatitude) {
+  const absolute = Math.abs(value);
+  const degrees = Math.floor(absolute);
+  const minutesFloat = (absolute - degrees) * 60;
+  const minutes = Math.floor(minutesFloat);
+  const seconds = ((minutesFloat - minutes) * 60).toFixed(1);
+  const direction = isLatitude ? (value >= 0 ? "N" : "S") : (value >= 0 ? "E" : "W");
+  return `${degrees}°${minutes}'${seconds}"${direction}`;
 }
 
-// Met a jour l'affichage des coordonnees et du champ lieu a partir du marqueur
-function updateLieu(lat,lon){
-coordonneesInput.value=`${toDms(lat,true)}, ${toDms(lon,false)}`;
-if(!lieuInput.value || lieuInput.value.startsWith("Lat:") || lieuInput.value.includes(", Lon:")){
-lieuInput.value=`Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
-}
-setLieuStatus("Position mise à jour. Clique sur \"Proposer une adresse\" pour obtenir une adresse lisible.");
-}
-
-// Lie le deplacement manuel du marqueur a la mise a jour des champs
-function bindMarkerEvents(){
-marker.on("dragend",e=>{
-const p=e.target.getLatLng();
-updateLieu(p.lat,p.lng);
-});
+function updateLieu(lat, lon) {
+  coordonneesInput.value = `${toDms(lat, true)}, ${toDms(lon, false)}`;
+  if (!lieuInput.value || lieuInput.value.startsWith("Lat:")) {
+    lieuInput.value = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+  }
+  setLieuStatus("Position mise à jour. Clique sur \"Proposer une adresse\" pour obtenir une adresse lisible.");
 }
 
-// Cree ou deplace le marqueur actif sur la carte
-function placeMarker(lat,lon,popupText="Point sélectionné"){
-if(marker){
-marker.setLatLng([lat,lon]).bindPopup(popupText);
-}else{
-marker=L.marker([lat,lon],{draggable:true})
-  .addTo(map)
-  .bindPopup(popupText);
-bindMarkerEvents();
+function bindMarkerEvents() {
+  marker.on("dragend", e => {
+    const p = e.target.getLatLng();
+    updateLieu(p.lat, p.lng);
+  });
 }
 
-marker.openPopup();
-updateLieu(lat,lon);
+function placeMarker(lat, lon, popupText = "Point sélectionné") {
+  if (marker) {
+    marker.setLatLng([lat, lon]).bindPopup(popupText);
+  } else {
+    marker = L.marker([lat, lon], { draggable: true }).addTo(map).bindPopup(popupText);
+    bindMarkerEvents();
+  }
+  marker.openPopup();
+  updateLieu(lat, lon);
 }
 
-// Tente de proposer une adresse postale a partir du point choisi sur la carte
-async function suggestAddressFromMarker(){
-if(!marker){
-setLieuStatus("Place d'abord le marqueur sur la carte.", true);
-return;
+async function suggestAddressFromMarker() {
+  if (!marker) {
+    setLieuStatus("Place d'abord le marqueur sur la carte.", true);
+    return;
+  }
+
+  const { lat, lng } = marker.getLatLng();
+  setLieuStatus("Recherche d'une adresse...");
+  try {
+    const response = await fetch(`[nominatim.openstreetmap.org](https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1)`, { headers: { "Accept": "application/json" } });
+    if (!response.ok) throw new Error("Adresse introuvable");
+    const data = await response.json();
+    const formatted = formatAddress(data.address || {});
+    if (formatted) {
+      lieuInput.value = formatted;
+      setLieuStatus("Adresse proposée à partir du point sélectionné.");
+    } else {
+      lieuInput.value = data.display_name || lieuInput.value;
+      setLieuStatus("Adresse partielle proposée. Tu peux la compléter manuellement.");
+    }
+  } catch (error) {
+    setLieuStatus("Impossible de proposer une adresse automatiquement pour l'instant.", true);
+  }
 }
 
-const {lat,lng}=marker.getLatLng();
-setLieuStatus("Recherche d'une adresse...");
-
-try{
-const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`,{
-headers:{ "Accept":"application/json" }
-});
-
-if(!response.ok) throw new Error("Adresse introuvable");
-
-const data=await response.json();
-const formatted=formatAddress(data.address || {});
-
-if(formatted){
-lieuInput.value=formatted;
-setLieuStatus("Adresse proposée à partir du point sélectionné.");
-}else{
-lieuInput.value=data.display_name || lieuInput.value;
-setLieuStatus("Adresse partielle proposée. Tu peux la compléter manuellement.");
-}
-}catch(error){
-setLieuStatus("Impossible de proposer une adresse automatiquement pour l'instant.", true);
-}
-}
-
-if(navigator.geolocation){
-navigator.geolocation.getCurrentPosition(pos=>{
-
-const lat=pos.coords.latitude;
-	const lon=pos.coords.longitude;
-	
-	map.setView([lat,lon],15);
-	
-	placeMarker(lat,lon,"Votre position actuelle");
-	
-	});
-}
-
-map.on("click",e=>{
-const {lat,lng}=e.latlng;
-placeMarker(lat,lng,"Point sélectionné sur la carte");
-setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
-});
-
-// Gestion des cartes de selection pour l'etat, le sous-etat et l'environnement
 suggestAddressBtn.addEventListener("click", suggestAddressFromMarker);
 
-const etatInput=document.getElementById("etat");
-const sousEtatInput=document.getElementById("sousEtat");
-
-const etatGrid=document.getElementById("etatGrid");
-const vivantOptions=document.getElementById("vivantOptions");
-const mortOptions=document.getElementById("mortOptions");
-
-etatGrid.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
-
-const val=card.dataset.etat;
-const isSelected=card.classList.contains("selected-main");
-
-if(isSelected){
-etatInput.value="";
-card.classList.remove("selected-main");
-vivantOptions.style.display="none";
-mortOptions.style.display="none";
-sousEtatInput.value="";
-[vivantOptions,mortOptions].forEach(group=>{
-group.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
-});
-return;
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    map.setView([lat, lon], 15);
+    placeMarker(lat, lon, "Votre position actuelle");
+  });
 }
 
-etatInput.value=val;
-
-etatGrid.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-main"));
-
-card.classList.add("selected-main");
-
-sousEtatInput.value="";
-
-vivantOptions.style.display="none";
-mortOptions.style.display="none";
-
-if(val==="vivant") vivantOptions.style.display="flex";
-if(val==="mort") mortOptions.style.display="flex";
-
-});
+map.on("click", e => {
+  const { lat, lng } = e.latlng;
+  placeMarker(lat, lng, "Point sélectionné sur la carte");
+  setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
 });
 
-[vivantOptions,mortOptions].forEach(group=>{
-group.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
+// ======== Sélections (état, sous-état, environnement) ==========
+const etatInput = document.getElementById("etat");
+const sousEtatInput = document.getElementById("sousEtat");
+const etatGrid = document.getElementById("etatGrid");
+const vivantOptions = document.getElementById("vivantOptions");
+const mortOptions = document.getElementById("mortOptions");
 
-const val=card.dataset.sousEtat;
-const isSelected=card.classList.contains("selected-sub");
-
-if(isSelected){
-sousEtatInput.value="";
-card.classList.remove("selected-sub");
-return;
-}
-
-sousEtatInput.value=val;
-
-group.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
-
-card.classList.add("selected-sub");
-
-});
-});
-});
-
-const envGrid=document.getElementById("envGrid");
-const envInput=document.getElementById("environnement");
-
-envGrid.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
-
-const isSelected=card.classList.contains("selected-sub");
-
-if(isSelected){
-envInput.value="";
-card.classList.remove("selected-sub");
-return;
-}
-
-envInput.value=card.dataset.env;
-
-envGrid.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
-
-card.classList.add("selected-sub");
-
-});
+etatGrid.querySelectorAll(".choice-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const val = card.dataset.etat;
+    const isSelected = card.classList.contains("selected-main");
+    if (isSelected) {
+      etatInput.value = "";
+      card.classList.remove("selected-main");
+      vivantOptions.style.display = "none";
+      mortOptions.style.display = "none";
+      sousEtatInput.value = "";
+      [vivantOptions, mortOptions].forEach(group => group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub")));
+      return;
+    }
+    etatInput.value = val;
+    etatGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-main"));
+    card.classList.add("selected-main");
+    sousEtatInput.value = "";
+    vivantOptions.style.display = val === "vivant" ? "flex" : "none";
+    mortOptions.style.display = val === "mort" ? "flex" : "none";
+  });
 });
 
-const photoInput=document.getElementById("photoUpload");
-const previewDiv=document.getElementById("preview");
-
-photoInput.addEventListener("change",function(){
-
-const file=this.files[0];
-
-if(file){
-const reader=new FileReader();
-
-reader.onload=e=>{
-previewDiv.innerHTML=`<img src="${e.target.result}">`;
-};
-
-reader.readAsDataURL(file);
-}
-
+[vivantOptions, mortOptions].forEach(group => {
+  group.querySelectorAll(".choice-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const val = card.dataset.sousEtat;
+      const isSelected = card.classList.contains("selected-sub");
+      if (isSelected) {
+        sousEtatInput.value = "";
+        card.classList.remove("selected-sub");
+        return;
+      }
+      sousEtatInput.value = val;
+      group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+      card.classList.add("selected-sub");
+    });
+  });
 });
 
-const form=document.getElementById("recensementForm");
+const envGrid = document.getElementById("envGrid");
+const envInput = document.getElementById("environnement");
 
-form.addEventListener("submit",async e=>{
-
-e.preventDefault();
-
-// Construit l'objet complet qui sera envoye dans Firestore
-if(!auth.currentUser)
-return window.location.href="login.html";
-const img = previewDiv.querySelector("img");
-
-if(!img){
-  alert("Ajoute une photo !");
-  return;
-}
-
-if(!model){
-  alert("IA en cours de chargement...");
-  return;
-}
-
-const ok = await isHedgehog(img);
-
-if(!ok){
-  alert("❌ Ce n'est pas un hérisson !");
-  return;
-}
-const recensement={
-
-uid:auth.currentUser.uid,
-username:localStorage.getItem("username") || "Inconnu",
-email:auth.currentUser.email || "Non renseigné",
-
-lieu:document.getElementById("lieu").value,
-date:dateInput.value,
-
-notes:document.getElementById("notes").value,
-
-etat:document.getElementById("etat").value,
-sousEtat:document.getElementById("sousEtat").value,
-environnement:document.getElementById("environnement").value,
-
-latitude:marker ? marker.getLatLng().lat : null,
-longitude:marker ? marker.getLatLng().lng : null
-
-};
-
-try{
-
-await addDoc(collection(db,"recensements"),recensement);
-await addRecensementBonus(50);
-form.reset();
-previewDiv.innerHTML="";
-
-if(marker) marker.setLatLng(map.getCenter());
-
-window.location.href="confirmation.html";
-
-}catch(err){
-
-console.error(err);
-alert("Impossible d'enregistrer le recensement.");
-
-}
-
+envGrid.querySelectorAll(".choice-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const isSelected = card.classList.contains("selected-sub");
+    if (isSelected) {
+      envInput.value = "";
+      card.classList.remove("selected-sub");
+      return;
+    }
+    envInput.value = card.dataset.env;
+    envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+    card.classList.add("selected-sub");
+  });
 });
 
+// ======== Upload d'image + Validation IA ==========
+const photoInput = document.getElementById("photoUpload");
+const previewDiv = document.getElementById("preview");
+
+photoInput.addEventListener("change", function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewDiv.innerHTML = `<img src="${e.target.result}">`;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ======== Soumission du formulaire ==========
+const form = document.getElementById("recensementForm");
+
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!auth.currentUser) return window.location.href = "login.html";
+  const img = previewDiv.querySelector("img");
+  if (!img) {
+    alert("Ajoute une photo !");
+    return;
+  }
+  if (!model) {
+    alert("IA en cours de chargement...");
+    return;
+  }
+
+  const ok = await isHedgehog(img);
+  if (!ok) {
+    alert("❌ Ce n'est pas un hérisson !");
+    return;
+  }
+
+  const recensement = {
+    uid: auth.currentUser.uid,
+    username: localStorage.getItem("username") || "Inconnu",
+    email: auth.currentUser.email || "Non renseigné",
+    lieu: document.getElementById("lieu").value,
+    date: dateInput.value,
+    notes: document.getElementById("notes").value,
+    etat: document.getElementById("etat").value,
+    sousEtat: document.getElementById("sousEtat").value,
+    environnement: document.getElementById("environnement").value,
+    latitude: marker ? marker.getLatLng().lat : null,
+    longitude: marker ? marker.getLatLng().lng : null
+  };
+
+  try {
+    await addDoc(collection(db, "recensements"), recensement);
+    await addRecensementBonus(50);
+    form.reset();
+    previewDiv.innerHTML = "";
+    if (marker) marker.setLatLng(map.getCenter());
+    window.location.href = "confirmation.html";
+  } catch (err) {
+    console.error(err);
+    alert("Impossible d'enregistrer le recensement.");
+  }
+});
 </script>
 
 </body>
