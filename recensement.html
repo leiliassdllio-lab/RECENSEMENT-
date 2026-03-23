@@ -678,12 +678,6 @@ onAuthStateChanged(auth, async user => {
   usernameBadge.textContent=username;
 });
 
-const savedUsername=localStorage.getItem("username");
-const usernameBadge=document.getElementById("usernameBadge");
-const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
-usernameBadge.textContent=username;
-});
-
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
 await signOut(auth);
 localStorage.removeItem("username");
@@ -1065,7 +1059,7 @@ requiredFields.forEach(field => {
     });
 });
 // Import TensorFlow et MobileNet
-import * as mobilenet from 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
+import * as mobilenet from 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js';
 import '@tensorflow/tfjs';
 
 // Variable pour le modèle
@@ -1088,46 +1082,17 @@ async function classifyImage(imgElement) {
     const predictions = await model.classify(imgElement);
     return predictions; // Tableau [{className, probability}, ...]
 }
-// Modification du submit pour intégrer la validation
-form.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    if (!validateForm()) return; // si formulaire incomplet, stop
-
-    // --- Ton code existant pour envoyer dans Firestore ---
-    if(!auth.currentUser)
-        return window.location.href="login.html";
-
-    const recensement={
-        uid:auth.currentUser.uid,
-        username:localStorage.getItem("username") || "Inconnu",
-        email:auth.currentUser.email || "Non renseigné",
-        lieu:document.getElementById("lieu").value,
-        date:dateInput.value,
-        notes:document.getElementById("notes").value,
-        etat:document.getElementById("etat").value,
-        sousEtat:document.getElementById("sousEtat").value,
-        environnement:document.getElementById("environnement").value,
-        latitude:marker ? marker.getLatLng().lat : null,
-        longitude:marker ? marker.getLatLng().lng : null
-    };
-
-    try{
-        await addDoc(collection(db,"recensements"),recensement);
-
         form.reset();
         previewDiv.innerHTML="";
 
         if(marker) marker.setLatLng(map.getCenter());
 
         window.location.href="confirmation.html";
-
-    } catch(err){
+    } catch(err) {
         console.error(err);
         alert("Impossible d'enregistrer le recensement.");
     }
 });
-
 </script>
 
 </body>
