@@ -408,6 +408,27 @@ border-radius:14px;
 font-size:1rem;
 box-shadow:0 12px 22px rgba(76,175,80,0.22);
 }
+
+.form-status-message {
+display:none;
+margin-top:18px;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #d6e5d4;
+background:#f3f8ef;
+color:#33523a;
+line-height:1.5;
+}
+
+.form-status-message.is-visible {
+display:block;
+}
+
+.form-status-message.is-error {
+background:#fef3f2;
+border-color:#f3c7c2;
+color:#b42318;
+}
 </style>
 </head>
 
@@ -602,6 +623,8 @@ class="upload-card">
 <textarea id="notes" placeholder="Ajoutez vos remarques"></textarea>
 </section>
 
+<div id="formStatusMessage" class="form-status-message" aria-live="polite"></div>
+
 <button type="submit" class="submit-button">Envoyer le recensement</button>
 
 </form>
@@ -781,6 +804,7 @@ map.on("click",e=>{
 const {lat,lng}=e.latlng;
 placeMarker(lat,lng,"Point sélectionné sur la carte");
 setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
+setFormStatus("");
 });
 
 // Gestion des cartes de selection pour l'etat, le sous-etat et l'environnement
@@ -809,6 +833,7 @@ sousEtatInput.value="";
 group.querySelectorAll(".choice-card")
 .forEach(c=>c.classList.remove("selected-sub"));
 });
+setFormStatus("");
 return;
 }
 
@@ -826,6 +851,7 @@ mortOptions.style.display="none";
 
 if(val==="vivant") vivantOptions.style.display="flex";
 if(val==="mort") mortOptions.style.display="flex";
+setFormStatus("");
 
 });
 });
@@ -840,6 +866,7 @@ const isSelected=card.classList.contains("selected-sub");
 if(isSelected){
 sousEtatInput.value="";
 card.classList.remove("selected-sub");
+setFormStatus("");
 return;
 }
 
@@ -849,6 +876,7 @@ group.querySelectorAll(".choice-card")
 .forEach(c=>c.classList.remove("selected-sub"));
 
 card.classList.add("selected-sub");
+setFormStatus("");
 
 });
 });
@@ -865,6 +893,7 @@ const isSelected=card.classList.contains("selected-sub");
 if(isSelected){
 envInput.value="";
 card.classList.remove("selected-sub");
+setFormStatus("");
 return;
 }
 
@@ -874,12 +903,51 @@ envGrid.querySelectorAll(".choice-card")
 .forEach(c=>c.classList.remove("selected-sub"));
 
 card.classList.add("selected-sub");
+setFormStatus("");
 
 });
 });
 
 const photoInput=document.getElementById("photoUpload");
 const previewDiv=document.getElementById("preview");
+const formStatusMessage=document.getElementById("formStatusMessage");
+
+function setFormStatus(message,isError=false){
+if(!message){
+formStatusMessage.textContent="";
+formStatusMessage.classList.remove("is-visible","is-error");
+return;
+}
+
+formStatusMessage.textContent=message;
+formStatusMessage.classList.add("is-visible");
+formStatusMessage.classList.toggle("is-error", isError);
+}
+
+function validateRecensementForm(){
+const missingFields=[];
+
+if(!etatInput.value){
+missingFields.push("sélectionner l'état du hérisson");
+}
+
+if(!envInput.value){
+missingFields.push("choisir un environnement");
+}
+
+if(!marker){
+missingFields.push("placer un point précis sur la carte");
+}
+
+if(missingFields.length){
+setFormStatus(`Impossible d'envoyer le recensement pour l'instant. Merci de ${missingFields.join(", ")}.`, true);
+formStatusMessage.scrollIntoView({ behavior:"smooth", block:"nearest" });
+return false;
+}
+
+setFormStatus("");
+return true;
+}
 
 photoInput.addEventListener("change",function(){
 
@@ -906,6 +974,10 @@ e.preventDefault();
 // Construit l'objet complet qui sera envoye dans Firestore
 if(!auth.currentUser)
 return window.location.href="login.html";
+
+if(!validateRecensementForm()){
+return;
+}
 
 const recensement={
 
