@@ -7,7 +7,7 @@
 
 <style>
 body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135deg,#0f172a,#1e293b); color:white; display:flex; height:100vh; }
-#header { position:absolute; top:10px; left:20px; font-size:20px; background:rgba(0,0,0,0.4); padding:8px 15px; border-radius:10px; }
+#header { position:absolute; top:10px; left:20px; font-size:20px; background:rgba(0,0,0,0.4); padding:8px 15px; border-radius:10px; z-index:10; }
 #character { width:50%; display:flex; justify-content:center; align-items:center; position:relative; }
 .layer { position:absolute; width:220px; transition:0.2s; }
 #base{z-index:1;} #pants{z-index:2;} #accessory{z-index:3;}
@@ -27,7 +27,7 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
 </head>
 <body>
 
-<div id="header">💰 Coins: <span id="coins">100</span></div>
+<div id="header">💰 Coins: <span id="coins">0</span></div>
 
 <div id="character">
   <img id="base" class="layer" src="https://i.imgur.com/8QfQZ6F.png">
@@ -36,7 +36,6 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
 </div>
 
 <div id="shop">
-
 <div class="tabs">
   <div class="tab active" onclick="openTab('skins')">Skins</div>
   <div class="tab" onclick="openTab('pantsTab')">Pantalons</div>
@@ -47,7 +46,6 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
   <div class="item" data-id="skin0" onclick="handleItem('skin','https://i.imgur.com/8QfQZ6F.png',0,this)">
     Normal<div class="price">Gratuit</div>
   </div>
-
   <div class="item" data-id="skin1" onmouseover="preview('base','https://i.imgur.com/YOUR_IMAGE.png')" onmouseout="resetPreview()" onclick="handleItem('skin','https://i.imgur.com/YOUR_IMAGE.png',50,this)">
     Skin Rouge<div class="price">50</div>
   </div>
@@ -67,49 +65,123 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
 
 </div>
 
-<script>
-let coins = parseInt(localStorage.getItem("coins")) || 100;
-let owned = JSON.parse(localStorage.getItem("owned")) || {};
-let equipped = JSON.parse(localStorage.getItem("equipped")) || {};
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-updateCoins();
-initOwnedUI();
-loadEquipped();
+// --- Config Firebase ---
+const firebaseConfig = {
+  apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+  authDomain:"herisson-f80ba.firebaseapp.com",
+  projectId:"herisson-f80ba",
+  storageBucket:"herisson-f80ba.firebasestorage.app",
+  messagingSenderId:"142270421417",
+  appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-function updateCoins(){ document.getElementById("coins").textContent = coins; localStorage.setItem("coins",coins);} 
+let coins = 0;
+let owned = {};
+let equipped = {};
+let userRef;
 
-function save(){ localStorage.setItem("owned",JSON.stringify(owned)); localStorage.setItem("equipped",JSON.stringify(equipped)); }
+// --- Gestion utilisateur ---
+onAuthStateChanged(auth, async user => {
+  if (!user) { alert("Connecte-toi d'abord."); return; }
 
-function openTab(tabName){ document.querySelectorAll('.items').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active')); document.getElementById(tabName).classList.add('active'); event.target.classList.add('active'); }
+  userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
 
-function handleItem(type,src,price,el){
+  if (!userSnap.exists()) {
+    // Création user avec 50 coins et aucun objet débloqué
+    await setDoc(userRef, { uid:user.uid, username:user.displayName||"Inconnu", coins:50, ownedItems:[], equipped:{} });
+    coins = 50;
+    owned = {};
+    equipped = {};
+  } else {
+    const data = userSnap.data();
+    coins = data.coins || 0;
+    owned = {};
+    if(data.ownedItems) data.ownedItems.forEach(id=>owned[id]=true);
+    equipped = data.equipped || {};
+  }
+
+  document.getElementById("coins").textContent = coins;
+  loadEquipped();
+  initOwnedUI();
+});
+
+// --- Fonction boutique ---
+function openTab(tabName){
+  document.querySelectorAll('.items').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function handleItem(type, src, price, el){
   const id = el.dataset.id;
-
   if(!owned[id]){
     if(coins < price){ alert("Pas assez de coins"); return; }
     coins -= price;
     owned[id] = true;
+    saveToFirebase();
   }
-
   equipped[type] = src;
   applyEquip(type,src);
-
   updateCoins();
-  save();
   initOwnedUI();
 }
 
-function applyEquip(type,src){ document.getElementById(type==='skin'?'base':type).src = src; }
+function applyEquip(type, src){
+  document.getElementById(type==='skin'?'base':type).src = src;
+}
 
-function initOwnedUI(){ document.querySelectorAll('.item').forEach(el=>{ const id=el.dataset.id; if(owned[id]) el.classList.add('owned'); }); }
+function initOwnedUI(){
+  document.querySelectorAll('.item').forEach(el=>{
+    const id=el.dataset.id;
+    if(owned[id]) el.classList.add('owned');
+  });
+}
 
-function loadEquipped(){ if(equipped.skin) applyEquip('skin',equipped.skin); if(equipped.pants) applyEquip('pants',equipped.pants); if(equipped.accessory) applyEquip('accessory',equipped.accessory); }
+function loadEquipped(){
+  if(equipped.skin) applyEquip('skin',equipped.skin);
+  if(equipped.pants) applyEquip('pants',equipped.pants);
+  if(equipped.accessory) applyEquip('accessory',equipped.accessory);
+}
 
-// PREVIEW
+function updateCoins(){
+  document.getElementById("coins").textContent = coins;
+}
+
+function saveToFirebase(){
+  if(!userRef) return;
+  const ownedItems = Object.keys(owned).filter(id=>owned[id]);
+  updateDoc(userRef, { coins, ownedItems, equipped });
+}
+
+// --- Preview ---
 let previewBackup = {};
-function preview(type,src){ const id = (type==='base')?'base':type; previewBackup[id] = document.getElementById(id).src; document.getElementById(id).src = src; }
-function resetPreview(){ for(let k in previewBackup){ document.getElementById(k).src = previewBackup[k]; } }
+function preview(type,src){
+  const id = (type==='base')?'base':type;
+  previewBackup[id] = document.getElementById(id).src;
+  document.getElementById(id).src = src;
+}
+function resetPreview(){
+  for(let k in previewBackup) document.getElementById(k).src = previewBackup[k];
+}
 
+// --- Bonus coins après recensement ---
+// Exemple : appeler cette fonction après soumission du recensement
+export async function addRecensementBonus(amount=50){
+  if(!userRef) return;
+  coins += amount;
+  updateCoins();
+  saveToFirebase();
+}
 </script>
 
 </body>
