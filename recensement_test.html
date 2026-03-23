@@ -781,66 +781,85 @@ map.on("click", e => {
 });
 
 // ======== Sélections (état, sous-état, environnement) ==========
-const etatInput = document.getElementById("etat");
-const sousEtatInput = document.getElementById("sousEtat");
-const etatGrid = document.getElementById("etatGrid");
-const vivantOptions = document.getElementById("vivantOptions");
-const mortOptions = document.getElementById("mortOptions");
+document.addEventListener("DOMContentLoaded", () => {
 
-etatGrid.querySelectorAll(".choice-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const val = card.dataset.etat;
-    const isSelected = card.classList.contains("selected-main");
-    if (isSelected) {
-      etatInput.value = "";
-      card.classList.remove("selected-main");
-      vivantOptions.style.display = "none";
-      mortOptions.style.display = "none";
-      sousEtatInput.value = "";
-      [vivantOptions, mortOptions].forEach(group => group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub")));
-      return;
-    }
-    etatInput.value = val;
-    etatGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-main"));
-    card.classList.add("selected-main");
-    sousEtatInput.value = "";
-    vivantOptions.style.display = val === "vivant" ? "flex" : "none";
-    mortOptions.style.display = val === "mort" ? "flex" : "none";
-  });
-});
+  const etatInput = document.getElementById("etat");
+  const sousEtatInput = document.getElementById("sousEtat");
+  const envInput = document.getElementById("environnement");
 
-[vivantOptions, mortOptions].forEach(group => {
-  group.querySelectorAll(".choice-card").forEach(card => {
+  const etatGrid = document.getElementById("etatGrid");
+  const vivantOptions = document.getElementById("vivantOptions");
+  const mortOptions = document.getElementById("mortOptions");
+  const envGrid = document.getElementById("envGrid");
+
+  // Etats principaux
+  etatGrid.querySelectorAll(".choice-card").forEach(card => {
     card.addEventListener("click", () => {
-      const val = card.dataset.sousEtat;
-      const isSelected = card.classList.contains("selected-sub");
+      const val = card.dataset.etat;
+      const isSelected = card.classList.contains("selected-main");
+
       if (isSelected) {
+        etatInput.value = "";
+        card.classList.remove("selected-main");
+        vivantOptions.style.display = "none";
+        mortOptions.style.display = "none";
         sousEtatInput.value = "";
+        [vivantOptions, mortOptions].forEach(group => {
+          group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+        });
+        return;
+      }
+
+      etatInput.value = val;
+
+      etatGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-main"));
+      card.classList.add("selected-main");
+
+      sousEtatInput.value = "";
+      vivantOptions.style.display = val === "vivant" ? "flex" : "none";
+      mortOptions.style.display = val === "mort" ? "flex" : "none";
+    });
+  });
+
+  // Sous-états
+  [vivantOptions, mortOptions].forEach(group => {
+    group.querySelectorAll(".choice-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const val = card.dataset.sousEtat;
+        const isSelected = card.classList.contains("selected-sub");
+
+        if (isSelected) {
+          sousEtatInput.value = "";
+          card.classList.remove("selected-sub");
+          return;
+        }
+
+        sousEtatInput.value = val;
+
+        group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+        card.classList.add("selected-sub");
+      });
+    });
+  });
+
+  // Environnement
+  envGrid.querySelectorAll(".choice-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const isSelected = card.classList.contains("selected-sub");
+
+      if (isSelected) {
+        envInput.value = "";
         card.classList.remove("selected-sub");
         return;
       }
-      sousEtatInput.value = val;
-      group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+
+      envInput.value = card.dataset.env;
+
+      envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
       card.classList.add("selected-sub");
     });
   });
-});
 
-const envGrid = document.getElementById("envGrid");
-const envInput = document.getElementById("environnement");
-
-envGrid.querySelectorAll(".choice-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const isSelected = card.classList.contains("selected-sub");
-    if (isSelected) {
-      envInput.value = "";
-      card.classList.remove("selected-sub");
-      return;
-    }
-    envInput.value = card.dataset.env;
-    envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
-    card.classList.add("selected-sub");
-  });
 });
 
 // ======== Upload d'image + Validation IA ==========
