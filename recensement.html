@@ -941,7 +941,29 @@ const form=document.getElementById("recensementForm");
 form.addEventListener("submit",async e=>{
 
 e.preventDefault();
+// Vérifier l'image avec l'IA
+const imgEl = previewDiv.querySelector('img');
+if (!imgEl) {
+    alert("Merci d'ajouter une photo du hérisson.");
+    return;
+}
 
+// Classification
+const predictions = await classifyImage(imgEl);
+console.log(predictions);
+
+// Vérifier si "hedgehog" ou "hérisson" est détecté
+const isHedgehog = predictions.some(p =>
+    p.className.toLowerCase().includes("hedgehog") ||
+    p.className.toLowerCase().includes("hérisson")
+);
+
+if (!isHedgehog) {
+    alert("La photo ne semble pas être un hérisson. Vérifie ton image.");
+    return;
+}
+
+// Si tout est ok, on continue l'envoi vers Firebase
 // Construit l'objet complet qui sera envoye dans Firestore
 if(!auth.currentUser)
 return window.location.href="login.html";
