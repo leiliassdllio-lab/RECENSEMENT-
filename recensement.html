@@ -1082,17 +1082,6 @@ async function classifyImage(imgElement) {
     const predictions = await model.classify(imgElement);
     return predictions; // Tableau [{className, probability}, ...]
 }
-        form.reset();
-        previewDiv.innerHTML="";
-
-        if(marker) marker.setLatLng(map.getCenter());
-
-        window.location.href="confirmation.html";
-    } catch(err) {
-        console.error(err);
-        alert("Impossible d'enregistrer le recensement.");
-    }
-});
 </script>
 
 </body>
