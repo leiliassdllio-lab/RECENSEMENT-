@@ -525,7 +525,38 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======== Upload d'image + Validation IA ==========
+let model;
+let modelReady = false;
+
+async function loadModel() {
+  try {
+    model = await mobilenet.load();
+    console.log("Modèle IA prêt !");
+    modelReady = true;
+  } catch (err) {
+    console.error("Erreur lors du chargement du modèle IA :", err);
+  }
+}
+
+loadModel();
+
+async function isHedgehog(img) {
+  if (!modelReady) return false;
+  const predictions = await model.classify(img);
+  return predictions.some(p =>
+    p.className.toLowerCase().includes("hedgehog") ||
+    p.className.toLowerCase().includes("porcupine")
+  );
+}
+const photoInput = document.getElementById("photoUpload");
+const previewDiv = document.getElementById("preview");
+
 photoInput.addEventListener("change", async () => {
+  if (!modelReady) {
+    alert("Le modèle IA n’est pas encore chargé. Réessaie dans quelques secondes.");
+    return;
+  }
+
   const file = photoInput.files[0];
   if (!file) return;
 
@@ -544,7 +575,6 @@ photoInput.addEventListener("change", async () => {
     }
   };
 });
-
 // ======== Soumission du formulaire ==========
 const form=document.getElementById("recensementForm");
 form.addEventListener("submit", async e=>{
