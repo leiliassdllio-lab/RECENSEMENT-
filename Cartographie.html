@@ -542,7 +542,8 @@ function buildPopupContent(data){
     Date : ${formatText(data.date)}<br>
     État : ${formatText(data.etat)}<br>
     Sous-état : ${formatText(data.sousEtat)}<br>
-    Utilisateur : ${formatText(data.username)}
+    Environnement : ${formatText(data.environnement)}<br>
+    Lieu : ${escapeHtml(formatText(data.lieu))}
   `;
 }
 
@@ -585,7 +586,8 @@ function renderRecensementsList(items){
         </div>
 
         <div class="recensement-meta">
-          <div><strong>Utilisateur :</strong> ${escapeHtml(data.username)}</div>
+          <div><strong>Lieu :</strong> ${escapeHtml(formatText(data.lieu))}</div>
+          <div><strong>Environnement :</strong> ${escapeHtml(formatText(data.environnement))}</div>
           <div><strong>Coordonnées :</strong> ${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</div>
         </div>
 

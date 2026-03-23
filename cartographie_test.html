@@ -187,7 +187,8 @@ function renderRecensementsList(items){
         </div>
 
         <div class="recensement-meta">
-          <div><strong>Utilisateur :</strong> ${data.username}</div>
+          <div><strong>Lieu :</strong> ${data.lieu || "Non renseigné"}</div>
+          <div><strong>Environnement :</strong> ${data.environnement || "Non renseigné"}</div>
           <div><strong>Coordonnées :</strong> ${data.latitude}, ${data.longitude}</div>
         </div>
 
