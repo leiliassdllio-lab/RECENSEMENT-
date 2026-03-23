@@ -621,7 +621,53 @@ class="upload-card">
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script type="module">
+document.querySelectorAll("[data-etat]").forEach(card=>{
+  card.addEventListener("click", ()=>{
 
+    document.querySelectorAll("[data-etat]").forEach(c=>{
+      c.classList.remove("selected-main");
+    });
+
+    card.classList.add("selected-main");
+
+    document.getElementById("etat").value = card.dataset.etat;
+
+    document.getElementById("vivantOptions").style.display = "none";
+    document.getElementById("mortOptions").style.display = "none";
+
+    if(card.dataset.etat === "vivant"){
+      document.getElementById("vivantOptions").style.display = "flex";
+    }
+
+    if(card.dataset.etat === "mort"){
+      document.getElementById("mortOptions").style.display = "flex";
+    }
+  });
+});
+document.querySelectorAll("[data-sous-etat]").forEach(card=>{
+  card.addEventListener("click", ()=>{
+
+    document.querySelectorAll("[data-sous-etat]").forEach(c=>{
+      c.classList.remove("selected-sub");
+    });
+
+    card.classList.add("selected-sub");
+
+    document.getElementById("sousEtat").value = card.dataset.sousEtat;
+  });
+});
+document.querySelectorAll("[data-env]").forEach(card=>{
+  card.addEventListener("click", ()=>{
+
+    document.querySelectorAll("[data-env]").forEach(c=>{
+      c.classList.remove("selected-main");
+    });
+
+    card.classList.add("selected-main");
+
+    document.getElementById("environnement").value = card.dataset.env;
+  });
+});
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -652,9 +698,14 @@ async function isHedgehog(img){
 
   const predictions = await model.classify(img);
 
-  return predictions.some(p =>
-    p.className.toLowerCase().includes("hedgehog")
+  return predictions.some(p => {
+  const name = p.className.toLowerCase();
+
+  return (
+    name.includes("hedgehog") ||
+    name.includes("porcupine") ||
   );
+});
 }
 
 // 🔥 Coins
@@ -731,11 +782,11 @@ photoInput.addEventListener("change", ()=>{
 
 // 🧪 Validation
 function validate(){
-  const lieu = document.getElementById("lieu").value;
-  const etat = document.getElementById("etat").value;
-  const env = document.getElementById("environnement").value;
-
-  return lieu && etat && env;
+	const lieu = document.getElementById("lieu").value;
+	const etat = document.getElementById("etat").value;
+	const env = document.getElementById("environnement").value;
+	const sousEtat = document.getElementById("sousEtat").value;
+	return lieu && etat && env && sousEtat;
 }
 
 // 🚀 SUBMIT
@@ -777,6 +828,7 @@ document.getElementById("recensementForm")
     lieu:document.getElementById("lieu").value,
     date:dateInput.value,
     etat:document.getElementById("etat").value,
+	sousEtat: document.getElementById("sousEtat").value,
     environnement:document.getElementById("environnement").value,
     notes:document.getElementById("notes").value,
     latitude: marker ? marker.getLatLng().lat : null,
