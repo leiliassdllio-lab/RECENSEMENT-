@@ -327,12 +327,48 @@ async function loadModel(){
   }
 }
 
-async function isHedgehog(img){
-  const loadedModel = model || await modelReady;
-  if(!loadedModel) return false;
+function formatPredictions(predictions){
+  const labelTranslations = {
+    "hedgehog": "herisson",
+    "porcupine": "porc-epic",
+    "echidna": "echidne",
+    "mongoose": "mangouste",
+    "meerkat": "suricate",
+    "hamster": "hamster",
+    "guinea pig": "cochon d'Inde"
+  };
 
-  const predictions = await loadedModel.classify(img);
-  return predictions.some(p => p.className.toLowerCase().includes("hedgehog") || p.className.toLowerCase().includes("porcupine"));
+  return predictions
+    .slice(0, 5)
+    .map(p => {
+      const englishLabel = p.className.toLowerCase();
+      const frenchLabel = labelTranslations[englishLabel] || p.className;
+      return `${frenchLabel} (${Math.round(p.probability * 100)}%)`;
+    })
+    .join(", ");
+}
+
+async function analyzeHedgehog(img){
+  const loadedModel = model || await modelReady;
+  if(!loadedModel){
+    return { detected:false, predictions:[] };
+  }
+
+  const predictions = await loadedModel.classify(img, 10);
+  const hedgehogKeywords = [
+    "hedgehog",
+    "porcupine",
+    "echidna",
+    "mongoose",
+    "meerkat",
+    "hamster",
+    "guinea pig"
+  ];
+  const detected = predictions.some(p =>
+    hedgehogKeywords.some(keyword => p.className.toLowerCase().includes(keyword))
+  );
+
+  return { detected, predictions };
 }
 // Auth + user badge
 onAuthStateChanged(auth, user => {
@@ -631,14 +667,15 @@ photoInput.addEventListener("change", async () => {
       previewDiv.innerHTML = `<img src="${objectUrl}" alt="Prévisualisation">`;
 
       // Vérifie si c'est un hérisson
-      const hedgehogDetected = await isHedgehog(img);
+      const analysis = await analyzeHedgehog(img);
+      const predictionsLabel = formatPredictions(analysis.predictions);
 
-      if (hedgehogDetected) {
+      if (analysis.detected) {
         console.log("Hérisson détecté ✅");
-        setPhotoAnalysisMessage("Hérisson détecté sur l'image.", "is-success");
+        setPhotoAnalysisMessage(`Hérisson détecté sur l'image. Prédictions : ${predictionsLabel}`, "is-success");
       } else {
         console.warn("Aucun hérisson détecté ⚠️");
-        setPhotoAnalysisMessage("Aucun hérisson détecté sur l'image.", "is-warning");
+        setPhotoAnalysisMessage(`Aucun hérisson détecté sur l'image. Prédictions les plus proches : ${predictionsLabel || "aucune"}`, "is-warning");
       }
     } catch (error) {
       console.error("Impossible d'analyser l'image.", error);
