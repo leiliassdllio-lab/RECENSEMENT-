@@ -290,7 +290,7 @@ class="upload-card">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
  
@@ -306,6 +306,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+let currentUsername = "";
 
 function redirectToLogin() {
   localStorage.removeItem("username");
@@ -322,15 +323,49 @@ function unlockProtectedPage() {
   document.documentElement.classList.add("auth-ready");
 }
 
-function applyAuthenticatedUi(user) {
-  const savedUsername=localStorage.getItem("username");
-  document.getElementById("usernameBadge").textContent = savedUsername || user.displayName || user.email || "Mon compte";
+function buildUsernameFromUser(user) {
+  if (user.displayName && user.displayName.trim()) return user.displayName.trim();
+  if (user.email) return user.email.split("@")[0];
+  return "Utilisateur";
+}
+
+async function resolveUsername(user) {
+  const fallbackUsername = localStorage.getItem("username") || buildUsernameFromUser(user);
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const profileUsername = userSnap.data().username?.trim();
+    if (profileUsername) {
+      localStorage.setItem("username", profileUsername);
+      currentUsername = profileUsername;
+      return profileUsername;
+    }
+  }
+
+  await setDoc(userRef, {
+    uid: user.uid,
+    email: user.email || "",
+    username: fallbackUsername
+  }, { merge: true });
+
+  localStorage.setItem("username", fallbackUsername);
+  currentUsername = fallbackUsername;
+  return fallbackUsername;
+}
+
+async function applyAuthenticatedUi(user) {
+  const username = await resolveUsername(user);
+  document.getElementById("usernameBadge").textContent = username;
   unlockProtectedPage();
 }
 
 onAuthStateChanged(auth,user=>{
   if(!user){ redirectToLogin(); return; }
-  applyAuthenticatedUi(user);
+  applyAuthenticatedUi(user).catch(error => {
+    console.error("Impossible de synchroniser le profil utilisateur.", error);
+    redirectToLogin();
+  });
 });
 
 window.addEventListener("pageshow", () => {
@@ -340,7 +375,10 @@ window.addEventListener("pageshow", () => {
     redirectToLogin();
     return;
   }
-  applyAuthenticatedUi(currentUser);
+  applyAuthenticatedUi(currentUser).catch(error => {
+    console.error("Impossible de recharger le profil utilisateur.", error);
+    redirectToLogin();
+  });
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
@@ -723,7 +761,7 @@ form.addEventListener("submit", async e=>{
 
   const recensement={
     uid: auth.currentUser.uid,
-    username: localStorage.getItem("username") || "Inconnu",
+    username: currentUsername || localStorage.getItem("username") || auth.currentUser.email || "Inconnu",
     email: auth.currentUser.email || "Non renseigné",
     lieu: document.getElementById("lieu").value,
     date: document.getElementById("date").value,

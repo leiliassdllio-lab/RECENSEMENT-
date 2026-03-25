@@ -654,7 +654,7 @@ class="upload-card">
 
 // Initialisation Firebase pour l'authentification et l'enregistrement des recensements
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -669,6 +669,7 @@ appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+let currentUsername="";
 
 function redirectToLogin(){
 localStorage.removeItem("username");
@@ -685,11 +686,41 @@ document.documentElement.classList.remove("auth-locked");
 document.documentElement.classList.add("auth-ready");
 }
 
-function applyAuthenticatedUi(user){
-const savedUsername=localStorage.getItem("username");
+function buildUsernameFromUser(user){
+if(user.displayName && user.displayName.trim()) return user.displayName.trim();
+if(user.email) return user.email.split("@")[0];
+return "Utilisateur";
+}
+
+async function resolveUsername(user){
+const fallbackUsername=localStorage.getItem("username") || buildUsernameFromUser(user);
+const userRef=doc(db,"users",user.uid);
+const userSnap=await getDoc(userRef);
+
+if(userSnap.exists()){
+const profileUsername=userSnap.data().username?.trim();
+if(profileUsername){
+localStorage.setItem("username",profileUsername);
+currentUsername=profileUsername;
+return profileUsername;
+}
+}
+
+await setDoc(userRef,{
+uid:user.uid,
+email:user.email || "",
+username:fallbackUsername
+},{ merge:true });
+
+localStorage.setItem("username",fallbackUsername);
+currentUsername=fallbackUsername;
+return fallbackUsername;
+}
+
+async function applyAuthenticatedUi(user){
+const savedUsername=await resolveUsername(user);
 const usernameBadge=document.getElementById("usernameBadge");
-const username=savedUsername || user.displayName || user.email || "Mon compte";
-usernameBadge.textContent=username;
+usernameBadge.textContent=savedUsername;
 unlockProtectedPage();
 }
 
@@ -699,7 +730,10 @@ redirectToLogin();
 return;
 }
 
-applyAuthenticatedUi(user);
+applyAuthenticatedUi(user).catch(error=>{
+console.error("Impossible de synchroniser le profil utilisateur.", error);
+redirectToLogin();
+});
 });
 
 window.addEventListener("pageshow",()=>{
@@ -709,7 +743,10 @@ if(!currentUser){
 redirectToLogin();
 return;
 }
-applyAuthenticatedUi(currentUser);
+applyAuthenticatedUi(currentUser).catch(error=>{
+console.error("Impossible de recharger le profil utilisateur.", error);
+redirectToLogin();
+});
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
@@ -1026,7 +1063,7 @@ return;
 const recensement={
 
 uid:auth.currentUser.uid,
-username:localStorage.getItem("username") || "Inconnu",
+username:currentUsername || localStorage.getItem("username") || auth.currentUser.email || "Inconnu",
 email:auth.currentUser.email || "Non renseigné",
 
 lieu:document.getElementById("lieu").value,

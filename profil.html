@@ -436,7 +436,7 @@ grid-template-columns:1fr;
 
 // Initialisation Firebase pour lire le profil, les scores de quiz et les recensements
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import{getFirestore,collection,query,where,getDocs,doc,getDoc}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import{getFirestore,collection,query,where,getDocs,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig={
@@ -451,6 +451,33 @@ appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
+
+function buildUsernameFromUser(user){
+if(user.displayName && user.displayName.trim()) return user.displayName.trim();
+if(user.email) return user.email.split("@")[0];
+return "Utilisateur";
+}
+
+async function resolveUsername(user){
+const userRef=doc(db,"users",user.uid);
+const userSnap=await getDoc(userRef);
+const fallbackUsername=localStorage.getItem("username") || buildUsernameFromUser(user);
+
+if(userSnap.exists()){
+const profileUsername=userSnap.data().username || fallbackUsername;
+localStorage.setItem("username",profileUsername);
+return profileUsername;
+}
+
+await setDoc(userRef,{
+uid:user.uid,
+email:user.email || "",
+username:fallbackUsername
+},{ merge:true });
+
+localStorage.setItem("username",fallbackUsername);
+return fallbackUsername;
+}
 
 const photoInput=document.getElementById("photoUpload");
 const userPhoto=document.getElementById("userPhoto");
@@ -533,9 +560,7 @@ if(!user){window.location.href="login.html";return;}
 // Alimente l'interface du profil a partir des donnees utilisateur
 document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("userEmail").textContent=user.email;
-const userSnap=await getDoc(doc(db,"users",user.uid));
-const username=userSnap.exists() ? (userSnap.data().username || "Utilisateur") : (localStorage.getItem("username") || "Utilisateur");
-localStorage.setItem("username",username);
+const username=await resolveUsername(user);
 document.getElementById("username").textContent=username;
 
 const count=await getRecensementsCount(user.uid);

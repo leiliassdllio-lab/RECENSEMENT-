@@ -77,8 +77,8 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 <script type="module">
 // Authentification Firebase + stockage du profil minimal utilisateur
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, query, where, getDocs, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, query, where, getDocs, collection, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // --- Firebase config ---
 const firebaseConfig = {
@@ -95,11 +95,32 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+await setPersistence(auth, browserLocalPersistence);
 
 function buildUsernameFromUser(user){
   if(user.displayName && user.displayName.trim()) return user.displayName.trim();
   if(user.email) return user.email.split("@")[0];
   return "Utilisateur";
+}
+
+function normalizeUsername(username, fallback = "Utilisateur"){
+  const cleanUsername = typeof username === "string" ? username.trim() : "";
+  return cleanUsername || fallback;
+}
+
+async function getUserProfile(user){
+  if(!user) return null;
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if(userSnap.exists()){
+    return userSnap.data();
+  }
+
+  if(!user.email) return null;
+
+  return getUserProfileByEmail(user.email);
 }
 
 // Recherche du profil utilisateur par email pour garder un username cohérent sur le site
@@ -110,14 +131,21 @@ async function getUserProfileByEmail(email){
   return snapshot.docs[0].data();
 }
 
-// Synchronise le nom stocké localement après connexion
-async function syncLocalUsername(user){
-  if(!user) return;
+async function syncUserProfile(user, preferredUsername = ""){
+  if(!user) return "Utilisateur";
 
-  const profile = user.email ? await getUserProfileByEmail(user.email) : null;
-  const username = profile?.username || buildUsernameFromUser(user);
+  const fallbackUsername = buildUsernameFromUser(user);
+  const existingProfile = await getUserProfile(user);
+  const username = normalizeUsername(preferredUsername || existingProfile?.username, fallbackUsername);
+  const profileData = {
+    uid: user.uid,
+    email: user.email || existingProfile?.email || "",
+    username
+  };
 
+  await setDoc(doc(db, "users", user.uid), profileData, { merge: true });
   localStorage.setItem("username", username);
+  return username;
 }
 
 // --- Références DOM principales ---
@@ -144,7 +172,7 @@ showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); log
 // --- Redirection si déjà connecté ---
 onAuthStateChanged(auth, async user => {
   if(!user) return;
-  await syncLocalUsername(user);
+  await syncUserProfile(user);
   window.location.href = "recensement1.html";
 });
 
@@ -164,7 +192,7 @@ loginBtn.addEventListener("click", async ()=>{
     const email = identifier.includes("@") ? identifier : await getEmailFromUsername(identifier);
     if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
     const credential = await signInWithEmailAndPassword(auth,email,loginPass.value);
-    await syncLocalUsername(credential.user);
+    await syncUserProfile(credential.user);
     window.location.href = "recensement1.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
@@ -175,15 +203,7 @@ googleBtn.addEventListener("click", async ()=>{
   try{
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const username = buildUsernameFromUser(user);
-
-    await setDoc(doc(db,"users",user.uid),{
-      uid: user.uid,
-      email: user.email || "",
-      username
-    },{ merge:true });
-
-    localStorage.setItem("username", username);
+    await syncUserProfile(user);
     window.location.href = "recensement1.html"; // redirection directe après succès
   }catch(e){ loginError.textContent=e.message; }
 });
@@ -192,15 +212,13 @@ googleBtn.addEventListener("click", async ()=>{
 createBtn.addEventListener("click", async ()=>{
   signupError.textContent="";
   try{
-    const username = signupUser.value.trim();
+    const username = normalizeUsername(signupUser.value);
     const email = signupEmail.value.trim();
     const password = signupPass.value.trim();
     if(!username || !email || !password){ signupError.textContent="Tous les champs sont requis"; return; }
 
     const userCredential = await createUserWithEmailAndPassword(auth,email,password);
-    const uid = userCredential.user.uid;
-    await setDoc(doc(db,"users",uid),{ uid, email, username });
-    localStorage.setItem("username", username);
+    await syncUserProfile(userCredential.user, username);
 
     window.location.href = "recensement1.html"; // redirection directe après création
   }catch(e){ signupError.textContent=e.message; }
