@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion – Hérisson</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="style.css">
 <style>
 body { display:flex; flex-direction:column; }
 .container { background:white; padding:30px; border-radius:18px; box-shadow:0 12px 28px rgba(25,49,29,0.10); width:90%; max-width:420px; text-align:center; border:1px solid #d6e5d4; }
@@ -123,8 +123,8 @@ await setPersistence(auth, browserLocalPersistence);
 let isRedirecting = false;
 let isLoadingExistingSession = true;
 const allowedNextPages = new Set([
-  "recensement.html",
-  "legacy/recensement.html",
+  "recensement1.html",
+  "recensement1.html",
   "profil.html",
   "boutique.html"
 ]);
@@ -184,7 +184,7 @@ function getRedirectTarget(){
   const params = new URLSearchParams(window.location.search);
   const next = params.get("next");
   if(next && allowedNextPages.has(next)) return next;
-  return "recensement.html";
+  return "recensement1.html";
 }
 
 function redirectToTarget(){
