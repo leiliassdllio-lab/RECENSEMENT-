@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -15,434 +16,68 @@ document.documentElement.classList.add("auth-locked");
 </script>
 
 <style>
-html.auth-locked body {
-visibility:hidden;
-}
-
-html.auth-ready body {
-visibility:visible;
-}
-
-body {
-font-family:'Arial',sans-serif;
-background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
-margin:0;
-padding:0;
-color:#203224;
-}
-
-.container {
-width:min(92%, 880px);
-margin:24px auto;
-background:white;
-border-radius:22px;
-padding:26px;
-box-shadow:0 18px 38px rgba(48,84,56,0.12);
-position:relative;
-border:1px solid rgba(111,153,118,0.15);
-}
-
-.top-actions {
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-flex-wrap:wrap;
-padding:14px 18px;
-background:#f7fbf5;
-border:1px solid #dce9d8;
-border-radius:18px;
-}
-
+/* === Garde exactement ton CSS précédent === */
+html.auth-locked body { visibility:hidden; }
+html.auth-ready body { visibility:visible; }
+body { font-family:'Arial',sans-serif; background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%); margin:0; padding:0; color:#203224; }
+.container { width:min(92%, 880px); margin:24px auto; background:white; border-radius:22px; padding:26px; box-shadow:0 18px 38px rgba(48,84,56,0.12); position:relative; border:1px solid rgba(111,153,118,0.15); }
+.top-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; background:#f7fbf5; border:1px solid #dce9d8; border-radius:18px; }
 .left-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-
-.user-pill {
-display:inline-flex;
-align-items:center;
-justify-content:center;
-min-height:44px;
-padding:10px 18px;
-border-radius:999px;
-background:#eef6eb;
-border:1px solid #d6e5d4;
-color:#33523a;
-font-weight:bold;
-text-align:center;
-flex:1;
-min-width:180px;
-}
-
-.form-shell {
-padding:30px;
-}
-
-.page-eyebrow {
-display:inline-flex;
-align-items:center;
-gap:8px;
-padding:7px 12px;
-border-radius:999px;
-background:#eef6eb;
-color:#2f7a39;
-font-size:0.92rem;
-font-weight:bold;
-letter-spacing:0.01em;
-}
-
-.page-title {
-margin:16px 0 8px;
-font-size:clamp(1.9rem, 3vw, 2.5rem);
-line-height:1.1;
-color:#234b2c;
-text-align:center;
-}
-
-.page-intro {
-max-width:620px;
-margin:0 auto 26px;
-text-align:center;
-color:#5a6f5e;
-line-height:1.6;
-}
-
-.map-panel {
-padding:16px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%);
-border:1px solid #dce9d8;
-margin-bottom:24px;
-}
-
-.map-help {
-margin:0 0 12px;
-color:#5a6f5e;
-line-height:1.5;
-}
-
-.form-section {
-margin-top:20px;
-padding:20px;
-border:1px solid #e0ebdc;
-border-radius:18px;
-background:#fcfdfb;
-}
-
-.section-label {
-display:flex;
-align-items:center;
-gap:10px;
-margin:0 0 14px;
-font-size:1.08rem;
-font-weight:bold;
-color:#234b2c;
-}
-
-.section-label span {
-font-size:1.35rem;
-}
-
-.field-grid {
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
-
-.field-help {
-font-size:0.92rem;
-color:#5a6f5e;
-margin:6px 0 0;
-line-height:1.5;
-}
-
-.field-actions {
-display:flex;
-justify-content:center;
-margin-top:14px;
-}
-
-.field-button {
-width:auto;
-margin-top:0;
-padding:10px 14px;
-border-radius:8px;
-background:#eef5ea;
-color:#2f7a39;
-border:1px solid #cfe0cd;
-font-weight:bold;
-}
-
-.field-button:hover {
-background:#e2efdf;
-}
-
-.field-status {
-min-height:1.2rem;
-font-size:0.9rem;
-color:#5a6f5e;
-margin-top:6px;
-}
-
-.location-panel {
-padding:18px;
-border:1px solid #d6e5d4;
-border-radius:16px;
-background:white;
-}
-
-.location-field label {
-display:block;
-font-weight:bold;
-margin-bottom:8px;
-color:#2f7a39;
-}
-
-.location-field input {
-margin:0;
-}
-
-.location-grid {
-display:grid;
-grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr);
-gap:16px;
-align-items:end;
-}
-
-.location-footer {
-display:flex;
-flex-direction:column;
-gap:12px;
-margin-top:14px;
-padding-top:14px;
-border-top:1px solid #dfead9;
-}
-
-.location-footer .field-help {
-margin:0;
-}
-
-.location-footer .field-status {
-margin-top:0;
-padding:10px 12px;
-border-radius:10px;
-background:#f3f8ef;
-border:1px solid #d6e5d4;
-}
-
-input, select, textarea, button {
-width:100%;
-padding:12px 14px;
-border-radius:12px;
-border:1px solid #cfd9cc;
-box-sizing:border-box;
-font:inherit;
-background:white;
-transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
-}
-
-input:focus, select:focus, textarea:focus {
-outline:none;
-border-color:#77a96c;
-box-shadow:0 0 0 4px rgba(119,169,108,0.12);
-}
-
-button {
-background:#4CAF50;
-color:white;
-font-weight:bold;
-border:none;
-cursor:pointer;
-margin-top:18px;
-transition:0.3s;
-}
-
+.user-pill { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 18px; border-radius:999px; background:#eef6eb; border:1px solid #d6e5d4; color:#33523a; font-weight:bold; text-align:center; flex:1; min-width:180px; }
+.form-shell { padding:30px; }
+.page-eyebrow { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; background:#eef6eb; color:#2f7a39; font-size:0.92rem; font-weight:bold; letter-spacing:0.01em; }
+.page-title { margin:16px 0 8px; font-size:clamp(1.9rem, 3vw, 2.5rem); line-height:1.1; color:#234b2c; text-align:center; }
+.page-intro { max-width:620px; margin:0 auto 26px; text-align:center; color:#5a6f5e; line-height:1.6; }
+.map-panel { padding:16px; border-radius:18px; background:linear-gradient(180deg,#f8fcf7 0%,#f4f8f2 100%); border:1px solid #dce9d8; margin-bottom:24px; }
+.map-help { margin:0 0 12px; color:#5a6f5e; line-height:1.5; }
+.form-section { margin-top:20px; padding:20px; border:1px solid #e0ebdc; border-radius:18px; background:#fcfdfb; }
+.section-label { display:flex; align-items:center; gap:10px; margin:0 0 14px; font-size:1.08rem; font-weight:bold; color:#234b2c; }
+.section-label span { font-size:1.35rem; }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field-help { font-size:0.92rem; color:#5a6f5e; margin:6px 0 0; line-height:1.5; }
+.field-actions { display:flex; justify-content:center; margin-top:14px; }
+.field-button { width:auto; margin-top:0; padding:10px 14px; border-radius:8px; background:#eef5ea; color:#2f7a39; border:1px solid #cfe0cd; font-weight:bold; }
+.field-button:hover { background:#e2efdf; }
+.field-status { min-height:1.2rem; font-size:0.9rem; color:#5a6f5e; margin-top:6px; }
+.location-panel { padding:18px; border:1px solid #d6e5d4; border-radius:16px; background:white; }
+.location-field label { display:block; font-weight:bold; margin-bottom:8px; color:#2f7a39; }
+.location-field input { margin:0; }
+.location-grid { display:grid; grid-template-columns:minmax(0, 1.25fr) minmax(240px, 0.75fr); gap:16px; align-items:end; }
+.location-footer { display:flex; flex-direction:column; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid #dfead9; }
+.location-footer .field-help { margin:0; }
+.location-footer .field-status { margin-top:0; padding:10px 12px; border-radius:10px; background:#f3f8ef; border:1px solid #d6e5d4; }
+input, select, textarea, button { width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cfd9cc; box-sizing:border-box; font:inherit; background:white; transition:border-color 0.2s, box-shadow 0.2s, background 0.2s; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:#77a96c; box-shadow:0 0 0 4px rgba(119,169,108,0.12); }
+button { background:#4CAF50; color:white; font-weight:bold; border:none; cursor:pointer; margin-top:18px; transition:0.3s; }
 button:hover { background:#43a047; }
-
-#map {
-height:340px;
-border-radius:16px;
-margin-bottom:0;
-overflow:hidden;
-box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08);
-}
-
-.icon-label {
-display:flex;
-align-items:center;
-gap:10px;
-font-weight:normal;
-}
-
-.icon-label span { font-size:1.5em; }
-
-@media (max-width: 720px) {
-.container {
-padding:20px;
-border-radius:18px;
-}
-.form-shell {
-padding:20px;
-}
-.field-grid {
-grid-template-columns:1fr;
-}
-.location-grid {
-grid-template-columns:1fr;
-}
-}
-
-#preview img {
-max-width:100%;
-border-radius:14px;
-box-shadow:0 10px 24px rgba(41,73,49,0.16);
-margin-top:12px;
-}
-
-#logoutBtn {
-background:#d32f2f;
-width:auto;
-padding:10px 16px;
-border-radius:12px;
-margin-top:0;
-align-self:center;
-}
+#map { height:340px; border-radius:16px; margin-bottom:0; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(79,122,88,0.08); }
+#preview img { max-width:100%; border-radius:14px; box-shadow:0 10px 24px rgba(41,73,49,0.16); margin-top:12px; }
+#logoutBtn { background:#d32f2f; width:auto; padding:10px 16px; border-radius:12px; margin-top:0; align-self:center; }
 #logoutBtn:hover { background:#b71c1c; }
-.nav-link {
-display:inline-block;
-background:white;
-color:#33523a;
-font-weight:bold;
-border:1px solid #d6e5d4;
-padding:10px 18px;
-border-radius:12px;
-text-decoration:none;
-}
+.nav-link { display:inline-block; background:white; color:#33523a; font-weight:bold; border:1px solid #d6e5d4; padding:10px 18px; border-radius:12px; text-decoration:none; }
 .nav-link:hover { background:#f3f7f2; }
-
-/* Cartes */
-.choice-grid {
-display:flex;
-flex-wrap:wrap;
-gap:15px;
-justify-content:center;
-margin-top:10px;
-}
-
-.choice-card {
-width:108px;
-height:108px;
-border:2px solid #d6dfd3;
-border-radius:16px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-transition:all 0.25s;
-background:white;
-overflow:hidden;
-box-shadow:0 8px 18px rgba(64,95,69,0.06);
-}
-
-.choice-card img {
-width:100%;
-height:100%;
-object-fit:cover;
-border-radius:14px;
-display:block;
-}
-
-.choice-text {
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:6px;
-font-weight:bold;
-color:#2f4f2f;
-text-align:center;
-padding:8px;
-}
-
-.choice-text span:first-child {
-font-size:2rem;
-line-height:1;
-}
-
-.choice-card.selected-main {
-border-color:#2196F3;
-background:rgba(33,150,243,0.1);
-box-shadow:0 12px 24px rgba(33,150,243,0.16);
-}
-
-.choice-card.selected-sub {
-border-color:#4CAF50;
-background:rgba(76,175,80,0.1);
-box-shadow:0 12px 24px rgba(76,175,80,0.18);
-}
-
-.choice-card:hover {
-transform:translateY(-2px);
-border-color:#9cb79d;
-}
-
-.upload-card {
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:8px;
-padding:24px 18px;
-border:2px dashed #8eb48d;
-border-radius:18px;
-cursor:pointer;
-background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%);
-text-align:center;
-color:#33523a;
-transition:transform 0.2s, border-color 0.2s, background 0.2s;
-}
-
-.upload-card:hover {
-transform:translateY(-2px);
-border-color:#6d9d6f;
-background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%);
-}
-
-.upload-icon {
-font-size:2.2rem;
-line-height:1;
-}
-
-.upload-title {
-font-weight:bold;
-}
-
-.submit-button {
-padding:14px 20px;
-border-radius:14px;
-font-size:1rem;
-box-shadow:0 12px 22px rgba(76,175,80,0.22);
-}
-
-.form-status-message {
-display:none;
-margin-top:18px;
-padding:12px 14px;
-border-radius:12px;
-border:1px solid #d6e5d4;
-background:#f3f8ef;
-color:#33523a;
-line-height:1.5;
-}
-
-.form-status-message.is-visible {
-display:block;
-}
-
-.form-status-message.is-error {
-background:#fef3f2;
-border-color:#f3c7c2;
-color:#b42318;
-}
+/* === Cartes & choix === */
+.choice-grid { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin-top:10px; }
+.choice-card { width:108px; height:108px; border:2px solid #d6dfd3; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s; background:white; overflow:hidden; box-shadow:0 8px 18px rgba(64,95,69,0.06); }
+.choice-card img { width:100%; height:100%; object-fit:cover; border-radius:14px; display:block; }
+.choice-text { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-weight:bold; color:#2f4f2f; text-align:center; padding:8px; }
+.choice-text span:first-child { font-size:2rem; line-height:1; }
+.choice-card.selected-main { border-color:#2196F3; background:rgba(33,150,243,0.1); box-shadow:0 12px 24px rgba(33,150,243,0.16); }
+.choice-card.selected-sub { border-color:#4CAF50; background:rgba(76,175,80,0.1); box-shadow:0 12px 24px rgba(76,175,80,0.18); }
+.choice-card:hover { transform:translateY(-2px); border-color:#9cb79d; }
+.upload-card { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:24px 18px; border:2px dashed #8eb48d; border-radius:18px; cursor:pointer; background:linear-gradient(180deg,#fbfef9 0%,#f3f8ef 100%); text-align:center; color:#33523a; transition:transform 0.2s, border-color 0.2s, background 0.2s; }
+.upload-card:hover { transform:translateY(-2px); border-color:#6d9d6f; background:linear-gradient(180deg,#fefefe 0%,#eef6eb 100%); }
+.upload-icon { font-size:2.2rem; line-height:1; }
+.upload-title { font-weight:bold; }
+.submit-button { padding:14px 20px; border-radius:14px; font-size:1rem; box-shadow:0 12px 22px rgba(76,175,80,0.22); }
+.form-status-message { display:none; margin-top:18px; padding:12px 14px; border-radius:12px; border:1px solid #d6e5d4; background:#f3f8ef; color:#33523a; line-height:1.5; }
+.form-status-message.is-visible { display:block; }
+.form-status-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
+.photo-analysis-message { display:none; margin-top:12px; padding:12px 14px; border-radius:12px; border:1px solid #d6e5d4; background:#f3f8ef; color:#33523a; line-height:1.5; font-weight:bold; }
+.photo-analysis-message.is-visible { display:block; }
+.photo-analysis-message.is-success { background:#edf8ee; border-color:#b9dec0; color:#1f6f2d; }
+.photo-analysis-message.is-warning { background:#fff7ed; border-color:#f3d3a1; color:#9a4d00; }
+.photo-analysis-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
 </style>
 </head>
 
@@ -460,7 +95,7 @@ color:#b42318;
 
 <!-- Raccourcis lies au compte et a l'historique utilisateur -->
 <div class="left-actions">
-<a href="cartographie.html" class="nav-link">Mes recensements</a>
+<a href="Cartographie.html" class="nav-link">Mes recensements</a>
 </div>
 
 <div class="user-pill" id="usernameBadge">Connexion requise</div>
@@ -628,6 +263,7 @@ class="upload-card">
 <input type="file" id="photoUpload" accept="image/*" capture="environment" style="display:none;">
 
 <div id="preview"></div>
+<div id="photoAnalysisMessage" class="photo-analysis-message" aria-live="polite"></div>
 </section>
 
 <!-- Bloc libre pour les remarques complementaires -->
@@ -645,454 +281,502 @@ class="upload-card">
 </div>
 
 <footer class="site-footer">
-© <span id="year"></span> – Team Hérisson
+© <span id="year"></span> – Les Six Pics
 </footer>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.6.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@3.1.0/dist/mobilenet.min.js"></script>
 
 <script type="module">
-
-// Initialisation Firebase pour l'authentification et l'enregistrement des recensements
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
+ 
 const firebaseConfig = {
-apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
-authDomain:"herisson-f80ba.firebaseapp.com",
-projectId:"herisson-f80ba",
-storageBucket:"herisson-f80ba.firebasestorage.app",
-messagingSenderId:"142270421417",
-appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
+  apiKey: "AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+  authDomain: "herisson-f80ba.firebaseapp.com",
+  projectId: "herisson-f80ba",
+  storageBucket: "herisson-f80ba.firebasestorage.app",
+  messagingSenderId: "142270421417",
+  appId: "1:142270421417:web:cb3abd700fab6731c40cb8"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-let currentUsername="";
+let currentUsername = "";
 
-function redirectToLogin(){
-localStorage.removeItem("username");
-const usernameBadge=document.getElementById("usernameBadge");
-if(usernameBadge){
-usernameBadge.textContent="Connexion requise";
-}
-document.documentElement.classList.add("auth-locked");
-window.location.replace("login.html?next=recensement.html");
-}
-
-function unlockProtectedPage(){
-document.documentElement.classList.remove("auth-locked");
-document.documentElement.classList.add("auth-ready");
+function redirectToLogin() {
+  localStorage.removeItem("username");
+  const usernameBadge = document.getElementById("usernameBadge");
+  if (usernameBadge) {
+    usernameBadge.textContent = "Connexion requise";
+  }
+  document.documentElement.classList.add("auth-locked");
+  window.location.replace("login.html?next=recensement.html");
 }
 
-function buildUsernameFromUser(user){
-if(user.displayName && user.displayName.trim()) return user.displayName.trim();
-if(user.email) return user.email.split("@")[0];
-return "Utilisateur";
+function unlockProtectedPage() {
+  document.documentElement.classList.remove("auth-locked");
+  document.documentElement.classList.add("auth-ready");
 }
 
-async function resolveUsername(user){
-const fallbackUsername=localStorage.getItem("username") || buildUsernameFromUser(user);
-const userRef=doc(db,"users",user.uid);
-const userSnap=await getDoc(userRef);
-
-if(userSnap.exists()){
-const profileUsername=userSnap.data().username?.trim();
-if(profileUsername){
-localStorage.setItem("username",profileUsername);
-currentUsername=profileUsername;
-return profileUsername;
-}
+function buildUsernameFromUser(user) {
+  if (user.displayName && user.displayName.trim()) return user.displayName.trim();
+  if (user.email) return user.email.split("@")[0];
+  return "Utilisateur";
 }
 
-await setDoc(userRef,{
-uid:user.uid,
-email:user.email || "",
-username:fallbackUsername
-},{ merge:true });
+async function resolveUsername(user) {
+  const fallbackUsername = localStorage.getItem("username") || buildUsernameFromUser(user);
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
 
-localStorage.setItem("username",fallbackUsername);
-currentUsername=fallbackUsername;
-return fallbackUsername;
+  if (userSnap.exists()) {
+    const profileUsername = userSnap.data().username?.trim();
+    if (profileUsername) {
+      localStorage.setItem("username", profileUsername);
+      currentUsername = profileUsername;
+      return profileUsername;
+    }
+  }
+
+  await setDoc(userRef, {
+    uid: user.uid,
+    email: user.email || "",
+    username: fallbackUsername
+  }, { merge: true });
+
+  localStorage.setItem("username", fallbackUsername);
+  currentUsername = fallbackUsername;
+  return fallbackUsername;
 }
 
-async function applyAuthenticatedUi(user){
-let savedUsername=buildUsernameFromUser(user);
-try{
-savedUsername=await resolveUsername(user);
-}catch(error){
-console.error("Impossible de synchroniser le profil utilisateur.", error);
-currentUsername=localStorage.getItem("username") || savedUsername;
-localStorage.setItem("username",currentUsername);
-savedUsername=currentUsername;
-}
-const usernameBadge=document.getElementById("usernameBadge");
-usernameBadge.textContent=savedUsername;
-unlockProtectedPage();
+async function applyAuthenticatedUi(user) {
+  let username = buildUsernameFromUser(user);
+  try {
+    username = await resolveUsername(user);
+  } catch (error) {
+    console.error("Impossible de synchroniser le profil utilisateur.", error);
+    currentUsername = localStorage.getItem("username") || username;
+    localStorage.setItem("username", currentUsername);
+    username = currentUsername;
+  }
+  document.getElementById("usernameBadge").textContent = username;
+  unlockProtectedPage();
 }
 
 onAuthStateChanged(auth,user=>{
-if(!user) {
-redirectToLogin();
-return;
-}
-
-applyAuthenticatedUi(user);
+  if(!user){ redirectToLogin(); return; }
+  applyAuthenticatedUi(user);
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
-await signOut(auth);
-localStorage.removeItem("username");
-redirectToLogin();
+  await signOut(auth);
+  localStorage.removeItem("username");
+  redirectToLogin();
 });
+document.getElementById("year").textContent = new Date().getFullYear();
 
-const dateInput=document.getElementById("date");
-const today=new Date();
-dateInput.value=today.toISOString().slice(0,10);
-document.getElementById("year").textContent=today.getFullYear();
+// ==== Chargement du modèle MobileNet pour IA ====
+let model;
+const modelReady = loadModel();
 
-const map=L.map("map").setView([50.8467,4.3525],13);
+async function loadModel(){
+  try{
+    model = await mobilenet.load();
+    console.log("Modèle IA prêt !");
+    return model;
+  }catch(error){
+    console.error("Impossible de charger le modèle IA.", error);
+    return null;
+  }
+}
 
-L.tileLayer(
-'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-{ attribution:'© OpenStreetMap contributors'}
-).addTo(map);
+function formatPredictions(predictions){
+  const labelTranslations = {
+    "hedgehog": "herisson",
+    "porcupine": "porc-epic",
+    "echidna": "echidne",
+    "mongoose": "mangouste",
+    "meerkat": "suricate",
+    "hamster": "hamster",
+    "guinea pig": "cochon d'Inde"
+  };
 
+  return predictions
+    .slice(0, 5)
+    .map(p => {
+      const englishLabel = p.className.toLowerCase();
+      const frenchLabel = labelTranslations[englishLabel] || p.className;
+      return `${frenchLabel} (${Math.round(p.probability * 100)}%)`;
+    })
+    .join(", ");
+}
+
+async function analyzeHedgehog(img){
+  const loadedModel = model || await modelReady;
+  if(!loadedModel){
+    return { detected:false, predictions:[] };
+  }
+
+  const predictions = await loadedModel.classify(img, 10);
+  const hedgehogKeywords = [
+    "hedgehog",
+    "porcupine",
+    "echidna",
+    "mongoose",
+    "meerkat",
+    "hamster",
+    "guinea pig"
+  ];
+  const detected = predictions.some(p =>
+    hedgehogKeywords.some(keyword => p.className.toLowerCase().includes(keyword))
+  );
+
+  return { detected, predictions };
+}
+// Date et année
+const dateInput = document.getElementById("date");
+const today = new Date();
+dateInput.value = today.toISOString().slice(0, 10);
+document.getElementById("year").textContent = today.getFullYear();
+
+// ======== Carte Leaflet ===========
+const map = L.map("map").setView([50.8467, 4.3525], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    subdomains: ['a','b','c']
+}).addTo(map);
+ 
 let marker;
-const lieuInput=document.getElementById("lieu");
-const coordonneesInput=document.getElementById("coordonnees");
-const lieuStatus=document.getElementById("lieuStatus");
-const suggestAddressBtn=document.getElementById("suggestAddressBtn");
+const lieuInput = document.getElementById("lieu");
+const coordonneesInput = document.getElementById("coordonnees");
+const lieuStatus = document.getElementById("lieuStatus");
+const suggestAddressBtn = document.getElementById("suggestAddressBtn");
 
-function setLieuStatus(message,isError=false){
-lieuStatus.textContent=message;
-lieuStatus.style.color=isError ? "#b42318" : "#5a6f5e";
+function setLieuStatus(message, isError = false) {
+  lieuStatus.textContent = message;
+  lieuStatus.style.color = isError ? "#b42318" : "#5a6f5e";
 }
 
-// Transforme la reponse de geocodage inverse en adresse plus lisible
-function formatAddress(data){
-const parts=[];
-const road=[data.house_number,data.road].filter(Boolean).join(" ").trim();
-const locality=data.city || data.town || data.village || data.hamlet || data.municipality;
-const postalLocality=[data.postcode,locality].filter(Boolean).join(" ").trim();
-if(road) parts.push(road);
-if(postalLocality) parts.push(postalLocality);
-if(data.country) parts.push(data.country);
-return parts.join(", ");
+function formatAddress(data) {
+  const parts = [];
+  const road = [data.house_number, data.road].filter(Boolean).join(" ").trim();
+  const locality = data.city || data.town || data.village || data.hamlet || data.municipality;
+  const postalLocality = [data.postcode, locality].filter(Boolean).join(" ").trim();
+  if (road) parts.push(road);
+  if (postalLocality) parts.push(postalLocality);
+  if (data.country) parts.push(data.country);
+  return parts.join(", ");
 }
 
-// Convertit les coordonnees decimales au format degres / minutes / secondes
-function toDms(value,isLatitude){
-const absolute=Math.abs(value);
-const degrees=Math.floor(absolute);
-const minutesFloat=(absolute-degrees)*60;
-const minutes=Math.floor(minutesFloat);
-const seconds=((minutesFloat-minutes)*60).toFixed(1);
-const direction=isLatitude
-? (value >= 0 ? "N" : "S")
-: (value >= 0 ? "E" : "W");
-
-return `${degrees}°${minutes}'${seconds}"${direction}`;
+function toDms(value, isLatitude) {
+  const absolute = Math.abs(value);
+  const degrees = Math.floor(absolute);
+  const minutesFloat = (absolute - degrees) * 60;
+  const minutes = Math.floor(minutesFloat);
+  const seconds = ((minutesFloat - minutes) * 60).toFixed(1);
+  const direction = isLatitude ? (value >= 0 ? "N" : "S") : (value >= 0 ? "E" : "W");
+  return `${degrees}°${minutes}'${seconds}"${direction}`;
 }
 
-// Met a jour l'affichage des coordonnees et du champ lieu a partir du marqueur
-function updateLieu(lat,lon){
-coordonneesInput.value=`${toDms(lat,true)}, ${toDms(lon,false)}`;
-if(!lieuInput.value || lieuInput.value.startsWith("Lat:") || lieuInput.value.includes(", Lon:")){
-lieuInput.value=`Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
-}
-setLieuStatus("Position mise à jour. Clique sur \"Proposer une adresse\" pour obtenir une adresse lisible.");
-}
-
-// Lie le deplacement manuel du marqueur a la mise a jour des champs
-function bindMarkerEvents(){
-marker.on("dragend",e=>{
-const p=e.target.getLatLng();
-updateLieu(p.lat,p.lng);
-});
+function updateLieu(lat, lon) {
+  coordonneesInput.value = `${toDms(lat, true)}, ${toDms(lon, false)}`;
+  if (!lieuInput.value || lieuInput.value.startsWith("Lat:")) {
+    lieuInput.value = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+  }
+  setLieuStatus("Position mise à jour. Clique sur \"Proposer une adresse\" pour obtenir une adresse lisible.");
 }
 
-// Cree ou deplace le marqueur actif sur la carte
-function placeMarker(lat,lon,popupText="Point sélectionné"){
-if(marker){
-marker.setLatLng([lat,lon]).bindPopup(popupText);
-}else{
-marker=L.marker([lat,lon],{draggable:true})
-  .addTo(map)
-  .bindPopup(popupText);
-bindMarkerEvents();
+function bindMarkerEvents() {
+  marker.on("dragend", e => {
+    const p = e.target.getLatLng();
+    updateLieu(p.lat, p.lng);
+  });
 }
 
-marker.openPopup();
-updateLieu(lat,lon);
+function placeMarker(lat, lon, popupText = "Point sélectionné") {
+  if (marker) {
+    marker.setLatLng([lat, lon]).bindPopup(popupText);
+  } else {
+    marker = L.marker([lat, lon], { draggable: true }).addTo(map).bindPopup(popupText);
+    bindMarkerEvents();
+  }
+  marker.openPopup();
+  updateLieu(lat, lon);
 }
 
-// Tente de proposer une adresse postale a partir du point choisi sur la carte
-async function suggestAddressFromMarker(){
-if(!marker){
-setLieuStatus("Place d'abord le marqueur sur la carte.", true);
-return;
+async function suggestAddressFromMarker() {
+  if (!marker) {
+    setLieuStatus("Place d'abord le marqueur sur la carte.", true);
+    return;
+  }
+
+  const { lat, lng } = marker.getLatLng();
+  setLieuStatus("Recherche d'une adresse...");
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`, { headers: { "Accept": "application/json" } });
+    if (!response.ok) throw new Error("Adresse introuvable");
+    const data = await response.json();
+    const formatted = formatAddress(data.address || {});
+    if (formatted) {
+      lieuInput.value = formatted;
+      setLieuStatus("Adresse proposée à partir du point sélectionné.");
+    } else {
+      lieuInput.value = data.display_name || lieuInput.value;
+      setLieuStatus("Adresse partielle proposée. Tu peux la compléter manuellement.");
+    }
+  } catch (error) {
+    setLieuStatus("Impossible de proposer une adresse automatiquement pour l'instant.", true);
+  }
 }
 
-const {lat,lng}=marker.getLatLng();
-setLieuStatus("Recherche d'une adresse...");
-
-try{
-const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`,{
-headers:{ "Accept":"application/json" }
-});
-
-if(!response.ok) throw new Error("Adresse introuvable");
-
-const data=await response.json();
-const formatted=formatAddress(data.address || {});
-
-if(formatted){
-lieuInput.value=formatted;
-setLieuStatus("Adresse proposée à partir du point sélectionné.");
-}else{
-lieuInput.value=data.display_name || lieuInput.value;
-setLieuStatus("Adresse partielle proposée. Tu peux la compléter manuellement.");
-}
-}catch(error){
-setLieuStatus("Impossible de proposer une adresse automatiquement pour l'instant.", true);
-}
-}
-
-if(navigator.geolocation){
-navigator.geolocation.getCurrentPosition(pos=>{
-
-const lat=pos.coords.latitude;
-	const lon=pos.coords.longitude;
-	
-	map.setView([lat,lon],15);
-	
-	placeMarker(lat,lon,"Votre position actuelle");
-	
-	});
-}
-
-map.on("click",e=>{
-const {lat,lng}=e.latlng;
-placeMarker(lat,lng,"Point sélectionné sur la carte");
-setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
-setFormStatus("");
-});
-
-// Gestion des cartes de selection pour l'etat, le sous-etat et l'environnement
 suggestAddressBtn.addEventListener("click", suggestAddressFromMarker);
 
-const etatInput=document.getElementById("etat");
-const sousEtatInput=document.getElementById("sousEtat");
-
-const etatGrid=document.getElementById("etatGrid");
-const vivantOptions=document.getElementById("vivantOptions");
-const mortOptions=document.getElementById("mortOptions");
-
-etatGrid.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
-
-const val=card.dataset.etat;
-const isSelected=card.classList.contains("selected-main");
-
-if(isSelected){
-etatInput.value="";
-card.classList.remove("selected-main");
-vivantOptions.style.display="none";
-mortOptions.style.display="none";
-sousEtatInput.value="";
-[vivantOptions,mortOptions].forEach(group=>{
-group.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
-});
-setFormStatus("");
-return;
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    map.setView([lat, lon], 15);
+    placeMarker(lat, lon, "Votre position actuelle");
+  });
 }
 
-etatInput.value=val;
-
-etatGrid.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-main"));
-
-card.classList.add("selected-main");
-
-sousEtatInput.value="";
-
-vivantOptions.style.display="none";
-mortOptions.style.display="none";
-
-if(val==="vivant") vivantOptions.style.display="flex";
-if(val==="mort") mortOptions.style.display="flex";
-setFormStatus("");
-
-});
+map.on("click", e => {
+  const { lat, lng } = e.latlng;
+  placeMarker(lat, lng, "Point sélectionné sur la carte");
+  setLieuStatus("Point placé sur la carte. Clique sur \"Proposer une adresse\" pour compléter l'adresse.");
+  setFormStatus("");
 });
 
-[vivantOptions,mortOptions].forEach(group=>{
-group.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
+// ======== Sélections (état, sous-état, environnement) ==========
+const formStatusMessage = document.getElementById("formStatusMessage");
 
-const val=card.dataset.sousEtat;
-const isSelected=card.classList.contains("selected-sub");
+function setFormStatus(message, isError = false) {
+  if (!message) {
+    formStatusMessage.textContent = "";
+    formStatusMessage.classList.remove("is-visible", "is-error");
+    return;
+  }
 
-if(isSelected){
-sousEtatInput.value="";
-card.classList.remove("selected-sub");
-setFormStatus("");
-return;
+  formStatusMessage.textContent = message;
+  formStatusMessage.classList.add("is-visible");
+  formStatusMessage.classList.toggle("is-error", isError);
 }
 
-sousEtatInput.value=val;
+function validateRecensementForm() {
+  const missingFields = [];
 
-group.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
+  if (!document.getElementById("etat").value) {
+    missingFields.push("sélectionner l'état du hérisson");
+  }
 
-card.classList.add("selected-sub");
-setFormStatus("");
+  if (!document.getElementById("environnement").value) {
+    missingFields.push("choisir un environnement");
+  }
 
-});
-});
-});
+  if (!marker) {
+    missingFields.push("placer un point précis sur la carte");
+  }
 
-const envGrid=document.getElementById("envGrid");
-const envInput=document.getElementById("environnement");
+  if (missingFields.length) {
+    setFormStatus(`Impossible d'envoyer le recensement pour l'instant. Merci de ${missingFields.join(", ")}.`, true);
+    formStatusMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    return false;
+  }
 
-envGrid.querySelectorAll(".choice-card").forEach(card=>{
-card.addEventListener("click",()=>{
-
-const isSelected=card.classList.contains("selected-sub");
-
-if(isSelected){
-envInput.value="";
-card.classList.remove("selected-sub");
-setFormStatus("");
-return;
+  setFormStatus("");
+  return true;
 }
 
-envInput.value=card.dataset.env;
+document.addEventListener("DOMContentLoaded", () => {
 
-envGrid.querySelectorAll(".choice-card")
-.forEach(c=>c.classList.remove("selected-sub"));
+  const etatInput = document.getElementById("etat");
+  const sousEtatInput = document.getElementById("sousEtat");
+  const envInput = document.getElementById("environnement");
 
-card.classList.add("selected-sub");
-setFormStatus("");
+  const etatGrid = document.getElementById("etatGrid");
+  const vivantOptions = document.getElementById("vivantOptions");
+  const mortOptions = document.getElementById("mortOptions");
+  const envGrid = document.getElementById("envGrid");
 
-});
-});
+  // Etats principaux
+  etatGrid.querySelectorAll(".choice-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const val = card.dataset.etat;
+      const isSelected = card.classList.contains("selected-main");
 
-const photoInput=document.getElementById("photoUpload");
-const previewDiv=document.getElementById("preview");
-const formStatusMessage=document.getElementById("formStatusMessage");
+      if (isSelected) {
+        etatInput.value = "";
+        card.classList.remove("selected-main");
+        vivantOptions.style.display = "none";
+        mortOptions.style.display = "none";
+        sousEtatInput.value = "";
+        [vivantOptions, mortOptions].forEach(group => {
+          group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+        });
+        setFormStatus("");
+        return;
+      }
 
-function setFormStatus(message,isError=false){
-if(!message){
-formStatusMessage.textContent="";
-formStatusMessage.classList.remove("is-visible","is-error");
-return;
-}
+      etatInput.value = val;
 
-formStatusMessage.textContent=message;
-formStatusMessage.classList.add("is-visible");
-formStatusMessage.classList.toggle("is-error", isError);
-}
+      etatGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-main"));
+      card.classList.add("selected-main");
 
-function validateRecensementForm(){
-const missingFields=[];
+      sousEtatInput.value = "";
+      vivantOptions.style.display = val === "vivant" ? "flex" : "none";
+      mortOptions.style.display = val === "mort" ? "flex" : "none";
+      setFormStatus("");
+    });
+  });
 
-if(!etatInput.value){
-missingFields.push("sélectionner l'état du hérisson");
-}
+  // Sous-états
+  [vivantOptions, mortOptions].forEach(group => {
+    group.querySelectorAll(".choice-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const val = card.dataset.sousEtat;
+        const isSelected = card.classList.contains("selected-sub");
 
-if(!envInput.value){
-missingFields.push("choisir un environnement");
-}
+        if (isSelected) {
+          sousEtatInput.value = "";
+          card.classList.remove("selected-sub");
+          setFormStatus("");
+          return;
+        }
 
-if(!marker){
-missingFields.push("placer un point précis sur la carte");
-}
+        sousEtatInput.value = val;
 
-if(missingFields.length){
-setFormStatus(`Impossible d'envoyer le recensement pour l'instant. Merci de ${missingFields.join(", ")}.`, true);
-formStatusMessage.scrollIntoView({ behavior:"smooth", block:"nearest" });
-return false;
-}
+        group.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+        card.classList.add("selected-sub");
+        setFormStatus("");
+      });
+    });
+  });
 
-setFormStatus("");
-return true;
-}
+  // Environnement
+  envGrid.querySelectorAll(".choice-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const isSelected = card.classList.contains("selected-sub");
 
-photoInput.addEventListener("change",function(){
+      if (isSelected) {
+        envInput.value = "";
+        card.classList.remove("selected-sub");
+        setFormStatus("");
+        return;
+      }
 
-const file=this.files[0];
+      envInput.value = card.dataset.env;
 
-if(file){
-const reader=new FileReader();
-
-reader.onload=e=>{
-previewDiv.innerHTML=`<img src="${e.target.result}">`;
-};
-
-reader.readAsDataURL(file);
-}
+      envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
+      card.classList.add("selected-sub");
+      setFormStatus("");
+    });
+  });
 
 });
 
+// ======== Upload d'image + Validation IA ==========
+const photoInput = document.getElementById("photoUpload");
+const previewDiv = document.getElementById("preview");
+const photoAnalysisMessage = document.getElementById("photoAnalysisMessage");
+
+function setPhotoAnalysisMessage(message, tone = "") {
+  if (!message) {
+    photoAnalysisMessage.textContent = "";
+    photoAnalysisMessage.classList.remove("is-visible", "is-success", "is-warning", "is-error");
+    return;
+  }
+
+  photoAnalysisMessage.textContent = message;
+  photoAnalysisMessage.classList.add("is-visible");
+  photoAnalysisMessage.classList.remove("is-success", "is-warning", "is-error");
+
+  if (tone) {
+    photoAnalysisMessage.classList.add(tone);
+  }
+}
+
+photoInput.addEventListener("change", async () => {
+  const file = photoInput.files[0];
+  if (!file) {
+    setPhotoAnalysisMessage("");
+    return;
+  }
+
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(file);
+  setPhotoAnalysisMessage("Analyse de l'image en cours...", "is-warning");
+
+  img.onload = async () => {
+    try {
+      // Affiche l'image dans la div preview
+      previewDiv.innerHTML = `<img src="${objectUrl}" alt="Prévisualisation">`;
+
+      // Vérifie si c'est un hérisson
+      const analysis = await analyzeHedgehog(img);
+      const predictionsLabel = formatPredictions(analysis.predictions);
+
+      if (analysis.detected) {
+        console.log("Hérisson détecté ✅");
+        setPhotoAnalysisMessage(`Hérisson détecté sur l'image. Prédictions : ${predictionsLabel}`, "is-success");
+      } else {
+        console.warn("Aucun hérisson détecté ⚠️");
+        setPhotoAnalysisMessage(`Aucun hérisson détecté sur l'image. Prédictions les plus proches : ${predictionsLabel || "aucune"}`, "is-warning");
+      }
+    } catch (error) {
+      console.error("Impossible d'analyser l'image.", error);
+      setPhotoAnalysisMessage("Impossible d'analyser l'image pour le moment.", "is-error");
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  img.onerror = () => {
+    console.error("Impossible de charger l'image sélectionnée.");
+    setPhotoAnalysisMessage("Impossible de charger l'image sélectionnée.", "is-error");
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  img.src = objectUrl;
+});
+// ======== Soumission du formulaire ==========
 const form=document.getElementById("recensementForm");
+form.addEventListener("submit", async e=>{
+  e.preventDefault();
+  if(!auth.currentUser) return redirectToLogin();
 
-form.addEventListener("submit",async e=>{
+  if(!validateRecensementForm()) return;
 
-e.preventDefault();
+  const recensement={
+    uid: auth.currentUser.uid,
+    username: currentUsername || localStorage.getItem("username") || auth.currentUser.email || "Inconnu",
+    email: auth.currentUser.email || "Non renseigné",
+    lieu: document.getElementById("lieu").value,
+    date: document.getElementById("date").value,
+    notes: document.getElementById("notes").value,
+    etat: document.getElementById("etat").value,
+    sousEtat: document.getElementById("sousEtat").value,
+    environnement: document.getElementById("environnement").value,
+    latitude: marker ? marker.getLatLng().lat : null,
+    longitude: marker ? marker.getLatLng().lng : null
+  };
 
-// Construit l'objet complet qui sera envoye dans Firestore
-if(!auth.currentUser)
-return redirectToLogin();
-
-if(!validateRecensementForm()){
-return;
-}
-
-const recensement={
-
-uid:auth.currentUser.uid,
-username:currentUsername || localStorage.getItem("username") || auth.currentUser.email || "Inconnu",
-email:auth.currentUser.email || "Non renseigné",
-
-lieu:document.getElementById("lieu").value,
-date:dateInput.value,
-
-notes:document.getElementById("notes").value,
-
-etat:document.getElementById("etat").value,
-sousEtat:document.getElementById("sousEtat").value,
-environnement:document.getElementById("environnement").value,
-
-latitude:marker ? marker.getLatLng().lat : null,
-longitude:marker ? marker.getLatLng().lng : null
-
-};
-
-try{
-
-await addDoc(collection(db,"recensements"),recensement);
-
-form.reset();
-previewDiv.innerHTML="";
-
-if(marker) marker.setLatLng(map.getCenter());
-
-window.location.href="confirmation.html";
-
-}catch(err){
-
-console.error(err);
-alert("Impossible d'enregistrer le recensement.");
-
-}
-
+  try{
+    await addDoc(collection(db,"recensements"), recensement);
+    form.reset();
+    previewDiv.innerHTML="";
+    setFormStatus("");
+    if(marker) marker.setLatLng([50.8467,4.3525]); // reset marker centre
+    window.location.href="confirmation.html";
+  }catch(err){
+    console.error(err);
+    alert("Impossible d'enregistrer le recensement.");
+  }
 });
-
 </script>
-
 </body>
 </html>
