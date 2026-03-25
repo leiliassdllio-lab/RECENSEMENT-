@@ -112,7 +112,6 @@ display:grid;
 gap:18px;
 }
 .identity-card,
-.account-edit-card,
 .actions-card,
 .stats-card{
 background:#fcfdfb;
@@ -121,88 +120,69 @@ border-radius:20px;
 padding:20px;
 }
 .identity-card h2{
-margin:0 0 8px;
+margin:0;
 font-size:2rem;
 color:#234b2c;
 text-align:left;
 }
-.identity-card p{
-margin:0;
-color:#5a6f5e;
-font-size:1rem;
-}
-.account-edit-card{
+.identity-summary{
 display:grid;
 gap:14px;
+margin-top:14px;
 }
-.form-grid{
+.identity-row{
 display:grid;
-grid-template-columns:repeat(2,minmax(0,1fr));
-gap:14px;
-}
-.field-group{
-display:grid;
-gap:8px;
-}
-.field-group label{
-font-weight:bold;
-color:#33523a;
-}
-.field-group input{
-width:100%;
+gap:4px;
 padding:12px 14px;
-border-radius:12px;
-border:1px solid #cfd9cc;
-box-sizing:border-box;
-font:inherit;
+border-radius:14px;
 background:white;
+border:1px solid #e0ebdc;
 }
-.field-group input[readonly]{
-background:#f3f7f2;
-color:#5a6f5e;
-}
-.form-actions{
-display:flex;
+.identity-birth-row{
+display:grid;
+grid-template-columns:minmax(0,1fr) auto;
 align-items:center;
+gap:14px;
+padding:14px 16px;
+}
+.identity-birth-main{
+display:grid;
+gap:6px;
+min-width:0;
+}
+.identity-row-label{
+font-size:.78rem;
+font-weight:bold;
+letter-spacing:.05em;
+text-transform:uppercase;
+color:#6b7f6f;
+}
+.identity-row-value{
+margin:0;
+color:#355335;
+font-size:1rem;
+line-height:1.45;
+}
+.identity-row-age{
+margin:0;
+padding:10px 14px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-size:.95rem;
+font-weight:bold;
+white-space:nowrap;
+border:1px solid #d6e5d4;
+box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+}
+.identity-actions{
+display:flex;
 gap:12px;
 flex-wrap:wrap;
+margin-top:16px;
 }
-.save-button{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-padding:12px 18px;
-border-radius:12px;
-background:#2f7a39;
-color:white;
-font-weight:bold;
-border:none;
-cursor:pointer;
-transition:background .2s,transform .2s;
-}
-.save-button:hover{
-background:#286931;
-transform:translateY(-1px);
-}
-.save-button:disabled{
-opacity:.7;
-cursor:wait;
-transform:none;
-}
-.account-status{
-min-height:1.2rem;
-margin:0;
-font-size:.95rem;
-color:#5a6f5e;
-}
-.account-status.is-error{
-color:#b42318;
-}
-.account-help{
-margin:0;
-font-size:.92rem;
-color:#5a6f5e;
-line-height:1.5;
+.identity-actions .danger-button{
+margin-left:auto;
 }
 .mini-label{
 display:block;
@@ -249,6 +229,23 @@ transition:background .2s,transform .2s;
 }
 .secondary-link:hover{
 background:#f3f7f2;
+transform:translateY(-1px);
+}
+.danger-button{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:12px 18px;
+border-radius:12px;
+background:#d32f2f;
+color:white;
+font-weight:bold;
+border:none;
+cursor:pointer;
+transition:background .2s,transform .2s;
+}
+.danger-button:hover{
+background:#b71c1c;
 transform:translateY(-1px);
 }
 .stats-grid{
@@ -376,8 +373,11 @@ opacity:1;
 .profile-card{
 grid-template-columns:1fr;
 }
-.form-grid{
+.identity-birth-row{
 grid-template-columns:1fr;
+}
+.identity-actions .danger-button{
+margin-left:0;
 }
 .stats-grid{
 grid-template-columns:1fr;
@@ -420,28 +420,23 @@ grid-template-columns:1fr;
 <section class="identity-card">
 <span class="mini-label">Identité</span>
 <h2 id="username"></h2>
-<p id="userEmail"></p>
-</section>
-
-<section class="account-edit-card">
-<span class="mini-label">Modifier mes informations</span>
-<form id="accountForm">
-<div class="form-grid">
-<div class="field-group">
-<label for="usernameInput">Pseudo</label>
-<input type="text" id="usernameInput" placeholder="Choisis un pseudo">
+<div class="identity-summary">
+<div class="identity-row">
+<span class="identity-row-label">Email</span>
+<p id="userEmail" class="identity-row-value"></p>
 </div>
-<div class="field-group">
-<label for="emailInput">Email</label>
-<input type="email" id="emailInput" readonly>
+<div class="identity-row identity-birth-row">
+<div class="identity-birth-main">
+<span class="identity-row-label">Date de naissance</span>
+<p id="userBirthDate" class="identity-row-value"></p>
+</div>
+<p id="userAge" class="identity-row-age"></p>
 </div>
 </div>
-<p class="account-help">Le pseudo sera affiché sur ton profil et associé à tes futurs recensements.</p>
-<div class="form-actions">
-<button type="submit" class="save-button" id="saveAccountBtn">Enregistrer mes informations</button>
-<p id="accountStatus" class="account-status" aria-live="polite"></p>
+<div class="identity-actions">
+<a href="modifier-compte.html" class="primary-link">Modifier mes informations</a>
+<button type="button" id="logoutBtn" class="danger-button">Se déconnecter</button>
 </div>
-</form>
 </section>
 
 <section class="actions-card">
@@ -535,7 +530,7 @@ grid-template-columns:1fr;
 // Initialisation Firebase pour lire le profil, les scores de quiz et les recensements
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import{getFirestore,collection,query,where,getDocs,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
@@ -549,7 +544,6 @@ appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
-let currentUser=null;
 
 function buildUsernameFromUser(user){
 if(user.displayName && user.displayName.trim()) return user.displayName.trim();
@@ -578,13 +572,62 @@ localStorage.setItem("username",fallbackUsername);
 return fallbackUsername;
 }
 
+async function resolveUserProfile(user){
+const userRef=doc(db,"users",user.uid);
+const userSnap=await getDoc(userRef);
+const fallbackUsername=localStorage.getItem("username") || buildUsernameFromUser(user);
+
+if(userSnap.exists()){
+  const data=userSnap.data();
+  const username=data.username || fallbackUsername;
+  localStorage.setItem("username",username);
+  return {
+    username,
+    birthDate:data.birthDate || ""
+  };
+}
+
+await setDoc(userRef,{
+uid:user.uid,
+email:user.email || "",
+username:fallbackUsername,
+birthDate:""
+},{ merge:true });
+
+localStorage.setItem("username",fallbackUsername);
+return {
+  username:fallbackUsername,
+  birthDate:""
+};
+}
+
+function formatBirthDate(value){
+if(!value) return "Non renseignée";
+const date=new Date(`${value}T00:00:00`);
+if(Number.isNaN(date.getTime())) return "Non renseignée";
+return date.toLocaleDateString("fr-BE");
+}
+
+function getAgeLabel(value){
+if(!value) return "Age inconnu";
+const birthDate=new Date(`${value}T00:00:00`);
+if(Number.isNaN(birthDate.getTime())) return "Age inconnu";
+
+const today=new Date();
+let age=today.getFullYear()-birthDate.getFullYear();
+const monthDiff=today.getMonth()-birthDate.getMonth();
+
+if(monthDiff<0 || (monthDiff===0 && today.getDate()<birthDate.getDate())){
+age-=1;
+}
+
+if(age<0) return "Age inconnu";
+return `${age} ans`;
+}
+
 const photoInput=document.getElementById("photoUpload");
 const userPhoto=document.getElementById("userPhoto");
-const accountForm=document.getElementById("accountForm");
-const usernameInput=document.getElementById("usernameInput");
-const emailInput=document.getElementById("emailInput");
-const accountStatus=document.getElementById("accountStatus");
-const saveAccountBtn=document.getElementById("saveAccountBtn");
+const logoutBtn=document.getElementById("logoutBtn");
 
 photoInput.addEventListener("change",function(){
 const file=this.files[0];
@@ -595,10 +638,11 @@ reader.readAsDataURL(file);
 }
 });
 
-function setAccountStatus(message,isError=false){
-accountStatus.textContent=message;
-accountStatus.classList.toggle("is-error",isError);
-}
+logoutBtn.addEventListener("click",async()=>{
+await signOut(auth);
+localStorage.removeItem("username");
+window.location.replace("login.html?next=profil.html");
+});
 
 async function getRecensementsCount(uid){
 const q=query(collection(db,"recensements"),where("uid","==",uid));
@@ -665,57 +709,20 @@ return completed;
 
 onAuthStateChanged(auth,async user=>{
 if(!user){window.location.replace("login.html?next=profil.html");return;}
-currentUser=user;
 
 // Alimente l'interface du profil a partir des donnees utilisateur
 document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("userEmail").textContent=user.email;
-const username=await resolveUsername(user);
-document.getElementById("username").textContent=username;
-usernameInput.value=username;
-emailInput.value=user.email || "";
+const profile=await resolveUserProfile(user);
+document.getElementById("username").textContent=profile.username;
+document.getElementById("userBirthDate").textContent=formatBirthDate(profile.birthDate);
+document.getElementById("userAge").textContent=getAgeLabel(profile.birthDate);
 
 const count=await getRecensementsCount(user.uid);
 let unlockedBadges=updateRecensementBadges(count);
 const completedQuiz=await loadQuizProgress(user.uid);
 if(completedQuiz===4) unlockedBadges++;
 document.getElementById("stat-badges").textContent=unlockedBadges;
-});
-
-accountForm.addEventListener("submit",async event=>{
-event.preventDefault();
-
-if(!currentUser){
-setAccountStatus("Connecte-toi pour modifier tes informations.",true);
-return;
-}
-
-const nextUsername=usernameInput.value.trim();
-
-if(!nextUsername){
-setAccountStatus("Merci d'indiquer un pseudo.",true);
-return;
-}
-
-saveAccountBtn.disabled=true;
-setAccountStatus("Enregistrement en cours...");
-
-try{
-await setDoc(doc(db,"users",currentUser.uid),{
-uid:currentUser.uid,
-email:currentUser.email || "",
-username:nextUsername
-},{ merge:true });
-
-localStorage.setItem("username",nextUsername);
-document.getElementById("username").textContent=nextUsername;
-setAccountStatus("Informations mises à jour.");
-}catch(error){
-console.error("Impossible de mettre à jour le profil.",error);
-setAccountStatus("Impossible d'enregistrer les modifications pour le moment.",true);
-}finally{
-saveAccountBtn.disabled=false;
-}
 });
 
 </script>

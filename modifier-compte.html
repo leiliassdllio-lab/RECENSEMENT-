@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modifier Mon Compte – Hérisson</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+body{
+margin:0;
+background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
+color:#203224;
+}
+.container{
+width:min(92%,720px);
+margin:26px auto 40px;
+}
+.panel{
+background:white;
+border:1px solid rgba(111,153,118,.16);
+border-radius:24px;
+box-shadow:0 18px 38px rgba(48,84,56,.12);
+padding:30px;
+}
+.intro{
+text-align:center;
+margin-bottom:24px;
+}
+.kicker{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:8px 14px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-weight:bold;
+font-size:.92rem;
+}
+.title{
+margin:16px 0 10px;
+font-size:clamp(2rem,3.5vw,2.6rem);
+line-height:1.08;
+color:#234b2c;
+}
+.subtitle{
+margin:0 auto;
+max-width:560px;
+color:#5a6f5e;
+line-height:1.6;
+}
+.form-card{
+background:#fcfdfb;
+border:1px solid #e0ebdc;
+border-radius:20px;
+padding:20px;
+display:grid;
+gap:16px;
+}
+.form-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:14px;
+}
+.field-group{
+display:grid;
+gap:8px;
+}
+.field-group label{
+font-weight:bold;
+color:#33523a;
+}
+.field-group input{
+width:100%;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #cfd9cc;
+box-sizing:border-box;
+font:inherit;
+background:white;
+}
+.field-group input[readonly]{
+background:#f3f7f2;
+color:#5a6f5e;
+}
+.form-help{
+margin:0;
+font-size:.92rem;
+color:#5a6f5e;
+line-height:1.5;
+}
+.form-actions{
+display:flex;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+}
+.save-button,
+.secondary-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:12px 18px;
+border-radius:12px;
+font-weight:bold;
+text-decoration:none;
+transition:background .2s,transform .2s;
+}
+.save-button{
+background:#2f7a39;
+color:white;
+border:none;
+cursor:pointer;
+}
+.save-button:hover{
+background:#286931;
+transform:translateY(-1px);
+}
+.save-button:disabled{
+opacity:.7;
+cursor:wait;
+transform:none;
+}
+.secondary-link{
+background:white;
+color:#33523a;
+border:1px solid #d6e5d4;
+}
+.secondary-link:hover{
+background:#f3f7f2;
+transform:translateY(-1px);
+}
+.status{
+min-height:1.2rem;
+margin:0;
+font-size:.95rem;
+color:#5a6f5e;
+}
+.status.is-error{
+color:#b42318;
+}
+@media (max-width: 720px){
+.form-grid{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+<body class="site-page">
+
+<header class="site-header">
+<div class="site-header-inner">
+<h1>Modifier Mon Compte</h1>
+<div class="back-box"><a href="profil.html" class="back-link">Retour au profil</a></div>
+</div>
+</header>
+
+<main class="container">
+<section class="panel">
+<div class="intro">
+<div class="kicker">Compte</div>
+<h2 class="title">Modifie tes informations</h2>
+<p class="subtitle">Renseigne ton pseudo pour qu’il apparaisse correctement sur ton profil et sur tes futurs recensements.</p>
+</div>
+
+<form id="accountForm" class="form-card">
+<div class="form-grid">
+<div class="field-group">
+<label for="usernameInput">Pseudo</label>
+<input type="text" id="usernameInput" placeholder="Choisis un pseudo">
+</div>
+<div class="field-group">
+<label for="emailInput">Email</label>
+<input type="email" id="emailInput" readonly>
+</div>
+<div class="field-group">
+<label for="birthDateInput">Date de naissance</label>
+<input type="date" id="birthDateInput">
+</div>
+</div>
+<p class="form-help">Le pseudo est enregistré avec ton compte et sera réutilisé lors de tes prochaines connexions.</p>
+<div class="form-actions">
+<button type="submit" class="save-button" id="saveAccountBtn">Enregistrer</button>
+<a href="profil.html" class="secondary-link">Annuler</a>
+<p id="accountStatus" class="status" aria-live="polite"></p>
+</div>
+</form>
+</section>
+</main>
+
+<footer class="site-footer">
+© <span id="year"></span> – Team Hérisson
+</footer>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import{getFirestore,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyDxCMszTckBP5Zmiaxmo74aVNHiIhUYvys",
+authDomain:"herisson-f80ba.firebaseapp.com",
+projectId:"herisson-f80ba",
+storageBucket:"herisson-f80ba.firebasestorage.app",
+messagingSenderId:"142270421417",
+appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
+let currentUser=null;
+
+const accountForm=document.getElementById("accountForm");
+const usernameInput=document.getElementById("usernameInput");
+const emailInput=document.getElementById("emailInput");
+const birthDateInput=document.getElementById("birthDateInput");
+const accountStatus=document.getElementById("accountStatus");
+const saveAccountBtn=document.getElementById("saveAccountBtn");
+
+document.getElementById("year").textContent=new Date().getFullYear();
+
+function buildUsernameFromUser(user){
+if(user.displayName && user.displayName.trim()) return user.displayName.trim();
+if(user.email) return user.email.split("@")[0];
+return "Utilisateur";
+}
+
+function setAccountStatus(message,isError=false){
+accountStatus.textContent=message;
+accountStatus.classList.toggle("is-error",isError);
+}
+
+async function resolveUsername(user){
+const userRef=doc(db,"users",user.uid);
+const userSnap=await getDoc(userRef);
+const fallbackUsername=localStorage.getItem("username") || buildUsernameFromUser(user);
+
+if(userSnap.exists()){
+const profileUsername=(userSnap.data().username || fallbackUsername).trim();
+localStorage.setItem("username",profileUsername);
+return profileUsername;
+}
+
+await setDoc(userRef,{
+uid:user.uid,
+email:user.email || "",
+username:fallbackUsername
+},{ merge:true });
+
+localStorage.setItem("username",fallbackUsername);
+return fallbackUsername;
+}
+
+async function getBirthDate(user){
+const userSnap=await getDoc(doc(db,"users",user.uid));
+if(!userSnap.exists()) return "";
+return userSnap.data().birthDate || "";
+}
+
+onAuthStateChanged(auth,async user=>{
+if(!user){
+window.location.replace("login.html?next=modifier-compte.html");
+return;
+}
+
+currentUser=user;
+emailInput.value=user.email || "";
+usernameInput.value=await resolveUsername(user);
+birthDateInput.value=await getBirthDate(user);
+});
+
+accountForm.addEventListener("submit",async event=>{
+event.preventDefault();
+
+if(!currentUser){
+setAccountStatus("Connecte-toi pour modifier tes informations.",true);
+return;
+}
+
+const nextUsername=usernameInput.value.trim();
+const birthDate=birthDateInput.value;
+if(!nextUsername){
+setAccountStatus("Merci d'indiquer un pseudo.",true);
+return;
+}
+
+saveAccountBtn.disabled=true;
+setAccountStatus("Enregistrement en cours...");
+
+try{
+await setDoc(doc(db,"users",currentUser.uid),{
+uid:currentUser.uid,
+email:currentUser.email || "",
+username:nextUsername,
+birthDate
+},{ merge:true });
+
+localStorage.setItem("username",nextUsername);
+setAccountStatus("Informations mises à jour.");
+ window.location.replace("profil.html");
+}catch(error){
+console.error("Impossible de mettre à jour le profil.",error);
+setAccountStatus("Impossible d'enregistrer les modifications pour le moment.",true);
+}finally{
+saveAccountBtn.disabled=false;
+}
+});
+</script>
+</body>
+</html>

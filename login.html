@@ -16,6 +16,24 @@ button:hover { opacity:0.9; }
 #loginBtn, #createBtn { background-color:#4CAF50; color:white; }
 #googleBtn { background-color:#4285F4; color:white; margin-top:10px; }
 #googleBtn:hover { background-color:#357ae8; }
+.toggle-password {
+  width:auto;
+  padding:8px 12px;
+  margin-top:0;
+  border:1px solid #d6e5d4;
+  background:#f3f7f2;
+  color:#33523a;
+}
+.toggle-password:hover { background:#e8f1e6; opacity:1; }
+.password-row {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:8px 0;
+}
+.password-row input {
+  margin:0;
+}
 p { font-size:0.9em; margin-top:12px; }
 a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 .error { color:red; margin-top:10px; font-size:0.9em; }
@@ -52,7 +70,10 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
   <!-- Bloc de connexion classique email / mot de passe -->
   <div id="loginDiv">
     <input type="text" id="loginUser" placeholder="Nom d’utilisateur / Email">
-    <input type="password" id="loginPass" placeholder="Mot de passe">
+    <div class="password-row">
+      <input type="password" id="loginPass" placeholder="Mot de passe">
+      <button type="button" id="toggleLoginPass" class="toggle-password">Afficher</button>
+    </div>
     <button id="loginBtn">Se connecter</button>
     <button id="googleBtn">Se connecter avec Google</button>
     <p>Pas encore de compte ? <a id="showSignup">Créer un compte</a></p>
@@ -64,7 +85,10 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
     <h1>Créer un compte</h1>
     <input type="text" id="signupUser" placeholder="Nom d’utilisateur">
     <input type="email" id="signupEmail" placeholder="Email">
-    <input type="password" id="signupPass" placeholder="Mot de passe">
+    <div class="password-row">
+      <input type="password" id="signupPass" placeholder="Mot de passe">
+      <button type="button" id="toggleSignupPass" class="toggle-password">Afficher</button>
+    </div>
     <button id="createBtn">Créer votre compte</button>
     <p>Déjà un compte ? <a id="showLogin">Se connecter</a></p>
     <div class="error" id="signupError"></div>
@@ -97,6 +121,7 @@ const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 await setPersistence(auth, browserLocalPersistence);
 let isRedirecting = false;
+let isLoadingExistingSession = true;
 const allowedNextPages = new Set([
   "recensement1.html",
   "recensement.html",
@@ -173,9 +198,11 @@ const loginDiv = document.getElementById("loginDiv");
 const signupDiv = document.getElementById("signupDiv");
 const loginUser = document.getElementById("loginUser");
 const loginPass = document.getElementById("loginPass");
+const toggleLoginPass = document.getElementById("toggleLoginPass");
 const signupUser = document.getElementById("signupUser");
 const signupEmail = document.getElementById("signupEmail");
 const signupPass = document.getElementById("signupPass");
+const toggleSignupPass = document.getElementById("toggleSignupPass");
 const loginError = document.getElementById("loginError");
 const signupError = document.getElementById("signupError");
 
@@ -185,9 +212,46 @@ const createBtn = document.getElementById("createBtn");
 const showSignup = document.getElementById("showSignup");
 const showLogin = document.getElementById("showLogin");
 
+function setButtonsDisabled(disabled){
+  loginBtn.disabled = disabled;
+  googleBtn.disabled = disabled;
+  createBtn.disabled = disabled;
+}
+
 // --- Bascule entre connexion et création de compte ---
 showSignup.addEventListener("click", ()=>{ loginDiv.classList.add("hidden"); signupDiv.classList.remove("hidden"); });
 showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); loginDiv.classList.remove("hidden"); });
+
+toggleLoginPass.addEventListener("click", ()=>{
+  const isHidden = loginPass.type === "password";
+  loginPass.type = isHidden ? "text" : "password";
+  toggleLoginPass.textContent = isHidden ? "Masquer" : "Afficher";
+});
+
+toggleSignupPass.addEventListener("click", ()=>{
+  const isHidden = signupPass.type === "password";
+  signupPass.type = isHidden ? "text" : "password";
+  toggleSignupPass.textContent = isHidden ? "Masquer" : "Afficher";
+});
+
+setButtonsDisabled(true);
+
+if(typeof auth.authStateReady === "function"){
+  await auth.authStateReady();
+}
+
+if(auth.currentUser){
+  try{
+    await syncUserProfile(auth.currentUser);
+  }catch(error){
+    console.error("Impossible de synchroniser le profil utilisateur.", error);
+    localStorage.setItem("username", buildUsernameFromUser(auth.currentUser));
+  }
+  redirectToTarget();
+}else{
+  isLoadingExistingSession = false;
+  setButtonsDisabled(false);
+}
 
 // --- Permettre la connexion via username ou email ---
 async function getEmailFromUsername(username){
@@ -199,6 +263,7 @@ async function getEmailFromUsername(username){
 
 // --- Connexion email/password ---
 loginBtn.addEventListener("click", async ()=>{
+  if(isLoadingExistingSession) return;
   loginError.textContent="";
   try{
     const identifier = loginUser.value.trim();
@@ -217,6 +282,7 @@ loginBtn.addEventListener("click", async ()=>{
 
 // --- Connexion Google avec création / mise à jour du profil Firestore ---
 googleBtn.addEventListener("click", async ()=>{
+  if(isLoadingExistingSession) return;
   loginError.textContent="";
   try{
     const result = await signInWithPopup(auth, provider);
@@ -232,6 +298,7 @@ googleBtn.addEventListener("click", async ()=>{
 
 // --- Création d'un compte local dans Firebase Auth + profil dans Firestore ---
 createBtn.addEventListener("click", async ()=>{
+  if(isLoadingExistingSession) return;
   signupError.textContent="";
   try{
     const username = normalizeUsername(signupUser.value);
