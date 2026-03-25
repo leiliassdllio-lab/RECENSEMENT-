@@ -4,11 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>As-tu vu un hérisson?</title>
+<meta http-equiv="Cache-Control" content="no-store, max-age=0, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script>
+document.documentElement.classList.add("auth-locked");
+</script>
 
 <style>
+html.auth-locked body {
+visibility:hidden;
+}
+
+html.auth-ready body {
+visibility:visible;
+}
+
 body {
 font-family:'Arial',sans-serif;
 background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%);
@@ -656,22 +670,47 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth,user=>{
-if(!user) {
-window.location.href="login.html";
-return;
+function redirectToLogin(){
+document.documentElement.classList.add("auth-locked");
+window.location.replace("login.html");
 }
 
+function unlockProtectedPage(){
+document.documentElement.classList.remove("auth-locked");
+document.documentElement.classList.add("auth-ready");
+}
+
+function applyAuthenticatedUi(user){
 const savedUsername=localStorage.getItem("username");
 const usernameBadge=document.getElementById("usernameBadge");
 const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
 usernameBadge.textContent=username;
+unlockProtectedPage();
+}
+
+onAuthStateChanged(auth,user=>{
+if(!user) {
+redirectToLogin();
+return;
+}
+
+applyAuthenticatedUi(user);
+});
+
+window.addEventListener("pageshow",()=>{
+document.documentElement.classList.add("auth-locked");
+const currentUser=auth.currentUser;
+if(!currentUser){
+redirectToLogin();
+return;
+}
+applyAuthenticatedUi(currentUser);
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
 await signOut(auth);
 localStorage.removeItem("username");
-window.location.href="login.html";
+redirectToLogin();
 });
 
 const dateInput=document.getElementById("date");
@@ -973,7 +1012,7 @@ e.preventDefault();
 
 // Construit l'objet complet qui sera envoye dans Firestore
 if(!auth.currentUser)
-return window.location.href="login.html";
+return redirectToLogin();
 
 if(!validateRecensementForm()){
 return;

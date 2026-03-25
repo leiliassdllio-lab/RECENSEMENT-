@@ -5,12 +5,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>As-tu vu un hérisson?</title>
+<meta http-equiv="Cache-Control" content="no-store, max-age=0, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script>
+document.documentElement.classList.add("auth-locked");
+</script>
 
 <style>
 /* === Garde exactement ton CSS précédent === */
+html.auth-locked body { visibility:hidden; }
+html.auth-ready body { visibility:visible; }
 body { font-family:'Arial',sans-serif; background:linear-gradient(180deg,#eef6eb 0%,#f7f9f7 180px,#f4f7f3 100%); margin:0; padding:0; color:#203224; }
 .container { width:min(92%, 880px); margin:24px auto; background:white; border-radius:22px; padding:26px; box-shadow:0 18px 38px rgba(48,84,56,0.12); position:relative; border:1px solid rgba(111,153,118,0.15); }
 .top-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; background:#f7fbf5; border:1px solid #dce9d8; border-radius:18px; }
@@ -299,16 +307,41 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth,user=>{
-  if(!user){ window.location.href="login.html"; return; }
+function redirectToLogin() {
+  document.documentElement.classList.add("auth-locked");
+  window.location.replace("login.html");
+}
+
+function unlockProtectedPage() {
+  document.documentElement.classList.remove("auth-locked");
+  document.documentElement.classList.add("auth-ready");
+}
+
+function applyAuthenticatedUi(user) {
   const savedUsername=localStorage.getItem("username");
   document.getElementById("usernameBadge").textContent = savedUsername || user.displayName || user.email || "Utilisateur connecté";
+  unlockProtectedPage();
+}
+
+onAuthStateChanged(auth,user=>{
+  if(!user){ redirectToLogin(); return; }
+  applyAuthenticatedUi(user);
+});
+
+window.addEventListener("pageshow", () => {
+  document.documentElement.classList.add("auth-locked");
+  const currentUser = auth.currentUser;
+  if(!currentUser){
+    redirectToLogin();
+    return;
+  }
+  applyAuthenticatedUi(currentUser);
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
   await signOut(auth);
   localStorage.removeItem("username");
-  window.location.href="login.html";
+  redirectToLogin();
 });
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -370,24 +403,6 @@ async function analyzeHedgehog(img){
 
   return { detected, predictions };
 }
-// Auth + user badge
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-  const savedUsername = localStorage.getItem("username");
-  const usernameBadge = document.getElementById("usernameBadge");
-  const username = savedUsername || user.displayName || user.email || "Utilisateur connecté";
-  usernameBadge.textContent = username;
-});
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
-  localStorage.removeItem("username");
-  window.location.href = "login.html";
-});
-
 // Date et année
 const dateInput = document.getElementById("date");
 const today = new Date();
@@ -697,7 +712,7 @@ photoInput.addEventListener("change", async () => {
 const form=document.getElementById("recensementForm");
 form.addEventListener("submit", async e=>{
   e.preventDefault();
-  if(!auth.currentUser) return window.location.href="login.html";
+  if(!auth.currentUser) return redirectToLogin();
 
   if(!validateRecensementForm()) return;
 
