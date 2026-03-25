@@ -405,6 +405,22 @@ background:#4CAF50;
 color:white;
 }
 
+.footer-license{
+margin:6px 0 0;
+font-size:0.95rem;
+opacity:0.92;
+}
+
+.footer-license a{
+color:inherit;
+text-decoration:underline;
+text-underline-offset:2px;
+}
+
+.footer-license a:hover{
+text-decoration-thickness:2px;
+}
+
 
 /* BOUTON HAUT */
 
