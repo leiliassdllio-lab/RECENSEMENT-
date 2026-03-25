@@ -1,0 +1,48 @@
+\documentclass{ULBreport}
+
+\sceau{Pictures/sceauULB.jpg}
+
+\addbibresource{biblio.bib}
+
+\input{common/packages.tex}
+
+\makeglossaries
+
+% \newglossaryentry{strip mining}
+% {
+%   name=strip mining,
+%   description={is the practice of mining a seam of mineral, by first removing a long strip of overlying soil and rock}
+% }
+
+
+
+% \newacronym{t}{t}{tons}
+
+
+
+\begin{document}
+
+\titleULB{
+	title={État des données et stratégie de science participative pour la conservation du hérisson en Wallonie},
+	course={BING-F406 -- Gestion de projet et projet de recherche},
+	author={ BOUDIS Célina, BEN ALLAL Manal, CLÉMENT Axelle \\ DIALLO Iliassou, DUTRANOIT Théo, MOREAU DE MELEN Larissa },
+	date={2025 - 2026},
+	teacher={Prof. HERMANS Christian \\ Prof. SIMON Patrick \\ DELLICOUR Simon \\ DE TANDT Bastien \\ MINNECI Monica},
+	logo={Pictures/bioing.png}
+}
+
+\listoftables % ToC for tables
+
+\listoffigures % ToC for figures
+
+\input{content/chapters.tex}
+
+\printglossary
+
+\printglossary[type=\acronymtype]
+
+%Bibliography
+\nocite{*}
+\printbibliography[type=article,title=Articles]
+
+\end{document}
