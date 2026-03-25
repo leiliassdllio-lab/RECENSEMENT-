@@ -9,7 +9,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="site-internet/assets/css/style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script>
 document.documentElement.classList.add("auth-locked");
@@ -164,11 +164,11 @@ Se déconnecter
 <div id="etatGrid" class="choice-grid">
 
 <div class="choice-card" data-etat="vivant">
-<img src="assets/images/observations/vivant.png">
+<img src="site-internet/assets/images/observations/vivant.png">
 </div>
 
 <div class="choice-card" data-etat="mort">
-<img src="assets/images/observations/mort.png">
+<img src="site-internet/assets/images/observations/mort.png">
 </div>
 
 </div>
@@ -178,15 +178,15 @@ Se déconnecter
 <div id="vivantOptions" class="choice-grid" style="display:none;">
 
 <div class="choice-card" data-sous-etat="sain">
-<img src="assets/images/observations/bonne-sante.png">
+<img src="site-internet/assets/images/observations/bonne-sante.png">
 </div>
 
 <div class="choice-card" data-sous-etat="blesse">
-<img src="assets/images/observations/blesse.png">
+<img src="site-internet/assets/images/observations/blesse.png">
 </div>
 
 <div class="choice-card" data-sous-etat="malade">
-<img src="assets/images/observations/malade.png">
+<img src="site-internet/assets/images/observations/malade.png">
 </div>
 
 </div>
@@ -194,11 +194,11 @@ Se déconnecter
 <div id="mortOptions" class="choice-grid" style="display:none;">
 
 <div class="choice-card" data-sous-etat="route">
-<img src="assets/images/observations/sur-route.png">
+<img src="site-internet/assets/images/observations/sur-route.png">
 </div>
 
 <div class="choice-card" data-sous-etat="hors_route">
-<img src="assets/images/observations/hors-route.png">
+<img src="site-internet/assets/images/observations/hors-route.png">
 </div>
 
 </div>
@@ -213,19 +213,19 @@ Se déconnecter
 <div id="envGrid" class="choice-grid">
 
 <div class="choice-card" data-env="route">
-<img src="assets/images/environment/route.png">
+<img src="site-internet/assets/images/environment/route.png">
 </div>
 
 <div class="choice-card" data-env="voie_ferree">
-<img src="assets/images/environment/rail.png">
+<img src="site-internet/assets/images/environment/rail.png">
 </div>
 
 <div class="choice-card" data-env="urbain">
-<img src="assets/images/environment/urbain.png">
+<img src="site-internet/assets/images/environment/urbain.png">
 </div>
 
 <div class="choice-card" data-env="jardin">
-<img src="assets/images/environment/jardin.png">
+<img src="site-internet/assets/images/environment/jardin.png">
 </div>
 
 <div class="choice-card" data-env="champ">
@@ -316,7 +316,7 @@ function redirectToLogin() {
     usernameBadge.textContent = "Connexion requise";
   }
   document.documentElement.classList.add("auth-locked");
-  window.location.replace("login.html?next=recensement.html");
+  window.location.replace("login.html?next=recensement1.html");
 }
 
 function unlockProtectedPage() {
