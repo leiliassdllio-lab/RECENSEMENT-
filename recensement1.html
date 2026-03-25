@@ -355,17 +355,22 @@ async function resolveUsername(user) {
 }
 
 async function applyAuthenticatedUi(user) {
-  const username = await resolveUsername(user);
+  let username = buildUsernameFromUser(user);
+  try {
+    username = await resolveUsername(user);
+  } catch (error) {
+    console.error("Impossible de synchroniser le profil utilisateur.", error);
+    currentUsername = localStorage.getItem("username") || username;
+    localStorage.setItem("username", currentUsername);
+    username = currentUsername;
+  }
   document.getElementById("usernameBadge").textContent = username;
   unlockProtectedPage();
 }
 
 onAuthStateChanged(auth,user=>{
   if(!user){ redirectToLogin(); return; }
-  applyAuthenticatedUi(user).catch(error => {
-    console.error("Impossible de synchroniser le profil utilisateur.", error);
-    redirectToLogin();
-  });
+  applyAuthenticatedUi(user);
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{

@@ -96,6 +96,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 await setPersistence(auth, browserLocalPersistence);
+let isRedirecting = false;
 
 function buildUsernameFromUser(user){
   if(user.displayName && user.displayName.trim()) return user.displayName.trim();
@@ -148,6 +149,12 @@ async function syncUserProfile(user, preferredUsername = ""){
   return username;
 }
 
+function redirectToRecensement(){
+  if(isRedirecting) return;
+  isRedirecting = true;
+  window.location.replace("recensement1.html");
+}
+
 // --- Références DOM principales ---
 const loginDiv = document.getElementById("loginDiv");
 const signupDiv = document.getElementById("signupDiv");
@@ -172,8 +179,13 @@ showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); log
 // --- Redirection si déjà connecté ---
 onAuthStateChanged(auth, async user => {
   if(!user) return;
-  await syncUserProfile(user);
-  window.location.href = "recensement1.html";
+  try{
+    await syncUserProfile(user);
+  }catch(error){
+    console.error("Impossible de synchroniser le profil utilisateur.", error);
+    localStorage.setItem("username", buildUsernameFromUser(user));
+  }
+  redirectToRecensement();
 });
 
 // --- Permettre la connexion via username ou email ---
@@ -191,9 +203,7 @@ loginBtn.addEventListener("click", async ()=>{
     const identifier = loginUser.value.trim();
     const email = identifier.includes("@") ? identifier : await getEmailFromUsername(identifier);
     if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
-    const credential = await signInWithEmailAndPassword(auth,email,loginPass.value);
-    await syncUserProfile(credential.user);
-    window.location.href = "recensement1.html"; // redirection directe après succès
+    await signInWithEmailAndPassword(auth,email,loginPass.value);
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -201,10 +211,7 @@ loginBtn.addEventListener("click", async ()=>{
 googleBtn.addEventListener("click", async ()=>{
   loginError.textContent="";
   try{
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    await syncUserProfile(user);
-    window.location.href = "recensement1.html"; // redirection directe après succès
+    await signInWithPopup(auth, provider);
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -217,10 +224,8 @@ createBtn.addEventListener("click", async ()=>{
     const password = signupPass.value.trim();
     if(!username || !email || !password){ signupError.textContent="Tous les champs sont requis"; return; }
 
-    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
-    await syncUserProfile(userCredential.user, username);
-
-    window.location.href = "recensement1.html"; // redirection directe après création
+    await createUserWithEmailAndPassword(auth,email,password);
+    localStorage.setItem("username", username);
   }catch(e){ signupError.textContent=e.message; }
 });
 </script>

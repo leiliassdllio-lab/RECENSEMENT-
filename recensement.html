@@ -718,7 +718,15 @@ return fallbackUsername;
 }
 
 async function applyAuthenticatedUi(user){
-const savedUsername=await resolveUsername(user);
+let savedUsername=buildUsernameFromUser(user);
+try{
+savedUsername=await resolveUsername(user);
+}catch(error){
+console.error("Impossible de synchroniser le profil utilisateur.", error);
+currentUsername=localStorage.getItem("username") || savedUsername;
+localStorage.setItem("username",currentUsername);
+savedUsername=currentUsername;
+}
 const usernameBadge=document.getElementById("usernameBadge");
 usernameBadge.textContent=savedUsername;
 unlockProtectedPage();
@@ -730,10 +738,7 @@ redirectToLogin();
 return;
 }
 
-applyAuthenticatedUi(user).catch(error=>{
-console.error("Impossible de synchroniser le profil utilisateur.", error);
-redirectToLogin();
-});
+applyAuthenticatedUi(user);
 });
 
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
