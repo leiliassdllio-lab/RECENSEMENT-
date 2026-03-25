@@ -112,6 +112,7 @@ display:grid;
 gap:18px;
 }
 .identity-card,
+.account-edit-card,
 .actions-card,
 .stats-card{
 background:#fcfdfb;
@@ -129,6 +130,79 @@ text-align:left;
 margin:0;
 color:#5a6f5e;
 font-size:1rem;
+}
+.account-edit-card{
+display:grid;
+gap:14px;
+}
+.form-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:14px;
+}
+.field-group{
+display:grid;
+gap:8px;
+}
+.field-group label{
+font-weight:bold;
+color:#33523a;
+}
+.field-group input{
+width:100%;
+padding:12px 14px;
+border-radius:12px;
+border:1px solid #cfd9cc;
+box-sizing:border-box;
+font:inherit;
+background:white;
+}
+.field-group input[readonly]{
+background:#f3f7f2;
+color:#5a6f5e;
+}
+.form-actions{
+display:flex;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+}
+.save-button{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:12px 18px;
+border-radius:12px;
+background:#2f7a39;
+color:white;
+font-weight:bold;
+border:none;
+cursor:pointer;
+transition:background .2s,transform .2s;
+}
+.save-button:hover{
+background:#286931;
+transform:translateY(-1px);
+}
+.save-button:disabled{
+opacity:.7;
+cursor:wait;
+transform:none;
+}
+.account-status{
+min-height:1.2rem;
+margin:0;
+font-size:.95rem;
+color:#5a6f5e;
+}
+.account-status.is-error{
+color:#b42318;
+}
+.account-help{
+margin:0;
+font-size:.92rem;
+color:#5a6f5e;
+line-height:1.5;
 }
 .mini-label{
 display:block;
@@ -302,6 +376,9 @@ opacity:1;
 .profile-card{
 grid-template-columns:1fr;
 }
+.form-grid{
+grid-template-columns:1fr;
+}
 .stats-grid{
 grid-template-columns:1fr;
 }
@@ -344,6 +421,27 @@ grid-template-columns:1fr;
 <span class="mini-label">Identité</span>
 <h2 id="username"></h2>
 <p id="userEmail"></p>
+</section>
+
+<section class="account-edit-card">
+<span class="mini-label">Modifier mes informations</span>
+<form id="accountForm">
+<div class="form-grid">
+<div class="field-group">
+<label for="usernameInput">Pseudo</label>
+<input type="text" id="usernameInput" placeholder="Choisis un pseudo">
+</div>
+<div class="field-group">
+<label for="emailInput">Email</label>
+<input type="email" id="emailInput" readonly>
+</div>
+</div>
+<p class="account-help">Le pseudo sera affiché sur ton profil et associé à tes futurs recensements.</p>
+<div class="form-actions">
+<button type="submit" class="save-button" id="saveAccountBtn">Enregistrer mes informations</button>
+<p id="accountStatus" class="account-status" aria-live="polite"></p>
+</div>
+</form>
 </section>
 
 <section class="actions-card">
@@ -451,6 +549,7 @@ appId:"1:142270421417:web:cb3abd700fab6731c40cb8"
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
+let currentUser=null;
 
 function buildUsernameFromUser(user){
 if(user.displayName && user.displayName.trim()) return user.displayName.trim();
@@ -481,6 +580,11 @@ return fallbackUsername;
 
 const photoInput=document.getElementById("photoUpload");
 const userPhoto=document.getElementById("userPhoto");
+const accountForm=document.getElementById("accountForm");
+const usernameInput=document.getElementById("usernameInput");
+const emailInput=document.getElementById("emailInput");
+const accountStatus=document.getElementById("accountStatus");
+const saveAccountBtn=document.getElementById("saveAccountBtn");
 
 photoInput.addEventListener("change",function(){
 const file=this.files[0];
@@ -490,6 +594,11 @@ reader.onload=e=>userPhoto.src=e.target.result;
 reader.readAsDataURL(file);
 }
 });
+
+function setAccountStatus(message,isError=false){
+accountStatus.textContent=message;
+accountStatus.classList.toggle("is-error",isError);
+}
 
 async function getRecensementsCount(uid){
 const q=query(collection(db,"recensements"),where("uid","==",uid));
@@ -556,18 +665,57 @@ return completed;
 
 onAuthStateChanged(auth,async user=>{
 if(!user){window.location.replace("login.html?next=profil.html");return;}
+currentUser=user;
 
 // Alimente l'interface du profil a partir des donnees utilisateur
 document.getElementById("year").textContent=new Date().getFullYear();
 document.getElementById("userEmail").textContent=user.email;
 const username=await resolveUsername(user);
 document.getElementById("username").textContent=username;
+usernameInput.value=username;
+emailInput.value=user.email || "";
 
 const count=await getRecensementsCount(user.uid);
 let unlockedBadges=updateRecensementBadges(count);
 const completedQuiz=await loadQuizProgress(user.uid);
 if(completedQuiz===4) unlockedBadges++;
 document.getElementById("stat-badges").textContent=unlockedBadges;
+});
+
+accountForm.addEventListener("submit",async event=>{
+event.preventDefault();
+
+if(!currentUser){
+setAccountStatus("Connecte-toi pour modifier tes informations.",true);
+return;
+}
+
+const nextUsername=usernameInput.value.trim();
+
+if(!nextUsername){
+setAccountStatus("Merci d'indiquer un pseudo.",true);
+return;
+}
+
+saveAccountBtn.disabled=true;
+setAccountStatus("Enregistrement en cours...");
+
+try{
+await setDoc(doc(db,"users",currentUser.uid),{
+uid:currentUser.uid,
+email:currentUser.email || "",
+username:nextUsername
+},{ merge:true });
+
+localStorage.setItem("username",nextUsername);
+document.getElementById("username").textContent=nextUsername;
+setAccountStatus("Informations mises à jour.");
+}catch(error){
+console.error("Impossible de mettre à jour le profil.",error);
+setAccountStatus("Impossible d'enregistrer les modifications pour le moment.",true);
+}finally{
+saveAccountBtn.disabled=false;
+}
 });
 
 </script>
