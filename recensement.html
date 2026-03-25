@@ -463,7 +463,7 @@ color:#b42318;
 <a href="cartographie.html" class="nav-link">Mes recensements</a>
 </div>
 
-<div class="user-pill" id="usernameBadge">Utilisateur connecté</div>
+<div class="user-pill" id="usernameBadge">Connexion requise</div>
 
 <button id="logoutBtn">
 Se déconnecter
@@ -671,6 +671,11 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 function redirectToLogin(){
+localStorage.removeItem("username");
+const usernameBadge=document.getElementById("usernameBadge");
+if(usernameBadge){
+usernameBadge.textContent="Connexion requise";
+}
 document.documentElement.classList.add("auth-locked");
 window.location.replace("login.html");
 }
@@ -683,7 +688,7 @@ document.documentElement.classList.add("auth-ready");
 function applyAuthenticatedUi(user){
 const savedUsername=localStorage.getItem("username");
 const usernameBadge=document.getElementById("usernameBadge");
-const username=savedUsername || user.displayName || user.email || "Utilisateur connecté";
+const username=savedUsername || user.displayName || user.email || "Mon compte";
 usernameBadge.textContent=username;
 unlockProtectedPage();
 }
