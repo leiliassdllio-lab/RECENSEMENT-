@@ -262,10 +262,15 @@ INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecss0800.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
+INPUT ./panneau.png
+INPUT ./panneau.png
+INPUT ./panneau.png
+INPUT ./panneau.png
+INPUT ./panneau.png
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/eccc1095.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecrm0800.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecrm0900.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecti1095.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/eccc1095.tfm
 INPUT rapport.aux
 INPUT ./rapport.out
 INPUT ./rapport.out
