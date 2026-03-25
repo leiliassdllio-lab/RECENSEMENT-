@@ -1,1 +1,1 @@
-Content (text, images): © 2026 LES6PICS – Licensed under CC BY 4.0
+Ce dossier est distribue sous licence MIT. Voir `../LICENSE`.

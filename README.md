@@ -2,6 +2,11 @@
 
 Projet web statique autour du recensement des herissons.
 
+## Licence
+
+Le code du depot est distribue sous licence MIT. Voir `LICENSE`.
+Le rapport dans `rapport/` est distribue sous licence CC BY 4.0. Voir `rapport/LICENSE`.
+
 ## Structure
 
 Le depot est maintenant organise en deux dossiers principaux :
