@@ -22,7 +22,8 @@ display:grid;
 gap:24px;
 }
 .hero-panel,
-.badges-panel{
+.badges-panel,
+.history-panel{
 background:white;
 border:1px solid rgba(111,153,118,.16);
 border-radius:24px;
@@ -272,6 +273,129 @@ margin-top:6px;
 font-size:.9rem;
 color:#5a6f5e;
 }
+.history-heading{
+text-align:center;
+margin-bottom:20px;
+}
+.history-heading h3{
+margin:0 0 10px;
+font-size:1.8rem;
+color:#234b2c;
+}
+.history-heading p{
+margin:0;
+color:#5a6f5e;
+}
+.history-list{
+display:grid;
+gap:16px;
+}
+.history-card{
+background:linear-gradient(180deg,#fbfef9 0%,#f5f8f3 100%);
+border:1px solid #e0ebdc;
+border-radius:20px;
+padding:20px;
+box-shadow:0 10px 24px rgba(51,82,58,.07);
+display:grid;
+gap:14px;
+}
+.history-top{
+display:flex;
+align-items:flex-start;
+justify-content:space-between;
+gap:16px;
+flex-wrap:wrap;
+}
+.history-top-main{
+display:grid;
+gap:8px;
+min-width:0;
+}
+.history-title{
+margin:0;
+font-size:1.12rem;
+color:#234b2c;
+}
+.history-subline{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+.history-date{
+margin:0;
+color:#5a6f5e;
+font-size:.95rem;
+}
+.history-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:8px 12px;
+border-radius:999px;
+background:#eef6eb;
+color:#2f7a39;
+font-weight:bold;
+font-size:.9rem;
+border:1px solid #d6e5d4;
+align-self:flex-start;
+}
+.history-id{
+display:inline-flex;
+align-items:center;
+padding:6px 10px;
+border-radius:999px;
+background:white;
+border:1px solid #e0ebdc;
+color:#6b7f6f;
+font-size:.82rem;
+font-weight:bold;
+}
+.history-meta{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:12px;
+}
+.history-meta-item{
+padding:12px 14px;
+border-radius:14px;
+background:white;
+border:1px solid #e0ebdc;
+min-height:74px;
+}
+.history-meta-label{
+display:block;
+margin-bottom:6px;
+font-size:.78rem;
+font-weight:bold;
+letter-spacing:.05em;
+text-transform:uppercase;
+color:#6b7f6f;
+}
+.history-meta-value{
+margin:0;
+color:#355335;
+line-height:1.45;
+}
+.history-meta-value.lines{
+display:grid;
+gap:2px;
+}
+.history-notes{
+padding:12px 14px;
+border-radius:14px;
+background:white;
+border:1px solid #e0ebdc;
+border-left:4px solid #9fc89f;
+}
+.history-empty{
+padding:18px;
+border-radius:18px;
+background:#f8fbf6;
+border:1px dashed #cfe0cd;
+text-align:center;
+color:#5a6f5e;
+}
 .badges-heading{
 text-align:center;
 margin-bottom:20px;
@@ -382,6 +506,9 @@ margin-left:0;
 .stats-grid{
 grid-template-columns:1fr;
 }
+.history-meta{
+grid-template-columns:1fr;
+}
 }
 </style>
 </head>
@@ -465,6 +592,16 @@ grid-template-columns:1fr;
 </div>
 </section>
 </div>
+</div>
+</section>
+
+<section class="history-panel">
+<div class="history-heading">
+<h3>Mes recensements</h3>
+<p>Retrouve ici la liste de tes observations déjà enregistrées.</p>
+</div>
+<div id="recensementsHistory" class="history-list">
+<div class="history-empty">Chargement de tes recensements...</div>
 </div>
 </section>
 
@@ -650,6 +787,122 @@ const snapshot=await getDocs(q);
 return snapshot.size;
 }
 
+async function getUserRecensements(uid){
+const q=query(collection(db,"recensements"),where("uid","==",uid));
+const snapshot=await getDocs(q);
+return snapshot.docs
+  .map(docSnap=>({ id:docSnap.id, ...docSnap.data() }))
+  .sort((a,b)=>{
+    const dateA=Date.parse(a.date || "") || 0;
+    const dateB=Date.parse(b.date || "") || 0;
+    return dateB-dateA;
+  });
+}
+
+function formatObservationDate(value){
+if(!value) return "Date non renseignée";
+const date=new Date(`${value}T00:00:00`);
+if(Number.isNaN(date.getTime())) return value;
+return date.toLocaleDateString("fr-BE");
+}
+
+function formatObservationStatus(item){
+const etat=(item.etat || "").trim();
+const sousEtat=(item.sousEtat || "").trim();
+if(!etat) return "Observation";
+if(!sousEtat) return etat.charAt(0).toUpperCase()+etat.slice(1);
+return `${etat.charAt(0).toUpperCase()+etat.slice(1)} • ${sousEtat}`;
+}
+
+function escapeHtml(value){
+return String(value ?? "")
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;");
+}
+
+function formatLocationLines(value){
+const parts=String(value || "")
+  .split(",")
+  .map(part=>part.trim())
+  .filter(Boolean);
+
+if(!parts.length){
+  return '<span>Non renseigné</span>';
+}
+
+return parts.map(part=>`<span>${escapeHtml(part)}</span>`).join("");
+}
+
+function toDms(value,isLatitude){
+const numericValue=Number(value);
+if(Number.isNaN(numericValue)) return null;
+
+const absolute=Math.abs(numericValue);
+const degrees=Math.floor(absolute);
+const minutesFloat=(absolute-degrees)*60;
+const minutes=Math.floor(minutesFloat);
+const seconds=((minutesFloat-minutes)*60).toFixed(1);
+const direction=isLatitude
+  ? (numericValue>=0 ? "N" : "S")
+  : (numericValue>=0 ? "E" : "W");
+
+return `${degrees}°${minutes}'${seconds}"${direction}`;
+}
+
+function formatCoordinates(latitude,longitude){
+const latValue=toDms(latitude,true);
+const lonValue=toDms(longitude,false);
+
+if(!latValue || !lonValue){
+  return '<span>Non renseignées</span>';
+}
+
+return `<span>${latValue}</span><span>${lonValue}</span>`;
+}
+
+function renderRecensementsHistory(items){
+const container=document.getElementById("recensementsHistory");
+
+if(!items.length){
+  container.innerHTML='<div class="history-empty">Tu n\'as pas encore enregistré de recensement.</div>';
+  return;
+}
+
+container.innerHTML=items.map(item=>{
+  const notes=(item.notes || "").trim();
+  return `
+    <article class="history-card">
+      <div class="history-top">
+        <div class="history-top-main">
+          <h4 class="history-title">${escapeHtml(item.lieu || "Lieu non renseigné")}</h4>
+          <div class="history-subline">
+            <p class="history-date">${escapeHtml(formatObservationDate(item.date))}</p>
+            <span class="history-id">Recensement</span>
+          </div>
+        </div>
+        <span class="history-badge">${escapeHtml(formatObservationStatus(item))}</span>
+      </div>
+      <div class="history-meta">
+        <div class="history-meta-item">
+          <span class="history-meta-label">Lieu</span>
+          <div class="history-meta-value lines">${formatLocationLines(item.lieu)}</div>
+        </div>
+        <div class="history-meta-item">
+          <span class="history-meta-label">Environnement</span>
+          <p class="history-meta-value">${escapeHtml(item.environnement || "Non renseigné")}</p>
+        </div>
+        <div class="history-meta-item">
+          <span class="history-meta-label">Coordonnées</span>
+          <div class="history-meta-value lines">${formatCoordinates(item.latitude,item.longitude)}</div>
+        </div>
+      </div>
+      ${notes ? `<div class="history-notes"><span class="history-meta-label">Notes</span><p class="history-meta-value">${escapeHtml(notes)}</p></div>` : ""}
+    </article>
+  `;
+}).join("");
+}
+
 // Met a jour les badges lies au nombre de recensements
 function updateRecensementBadges(count){
 
@@ -720,6 +973,8 @@ document.getElementById("userAge").textContent=getAgeLabel(profile.birthDate);
 
 const count=await getRecensementsCount(user.uid);
 let unlockedBadges=updateRecensementBadges(count);
+const recensements=await getUserRecensements(user.uid);
+renderRecensementsHistory(recensements);
 const completedQuiz=await loadQuizProgress(user.uid);
 if(completedQuiz===4) unlockedBadges++;
 document.getElementById("stat-badges").textContent=unlockedBadges;
