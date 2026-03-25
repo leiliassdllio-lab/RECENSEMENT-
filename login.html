@@ -77,7 +77,7 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 <script type="module">
 // Authentification Firebase + stockage du profil minimal utilisateur
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, query, where, getDocs, collection, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // --- Firebase config ---
@@ -176,18 +176,6 @@ const showLogin = document.getElementById("showLogin");
 showSignup.addEventListener("click", ()=>{ loginDiv.classList.add("hidden"); signupDiv.classList.remove("hidden"); });
 showLogin.addEventListener("click", ()=>{ signupDiv.classList.add("hidden"); loginDiv.classList.remove("hidden"); });
 
-// --- Redirection si déjà connecté ---
-onAuthStateChanged(auth, async user => {
-  if(!user) return;
-  try{
-    await syncUserProfile(user);
-  }catch(error){
-    console.error("Impossible de synchroniser le profil utilisateur.", error);
-    localStorage.setItem("username", buildUsernameFromUser(user));
-  }
-  redirectToRecensement();
-});
-
 // --- Permettre la connexion via username ou email ---
 async function getEmailFromUsername(username){
   const q = query(collection(db,"users"), where("username","==",username));
@@ -203,7 +191,14 @@ loginBtn.addEventListener("click", async ()=>{
     const identifier = loginUser.value.trim();
     const email = identifier.includes("@") ? identifier : await getEmailFromUsername(identifier);
     if(!email){ loginError.textContent="Nom d'utilisateur introuvable"; return; }
-    await signInWithEmailAndPassword(auth,email,loginPass.value);
+    const credential = await signInWithEmailAndPassword(auth,email,loginPass.value);
+    try{
+      await syncUserProfile(credential.user);
+    }catch(error){
+      console.error("Impossible de synchroniser le profil utilisateur.", error);
+      localStorage.setItem("username", buildUsernameFromUser(credential.user));
+    }
+    redirectToRecensement();
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -211,7 +206,14 @@ loginBtn.addEventListener("click", async ()=>{
 googleBtn.addEventListener("click", async ()=>{
   loginError.textContent="";
   try{
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    try{
+      await syncUserProfile(result.user);
+    }catch(error){
+      console.error("Impossible de synchroniser le profil utilisateur.", error);
+      localStorage.setItem("username", buildUsernameFromUser(result.user));
+    }
+    redirectToRecensement();
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -224,8 +226,14 @@ createBtn.addEventListener("click", async ()=>{
     const password = signupPass.value.trim();
     if(!username || !email || !password){ signupError.textContent="Tous les champs sont requis"; return; }
 
-    await createUserWithEmailAndPassword(auth,email,password);
-    localStorage.setItem("username", username);
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+    try{
+      await syncUserProfile(userCredential.user, username);
+    }catch(error){
+      console.error("Impossible de synchroniser le profil utilisateur.", error);
+      localStorage.setItem("username", username);
+    }
+    redirectToRecensement();
   }catch(e){ signupError.textContent=e.message; }
 });
 </script>
