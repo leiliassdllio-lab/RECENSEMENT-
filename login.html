@@ -97,6 +97,12 @@ const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 await setPersistence(auth, browserLocalPersistence);
 let isRedirecting = false;
+const allowedNextPages = new Set([
+  "recensement1.html",
+  "recensement.html",
+  "profil.html",
+  "boutique.html"
+]);
 
 function buildUsernameFromUser(user){
   if(user.displayName && user.displayName.trim()) return user.displayName.trim();
@@ -149,10 +155,17 @@ async function syncUserProfile(user, preferredUsername = ""){
   return username;
 }
 
-function redirectToRecensement(){
+function getRedirectTarget(){
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get("next");
+  if(next && allowedNextPages.has(next)) return next;
+  return "recensement1.html";
+}
+
+function redirectToTarget(){
   if(isRedirecting) return;
   isRedirecting = true;
-  window.location.replace("recensement1.html");
+  window.location.replace(getRedirectTarget());
 }
 
 // --- Références DOM principales ---
@@ -198,7 +211,7 @@ loginBtn.addEventListener("click", async ()=>{
       console.error("Impossible de synchroniser le profil utilisateur.", error);
       localStorage.setItem("username", buildUsernameFromUser(credential.user));
     }
-    redirectToRecensement();
+    redirectToTarget();
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -213,7 +226,7 @@ googleBtn.addEventListener("click", async ()=>{
       console.error("Impossible de synchroniser le profil utilisateur.", error);
       localStorage.setItem("username", buildUsernameFromUser(result.user));
     }
-    redirectToRecensement();
+    redirectToTarget();
   }catch(e){ loginError.textContent=e.message; }
 });
 
@@ -233,7 +246,7 @@ createBtn.addEventListener("click", async ()=>{
       console.error("Impossible de synchroniser le profil utilisateur.", error);
       localStorage.setItem("username", username);
     }
-    redirectToRecensement();
+    redirectToTarget();
   }catch(e){ signupError.textContent=e.message; }
 });
 </script>

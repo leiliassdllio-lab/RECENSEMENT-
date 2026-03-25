@@ -315,7 +315,7 @@ function redirectToLogin() {
     usernameBadge.textContent = "Connexion requise";
   }
   document.documentElement.classList.add("auth-locked");
-  window.location.replace("login.html");
+  window.location.replace("login.html?next=recensement1.html");
 }
 
 function unlockProtectedPage() {
