@@ -80,6 +80,11 @@
 \definecolor{antiquefuchsia}{rgb}{0.57, 0.36, 0.51}
 \colorlet{shadecolor}{cyan!30!white}
 \colorlet{framecolor}{blue!50!black}
+\hypersetup{
+    colorlinks=true,
+    allcolors=red,
+    pdfborder={0 0 0}
+}
 
 %%%%Custom command%%%%
 
