@@ -55,13 +55,32 @@ Le depot contient maintenant un export CSV versionne dans `data/recensements.csv
 
 Fonctionnement :
 - le script `scripts/export-recensements-to-csv.mjs` lit la collection Firestore `recensements`
-- le workflow GitHub Actions `.github/workflows/sync-recensements-csv.yml` regenere le CSV
+- le workflow GitHub Actions `.github/workflows/sync-recensements-csv.yml` regenere le CSV complet
 - si le fichier change, GitHub commit automatiquement la nouvelle version
+- une Cloud Function Firebase dans `functions/index.js` declenche ce workflow a chaque nouveau recensement
 
 Configuration necessaire sur GitHub :
 - ajouter un secret `FIREBASE_SERVICE_ACCOUNT_JSON`
 - sa valeur doit etre le JSON complet d'un compte de service Firebase / Google Cloud ayant acces en lecture a Firestore
 
-Limite importante :
-- dans cette version, la synchronisation tourne toutes les 15 minutes et peut aussi etre lancee manuellement
-- pour une mise a jour strictement immediate a chaque nouveau recensement, il faudrait ajouter une fonction serveur declenchee a l'ecriture dans Firestore
+Configuration necessaire pour la Cloud Function Firebase :
+- deploiement de la fonction `syncRecensementsCsvOnCreate`
+- secrets Firebase a definir :
+- `GITHUB_ACTIONS_TOKEN` : token GitHub avec droit de declencher des workflows
+- `GITHUB_OWNER` : proprietaire du depot GitHub
+- `GITHUB_REPO` : nom du depot GitHub
+- `GITHUB_BRANCH` : branche a mettre a jour, par exemple `main`
+
+Commandes utiles :
+- `npm install`
+- `npm run sync:recensements-csv`
+- `cd functions && npm install`
+- `firebase functions:secrets:set GITHUB_ACTIONS_TOKEN`
+- `firebase functions:secrets:set GITHUB_OWNER`
+- `firebase functions:secrets:set GITHUB_REPO`
+- `firebase functions:secrets:set GITHUB_BRANCH`
+- `firebase deploy --only functions --project herisson-f80ba`
+
+Resultat :
+- le CSV inclut aussi les anciennes donnees, car chaque synchronisation relit toute la collection `recensements`
+- a chaque nouveau recensement, la fonction declenche GitHub, qui regenere puis commit le CSV

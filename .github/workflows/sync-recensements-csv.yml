@@ -2,6 +2,11 @@ name: Sync Recensements CSV
 
 on:
   workflow_dispatch:
+    inputs:
+      source_event_id:
+        description: "Event ID ayant déclenché la synchronisation"
+        required: false
+        type: string
   schedule:
     - cron: "*/15 * * * *"
 
