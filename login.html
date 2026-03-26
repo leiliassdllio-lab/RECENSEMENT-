@@ -51,6 +51,16 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
   box-shadow:0 3px 10px rgba(0,0,0,0.06);
 }
 .back-link:hover { background:#f1f7f1; }
+.context-box {
+  margin:0 0 18px;
+  padding:14px 16px;
+  border-radius:12px;
+  background:#f3f8f1;
+  border:1px solid #d6e5d4;
+  color:#33523a;
+  text-align:left;
+  line-height:1.5;
+}
 </style>
 </head>
 <body class="site-page">
@@ -67,6 +77,9 @@ a { cursor:pointer; color:#4CAF50; text-decoration:none; }
 <main class="site-main" style="display:flex;justify-content:center;align-items:center;">
 <div class="auth-wrap">
 <div class="container">
+  <div id="loginContext" class="context-box hidden">
+    Vous êtes bien sur le site. Avant de nous aider à recenser, veuillez vous connecter ou créer un compte.
+  </div>
   <!-- Bloc de connexion classique email / mot de passe -->
   <div id="loginDiv">
     <input type="text" id="loginUser" placeholder="Nom d’utilisateur / Email">
@@ -211,11 +224,16 @@ const googleBtn = document.getElementById("googleBtn");
 const createBtn = document.getElementById("createBtn");
 const showSignup = document.getElementById("showSignup");
 const showLogin = document.getElementById("showLogin");
+const loginContext = document.getElementById("loginContext");
 
 function setButtonsDisabled(disabled){
   loginBtn.disabled = disabled;
   googleBtn.disabled = disabled;
   createBtn.disabled = disabled;
+}
+
+if(getRedirectTarget() === "recensement1.html"){
+  loginContext.classList.remove("hidden");
 }
 
 // --- Bascule entre connexion et création de compte ---
