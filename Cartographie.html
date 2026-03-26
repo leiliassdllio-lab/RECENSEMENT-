@@ -110,17 +110,26 @@ text-align:center;
 
 .filters-grid{
 display:grid;
-grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
+grid-template-columns:repeat(2,minmax(0,1fr));
+grid-template-areas:
+"selection selection"
+"region status";
 gap:18px;
-align-items:start;
+align-items:stretch;
 }
 
 .filter-group{
+display:flex;
+flex-direction:column;
 padding:18px;
 border-radius:18px;
 background:#fcfdfb;
 border:1px solid #e0ebdc;
 }
+
+.filter-group-selection{grid-area:selection;}
+.filter-group-region{grid-area:region;}
+.filter-group-status{grid-area:status;}
 
 .filter-group-title{
 display:block;
@@ -143,12 +152,14 @@ display:flex;
 align-items:center;
 gap:10px;
 line-height:1.4;
+min-height:52px;
 padding:12px 14px;
 border-radius:14px;
 background:white;
 border:1px solid #dfead9;
 cursor:pointer;
 transition:background .2s,border-color .2s,transform .2s;
+box-sizing:border-box;
 }
 
 .filter-options label:hover{
@@ -167,17 +178,6 @@ margin:0;
 font-size:.92rem;
 color:#5a6f5e;
 line-height:1.5;
-}
-
-.region-grid{
-display:grid;
-grid-template-columns:repeat(3,minmax(0,1fr));
-gap:10px;
-}
-
-.region-grid label{
-justify-content:center;
-text-align:center;
 }
 
 .map-shell{
@@ -351,10 +351,12 @@ background:#f8fbf6;
 grid-template-columns:1fr;
 }
 
-.region-grid{
-grid-template-columns:1fr;
+.filters-grid{
+grid-template-areas:
+"selection"
+"region"
+"status";
 }
-
 .map-legend{
 position:static;
 max-width:none;
@@ -405,21 +407,28 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
   <!-- Filtres utilises a la fois pour la carte et pour la liste des recensements -->
   <h2 class="filters-title">Filtres d’affichage</h2>
   <div id="controls" class="filters-grid">
-    <div class="filter-group">
+    <div class="filter-group filter-group-selection">
       <span class="filter-group-title">Sélection</span>
-      <p class="filter-note">Affiche uniquement tes propres signalements si tu veux te concentrer sur ton historique.</p>
       <div class="filter-options">
         <label><input type="checkbox" id="myRecensements"> Mes recensements</label>
       </div>
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group filter-group-region">
       <span class="filter-group-title">Région</span>
-      <p class="filter-note">Choisis la zone d’observation affichée sur la carte et dans la liste.</p>
       <div class="filter-options region-grid">
         <label><input type="radio" name="region" value="all" checked> Belgique entière</label>
         <label><input type="radio" name="region" value="wallonie"> Wallonie</label>
         <label><input type="radio" name="region" value="flandre"> Flandre</label>
+      </div>
+    </div>
+
+    <div class="filter-group filter-group-status">
+      <span class="filter-group-title">État du hérisson</span>
+      <div class="filter-options">
+        <label><input type="radio" name="status" value="all" checked> Tous les états</label>
+        <label><input type="radio" name="status" value="vivant"> Vivant</label>
+        <label><input type="radio" name="status" value="mort"> Mort</label>
       </div>
     </div>
   </div>
@@ -558,6 +567,11 @@ function getStatusInfo(data){
   return { label:'Vivant', className:'badge-vivant', color:'#4CAF50' };
 }
 
+function matchesStatusFilter(data, status){
+  if(status === "all") return true;
+  return data.etat === status;
+}
+
 /* ---------- POPUP ---------- */
 
 function buildPopupContent(data){
@@ -655,6 +669,7 @@ function displayMarkers(){
   markersMap.clear();
 
   const region = document.querySelector('input[name="region"]:checked').value;
+  const status = document.querySelector('input[name="status"]:checked').value;
   const myRecensements = document.getElementById('myRecensements').checked;
 
   let filtered = allRecensements;
@@ -668,6 +683,8 @@ function displayMarkers(){
   if(myRecensements && currentUserUid){
     filtered = filtered.filter(d => d.uid === currentUserUid);
   }
+
+  filtered = filtered.filter(d => matchesStatusFilter(d, status));
 
   filtered.forEach(data=>{
     const status = getStatusInfo(data);
@@ -702,6 +719,9 @@ function displayMarkers(){
 /* ---------- EVENTS ---------- */
 
 document.querySelectorAll('input[name="region"], #myRecensements')
+.forEach(el => el.addEventListener('change', displayMarkers));
+
+document.querySelectorAll('input[name="status"]')
 .forEach(el => el.addEventListener('change', displayMarkers));
 
 loadRecensements();
