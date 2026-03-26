@@ -189,6 +189,44 @@ margin-bottom:18px;
 position:relative;
 }
 
+.map-focus-bar{
+display:none;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:12px 14px;
+margin-bottom:14px;
+border-radius:16px;
+background:#f4faf2;
+border:1px solid #dbe9d8;
+color:#33523a;
+}
+
+.map-focus-bar.is-visible{
+display:flex;
+}
+
+.map-focus-text{
+font-size:.95rem;
+line-height:1.4;
+}
+
+.map-reset-btn{
+border:none;
+border-radius:12px;
+padding:10px 14px;
+background:#234b2c;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:background .2s,transform .2s;
+}
+
+.map-reset-btn:hover{
+background:#1b3c22;
+transform:translateY(-1px);
+}
+
 .map-shell-head{
 display:flex;
 justify-content:center;
@@ -284,11 +322,13 @@ line-height:1.6;
 
 .recensements-list{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:16px;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:18px;
 }
 
 .recensement-card{
+display:grid;
+gap:16px;
 background:linear-gradient(180deg,#fbfef9 0%,#f5f8f3 100%);
 border:1px solid #e0ebdc;
 border-radius:20px;
@@ -301,7 +341,8 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 gap:12px;
-margin-bottom:12px;
+padding-bottom:12px;
+border-bottom:1px solid #e3ede0;
 }
 
 .recensement-badge{
@@ -323,17 +364,69 @@ color:white;
 font-size:.9rem;
 color:#5a6f5e;
 font-weight:bold;
+text-align:right;
 }
 
 .recensement-meta{
 display:grid;
-gap:8px;
+gap:10px;
 color:#33523a;
 line-height:1.5;
 }
 
-.recensement-meta strong{
+.recensement-row{
+display:grid;
+gap:4px;
+padding:12px 14px;
+border-radius:16px;
+background:white;
+border:1px solid #e2ebdf;
+}
+
+.recensement-label{
+font-size:.76rem;
+font-weight:bold;
+letter-spacing:.05em;
+text-transform:uppercase;
+color:#6b7f6f;
+}
+
+.recensement-value,
+.recensement-coordinates{
 color:#234b2c;
+}
+
+.recensement-value{
+font-weight:600;
+}
+
+.recensement-coordinates{
+font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+font-size:.9rem;
+}
+
+.focus-btn{
+width:100%;
+border:none;
+border-radius:14px;
+padding:13px 16px;
+background:#2f7a39;
+color:white;
+font-weight:bold;
+font-size:.96rem;
+cursor:pointer;
+transition:transform .2s,box-shadow .2s,background .2s;
+box-shadow:0 12px 22px rgba(47,122,57,0.18);
+}
+
+.focus-btn:hover{
+background:#276730;
+transform:translateY(-1px);
+box-shadow:0 14px 24px rgba(39,103,48,0.22);
+}
+
+.focus-btn:active{
+transform:translateY(0);
 }
 
 .empty-state{
@@ -361,6 +454,11 @@ grid-template-areas:
 position:static;
 max-width:none;
 margin-top:14px;
+}
+
+.map-focus-bar{
+flex-direction:column;
+align-items:stretch;
 }
 }
 </style>
@@ -442,6 +540,10 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
       <p>Utilise les filtres pour affiner les observations, puis explore les points directement sur la carte.</p>
     </div>
   </div>
+  <div id="mapFocusBar" class="map-focus-bar">
+    <span id="mapFocusText" class="map-focus-text"></span>
+    <button id="resetMapFocus" class="map-reset-btn" type="button">Revenir à toutes les observations</button>
+  </div>
   <div class="map-frame">
     <div id="map" style="height: 600px;"></div>
     <div class="map-legend">
@@ -491,6 +593,7 @@ const auth = getAuth(app);
 let currentUserUid = null;
 let allRecensements = [];
 let markersMap = new Map(); // 🔥 liaison ID → marker
+let focusedRecensementId = null;
 
 onAuthStateChanged(auth, user => {
   currentUserUid = user ? user.uid : null;
@@ -588,21 +691,27 @@ function buildPopupContent(data){
 
 /* ---------- FOCUS CARTE ---------- */
 function focusOnMarker(id){
-  const marker = markersMap.get(id);
-  if(!marker) return;
+  focusedRecensementId = id;
+  displayMarkers();
+}
 
-  // scroll automatique vers la carte
-  document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+function resetMapFocus(){
+  focusedRecensementId = null;
+  displayMarkers();
+}
 
-  // zoom pour dégroupper le marker si nécessaire
-  markers.zoomToShowLayer(marker, function(){
-    map.setView(marker.getLatLng(), Math.max(map.getZoom(), 12), { animate:true });
-    marker.openPopup();
+function updateMapFocusBar(item){
+  const bar = document.getElementById("mapFocusBar");
+  const text = document.getElementById("mapFocusText");
 
-    // effet visuel sur le marker
-    marker.setStyle({ radius: 10 });
-    setTimeout(()=> marker.setStyle({ radius:7 }), 800);
-  });
+  if(!item){
+    bar.classList.remove("is-visible");
+    text.textContent = "";
+    return;
+  }
+
+  text.textContent = `Observation ciblée : ${formatText(item.lieu)}.`;
+  bar.classList.add("is-visible");
 }
 
 /* ---------- LISTE ---------- */
@@ -622,13 +731,22 @@ function renderRecensementsList(items){
       <article class="recensement-card">
         <div class="recensement-head">
           <span class="recensement-badge ${status.className}">${status.label}</span>
+          <span class="recensement-date">${escapeHtml(formatCreatedAt(data.createdAt))}</span>
         </div>
 
         <div class="recensement-meta">
-          <div><strong>Lieu :</strong> ${escapeHtml(formatText(data.lieu))}</div>
-          <div><strong>Environnement :</strong> ${escapeHtml(formatText(data.environnement))}</div>
-          <div><strong>Complété le :</strong> ${escapeHtml(formatCreatedAt(data.createdAt))}</div>
-          <div><strong>Coordonnées :</strong> ${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</div>
+          <div class="recensement-row">
+            <span class="recensement-label">Lieu</span>
+            <span class="recensement-value">${escapeHtml(formatText(data.lieu))}</span>
+          </div>
+          <div class="recensement-row">
+            <span class="recensement-label">Environnement</span>
+            <span class="recensement-value">${escapeHtml(formatText(data.environnement))}</span>
+          </div>
+          <div class="recensement-row">
+            <span class="recensement-label">Coordonnées</span>
+            <span class="recensement-coordinates">${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</span>
+          </div>
         </div>
 
         <button class="focus-btn" data-id="${data.id}">
@@ -686,7 +804,17 @@ function displayMarkers(){
 
   filtered = filtered.filter(d => matchesStatusFilter(d, status));
 
-  filtered.forEach(data=>{
+  const focusedItem = focusedRecensementId
+    ? filtered.find(d => d.id === focusedRecensementId) ?? null
+    : null;
+
+  if(focusedRecensementId && !focusedItem){
+    focusedRecensementId = null;
+  }
+
+  const displayItems = focusedRecensementId && focusedItem ? [focusedItem] : filtered;
+
+  displayItems.forEach(data=>{
     const status = getStatusInfo(data);
 
     const marker = L.circleMarker([data.latitude,data.longitude],{
@@ -696,7 +824,9 @@ function displayMarkers(){
       fillOpacity:0.85
     });
 
-    marker.bindPopup(buildPopupContent(data));
+    marker.bindPopup(buildPopupContent(data), {
+      autoPan: false
+    });
 
     // 🔥 stockage
     markersMap.set(data.id, marker);
@@ -712,8 +842,21 @@ function displayMarkers(){
   document.getElementById("stats").textContent = `${filtered.length} observations affichées`;
   document.getElementById("overviewTotal").textContent = allRecensements.length;
   document.getElementById("overviewFiltered").textContent = filtered.length;
+  updateMapFocusBar(focusedRecensementId && focusedItem ? focusedItem : null);
 
   renderRecensementsList(filtered);
+
+  if(focusedRecensementId && focusedItem){
+    const marker = markersMap.get(focusedRecensementId);
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    if(marker){
+      map.setView(marker.getLatLng(), 12, { animate:true });
+      marker.openPopup();
+      marker.setStyle({ radius: 10 });
+      setTimeout(()=> marker.setStyle({ radius:7 }), 800);
+    }
+  }
 }
 
 /* ---------- EVENTS ---------- */
@@ -723,6 +866,8 @@ document.querySelectorAll('input[name="region"], #myRecensements')
 
 document.querySelectorAll('input[name="status"]')
 .forEach(el => el.addEventListener('change', displayMarkers));
+
+document.getElementById("resetMapFocus").addEventListener("click", resetMapFocus);
 
 loadRecensements();
 
