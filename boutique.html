@@ -23,6 +23,30 @@ body { margin:0; font-family: Arial, sans-serif; background: linear-gradient(135
 .price { margin-top:5px; font-size:14px; color:#facc15; }
 .locked { opacity:0.4; }
 .owned::after { content:"✔"; position:absolute; top:5px; right:8px; color:#4ade80; }
+
+@media (max-width: 900px) {
+  body { flex-direction:column; height:auto; min-height:100vh; }
+  #header { position:sticky; top:10px; left:auto; align-self:flex-start; margin:12px 0 0 12px; }
+  #character,
+  #shop { width:100%; }
+  #character { min-height:320px; padding:72px 20px 20px; }
+  #shop { box-sizing:border-box; box-shadow:none; }
+}
+
+@media (max-width: 640px) {
+  #header { font-size:16px; padding:8px 12px; }
+  #character { min-height:260px; padding:64px 16px 16px; }
+  .layer { width:170px; }
+  #shop { padding:16px; }
+  .tabs { flex-direction:column; }
+  .items { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+  .tab,
+  .item { font-size:14px; }
+}
+
+@media (max-width: 420px) {
+  .items { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>

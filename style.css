@@ -443,8 +443,19 @@ display:none;
 
 @media (max-width:768px){
 
+.container{
+width:min(100%, calc(100% - 24px));
+padding:28px 0;
+}
+
 .hero h1{
 font-size:2rem;
+}
+
+.hero{
+min-height:100svh;
+height:auto;
+padding:32px 0;
 }
 
 .subtitle{
@@ -454,6 +465,18 @@ font-size:1rem;
 .btn{
 padding:12px 28px;
 font-size:1rem;
+}
+
+.map-page{
+padding:24px 16px 32px;
+}
+
+#map{
+height:420px;
+}
+
+.map-legend{
+width:auto;
 }
 
 .cards{
@@ -472,11 +495,13 @@ grid-template-columns:1fr;
 
 .card-featured .card-media img{
 min-height:220px;
+height:240px;
 }
 
 .card-featured .card-body,
 .card-body{
 text-align:center;
+padding:18px;
 }
 
 .card-kicker,
@@ -583,6 +608,39 @@ grid-template-columns:1fr;
   opacity: 1;
 }
 
+}
+
+@media (max-width:560px){
+.hero .container{
+padding:16px;
+}
+
+.hero h1{
+font-size:1.8rem;
+}
+
+.subtitle{
+font-size:0.98rem;
+margin-bottom:22px;
+}
+
+.btn{
+width:100%;
+max-width:320px;
+}
+
+.card img{
+height:180px;
+}
+
+.card-featured .card-media img{
+height:200px;
+min-height:200px;
+}
+
+.card-featured .card-body h3{
+font-size:1.7rem;
+}
 }
 
 /* SHARED PAGE SYSTEM */
@@ -754,6 +812,23 @@ grid-template-columns:1fr;
   .site-main{
     width:min(100%, calc(100% - 20px));
     margin:20px auto 32px;
+  }
+
+  .site-header{
+    padding:22px 14px 18px !important;
+  }
+
+  .site-header-inner{
+    width:min(100%, calc(100% - 16px)) !important;
+    gap:10px !important;
+  }
+
+  .site-header h1{
+    font-size:clamp(1.6rem, 6vw, 2.1rem) !important;
+  }
+
+  .site-header p{
+    font-size:0.98rem !important;
   }
 
   .site-panel{

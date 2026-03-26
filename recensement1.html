@@ -78,6 +78,41 @@ button:hover { background:#43a047; }
 .photo-analysis-message.is-success { background:#edf8ee; border-color:#b9dec0; color:#1f6f2d; }
 .photo-analysis-message.is-warning { background:#fff7ed; border-color:#f3d3a1; color:#9a4d00; }
 .photo-analysis-message.is-error { background:#fef3f2; border-color:#f3c7c2; color:#b42318; }
+
+@media (max-width: 768px) {
+  .container { width:min(100%, calc(100% - 20px)); margin:16px auto; border-radius:18px; padding:18px; }
+  .top-actions { padding:14px; justify-content:center; }
+  .left-actions { width:100%; }
+  .left-actions .nav-link { width:100%; text-align:center; }
+  .user-pill { min-width:0; width:100%; }
+  #logoutBtn { width:100%; }
+  .form-shell { padding:20px 16px; }
+  .page-title { margin-top:14px; }
+  .page-intro { margin-bottom:22px; font-size:0.98rem; }
+  .map-panel,
+  .form-section,
+  .location-panel { padding:14px; border-radius:16px; }
+  .field-grid,
+  .location-grid { grid-template-columns:1fr; }
+  .field-actions { justify-content:stretch; }
+  .field-button { width:100%; }
+  #map { height:280px; }
+  .choice-grid { gap:12px; }
+  .choice-card { width:calc(50% - 8px); max-width:150px; min-width:120px; height:120px; }
+  .submit-button { padding:14px 18px; }
+}
+
+@media (max-width: 520px) {
+  .container { width:min(100%, calc(100% - 16px)); padding:14px; }
+  .form-shell { padding:16px 12px; }
+  .page-eyebrow { font-size:0.84rem; }
+  .page-title { font-size:1.7rem; }
+  .section-label { font-size:1rem; }
+  .choice-grid { justify-content:space-between; }
+  .choice-card { width:calc(50% - 6px); min-width:0; height:112px; border-radius:14px; }
+  .choice-card img { border-radius:12px; }
+  .upload-card { padding:18px 14px; }
+}
 </style>
 </head>
 
