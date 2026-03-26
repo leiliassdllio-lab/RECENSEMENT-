@@ -313,11 +313,50 @@ color:#234b2c;
 text-align:center;
 }
 
+.recensements-panel-head{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:16px;
+margin-bottom:8px;
+flex-wrap:wrap;
+}
+
+.recensements-panel-head h2{
+margin:0;
+}
+
 .recensements-intro{
 margin:0 0 18px;
 text-align:center;
 color:#5a6f5e;
 line-height:1.6;
+}
+
+.export-btn{
+border:none;
+border-radius:14px;
+padding:12px 16px;
+background:#234b2c;
+color:white;
+font-weight:bold;
+font-size:.94rem;
+cursor:pointer;
+transition:background .2s,transform .2s,box-shadow .2s;
+box-shadow:0 12px 22px rgba(35,75,44,0.18);
+}
+
+.export-btn:hover{
+background:#1b3c22;
+transform:translateY(-1px);
+box-shadow:0 14px 24px rgba(27,60,34,0.22);
+}
+
+.export-btn:disabled{
+background:#9cb39f;
+cursor:not-allowed;
+transform:none;
+box-shadow:none;
 }
 
 .recensements-list{
@@ -491,6 +530,10 @@ flex-direction:column;
 align-items:stretch;
 }
 
+.recensements-panel-head{
+justify-content:center;
+}
+
 .recensement-meta-grid{
 grid-template-columns:1fr;
 }
@@ -595,8 +638,10 @@ Chaque point correspond à un signalement enregistré, avec une vue complémenta
 
 <section class="recensements-panel">
   <!-- Liste textuelle des recensements actuellement visibles sur la carte -->
-  <h2>Tous les recensements affichés</h2>
-  <p class="recensements-intro">Cette liste reprend les recensements visibles sur la carte, avec leurs informations principales.</p>
+  <div class="recensements-panel-head">
+    <h2>Tous les recensements affichés</h2>
+    <button id="exportCsvBtn" class="export-btn" type="button">Exporter la sélection en CSV</button>
+  </div>
   <div id="recensementsList" class="recensements-list"></div>
 </section>
 </div>
@@ -628,6 +673,23 @@ let currentUserUid = null;
 let allRecensements = [];
 let markersMap = new Map(); // 🔥 liaison ID → marker
 let focusedRecensementId = null;
+let currentFilteredRecensements = [];
+
+const CSV_HEADERS = [
+  "id",
+  "uid",
+  "username",
+  "email",
+  "lieu",
+  "date",
+  "notes",
+  "etat",
+  "sousEtat",
+  "environnement",
+  "latitude",
+  "longitude",
+  "createdAt"
+];
 
 onAuthStateChanged(auth, user => {
   currentUserUid = user ? user.uid : null;
@@ -694,6 +756,106 @@ function formatCreatedAt(value){
   });
 }
 
+function toCsvDate(value){
+  if(!value) return "";
+
+  if(typeof value?.toDate === "function"){
+    return value.toDate().toISOString();
+  }
+
+  const date = new Date(value);
+  if(!Number.isNaN(date.getTime())){
+    return date.toISOString();
+  }
+
+  return String(value);
+}
+
+function csvEscape(value){
+  if(value === null || value === undefined) return "";
+
+  const normalized = String(value).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  if(/["\n,]/.test(normalized)){
+    return `"${normalized.replace(/"/g, "\"\"")}"`;
+  }
+
+  return normalized;
+}
+
+function normalizeRecensementForCsv(data){
+  return {
+    id: data.id ?? "",
+    uid: data.uid ?? "",
+    username: data.username ?? "",
+    email: data.email ?? "",
+    lieu: data.lieu ?? "",
+    date: data.date ?? "",
+    notes: data.notes ?? "",
+    etat: data.etat ?? "",
+    sousEtat: data.sousEtat ?? "",
+    environnement: data.environnement ?? "",
+    latitude: data.latitude ?? "",
+    longitude: data.longitude ?? "",
+    createdAt: toCsvDate(data.createdAt)
+  };
+}
+
+function buildCsv(records){
+  const header = CSV_HEADERS.join(",");
+  const rows = records.map(record =>
+    CSV_HEADERS.map(key => csvEscape(record[key])).join(",")
+  );
+
+  return [header, ...rows].join("\n") + "\n";
+}
+
+function getFilteredRecensements(){
+  const region = document.querySelector('input[name="region"]:checked').value;
+  const status = document.querySelector('input[name="status"]:checked').value;
+  const myRecensements = document.getElementById('myRecensements').checked;
+
+  let filtered = allRecensements;
+
+  if(region === 'wallonie'){
+    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, wallonieBounds));
+  } else if(region === 'flandre'){
+    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, flandreBounds));
+  }
+
+  if(myRecensements && currentUserUid){
+    filtered = filtered.filter(d => d.uid === currentUserUid);
+  }
+
+  return filtered.filter(d => matchesStatusFilter(d, status));
+}
+
+function updateExportButtonState(){
+  const button = document.getElementById("exportCsvBtn");
+  const count = currentFilteredRecensements.length;
+  button.disabled = count === 0;
+  button.textContent = count === 0
+    ? "Aucune observation à exporter"
+    : "Exporter la sélection en CSV";
+}
+
+function exportCurrentSelectionToCsv(){
+  if(!currentFilteredRecensements.length) return;
+
+  const records = currentFilteredRecensements.map(normalizeRecensementForCsv);
+  const csv = buildCsv(records);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const timestamp = new Date().toISOString().slice(0, 19).replaceAll(":", "-");
+
+  link.href = url;
+  link.download = `recensements-selection-${timestamp}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function getStatusInfo(data){
   if(data.etat === 'mort' && data.sousEtat === 'route'){
     return { label:'Mort sur route', className:'badge-mort-route', color:'#FF0000' };
@@ -758,15 +920,18 @@ function renderRecensementsList(items){
     return;
   }
 
-  container.innerHTML = items.map(data=>{
+  container.innerHTML = items.map((data, index)=>{
     const status = getStatusInfo(data);
     const isFocused = data.id === focusedRecensementId;
 
     return `
-      <article class="recensement-card ${isFocused ? "is-focused" : ""}">
+      <article class="recensement-card ${isFocused ? "is-focused" : ""}" style="--recensement-accent:${status.color};">
         <div class="recensement-head">
           <div class="recensement-topline">
-            <span class="recensement-badge ${status.className}">${status.label}</span>
+            <div class="recensement-status">
+              <span class="recensement-index">#${index + 1}</span>
+              <span class="recensement-badge ${status.className}">${status.label}</span>
+            </div>
             <span class="recensement-date">${escapeHtml(formatCreatedAt(data.createdAt))}</span>
           </div>
           <h3 class="recensement-title">${escapeHtml(formatText(data.lieu))}</h3>
@@ -785,9 +950,12 @@ function renderRecensementsList(items){
           </div>
         </div>
 
-        <button class="focus-btn" data-id="${data.id}">
-          Voir sur la carte
-        </button>
+        <div class="recensement-footer">
+          ${isFocused ? '<div class="recensement-focus-hint">Observation actuellement affichée seule sur la carte</div>' : ""}
+          <button class="focus-btn" data-id="${data.id}">
+            Voir sur la carte
+          </button>
+        </div>
       </article>
     `;
   }).join("");
@@ -821,24 +989,8 @@ async function loadRecensements(){
 function displayMarkers(){
   markers.clearLayers();
   markersMap.clear();
-
-  const region = document.querySelector('input[name="region"]:checked').value;
-  const status = document.querySelector('input[name="status"]:checked').value;
-  const myRecensements = document.getElementById('myRecensements').checked;
-
-  let filtered = allRecensements;
-
-  if(region === 'wallonie'){
-    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, wallonieBounds));
-  } else if(region === 'flandre'){
-    filtered = filtered.filter(d => isInside(d.latitude,d.longitude, flandreBounds));
-  }
-
-  if(myRecensements && currentUserUid){
-    filtered = filtered.filter(d => d.uid === currentUserUid);
-  }
-
-  filtered = filtered.filter(d => matchesStatusFilter(d, status));
+  const filtered = getFilteredRecensements();
+  currentFilteredRecensements = filtered;
 
   const focusedItem = focusedRecensementId
     ? filtered.find(d => d.id === focusedRecensementId) ?? null
@@ -879,6 +1031,7 @@ function displayMarkers(){
   document.getElementById("overviewTotal").textContent = allRecensements.length;
   document.getElementById("overviewFiltered").textContent = filtered.length;
   updateMapFocusBar(focusedRecensementId && focusedItem ? focusedItem : null);
+  updateExportButtonState();
 
   renderRecensementsList(filtered);
 
@@ -904,6 +1057,7 @@ document.querySelectorAll('input[name="status"]')
 .forEach(el => el.addEventListener('change', displayMarkers));
 
 document.getElementById("resetMapFocus").addEventListener("click", resetMapFocus);
+document.getElementById("exportCsvBtn").addEventListener("click", exportCurrentSelectionToCsv);
 
 loadRecensements();
 
