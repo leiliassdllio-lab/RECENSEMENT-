@@ -243,40 +243,41 @@ Se déconnecter
 
 <!-- Bloc de selection de l'environnement observe -->
 <section class="form-section">
-<p class="section-label"><span>🌍</span> Type d’environnement</p>
+<p class="section-label"><span>🌍</span> Dans quel type de milieu avez-vous trouvé le hérisson ?</p>
+<p class="field-help">Choisissez l’environnement qui décrit le mieux l’endroit où le hérisson a été observé.</p>
 
 <div id="envGrid" class="choice-grid">
 
-<div class="choice-card" data-env="route">
+<div class="choice-card" data-env="route" data-env-label="Bord de route">
 <img src="site-internet/assets/images/environment/route.png">
 </div>
 
-<div class="choice-card" data-env="voie_ferree">
+<div class="choice-card" data-env="voie_ferree" data-env-label="Voie ferrée">
 <img src="site-internet/assets/images/environment/rail.png">
 </div>
 
-<div class="choice-card" data-env="urbain">
+<div class="choice-card" data-env="urbain" data-env-label="Zone urbaine">
 <img src="site-internet/assets/images/environment/urbain.png">
 </div>
 
-<div class="choice-card" data-env="jardin">
+<div class="choice-card" data-env="jardin" data-env-label="Jardin ou cour">
 <img src="site-internet/assets/images/environment/jardin.png">
 </div>
 
-<div class="choice-card" data-env="champ">
-<div class="choice-text"><span>🌾</span><span>Champ</span></div>
+<div class="choice-card" data-env="champ" data-env-label="Champ ou prairie">
+<div class="choice-text"><span>🌾</span><span>Champ ou prairie</span></div>
 </div>
 
-<div class="choice-card" data-env="foret">
-<div class="choice-text"><span>🌲</span><span>Forêt</span></div>
+<div class="choice-card" data-env="foret" data-env-label="Bois ou forêt">
+<div class="choice-text"><span>🌲</span><span>Bois ou forêt</span></div>
 </div>
 
-<div class="choice-card" data-env="parc">
-<div class="choice-text"><span>🌿</span><span>Parc</span></div>
+<div class="choice-card" data-env="parc" data-env-label="Parc ou espace vert">
+<div class="choice-text"><span>🌿</span><span>Parc ou espace vert</span></div>
 </div>
 
-<div class="choice-card" data-env="haie">
-<div class="choice-text"><span>🪴</span><span>Haie</span></div>
+<div class="choice-card" data-env="haie" data-env-label="Haie ou lisière">
+<div class="choice-text"><span>🪴</span><span>Haie ou lisière</span></div>
 </div>
 
 </div>
@@ -326,7 +327,7 @@ class="upload-card">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
  
@@ -705,7 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      envInput.value = card.dataset.env;
+      envInput.value = card.dataset.envLabel || card.dataset.env;
 
       envGrid.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected-sub"));
       card.classList.add("selected-sub");
@@ -798,7 +799,8 @@ form.addEventListener("submit", async e=>{
     sousEtat: document.getElementById("sousEtat").value,
     environnement: document.getElementById("environnement").value,
     latitude: marker ? marker.getLatLng().lat : null,
-    longitude: marker ? marker.getLatLng().lng : null
+    longitude: marker ? marker.getLatLng().lng : null,
+    createdAt: serverTimestamp()
   };
 
   try{

@@ -524,6 +524,30 @@ function formatText(value,fallback="Non renseigné"){
   return text ? text : fallback;
 }
 
+function formatCreatedAt(value){
+  if(!value) return "Non renseignée";
+
+  let date = null;
+
+  if(typeof value?.toDate === "function"){
+    date = value.toDate();
+  }else{
+    date = new Date(value);
+  }
+
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+    return "Non renseignée";
+  }
+
+  return date.toLocaleString("fr-BE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function getStatusInfo(data){
   if(data.etat === 'mort' && data.sousEtat === 'route'){
     return { label:'Mort sur route', className:'badge-mort-route', color:'#FF0000' };
@@ -540,6 +564,7 @@ function buildPopupContent(data){
   return `
     <strong>Observation de hérisson</strong><br>
     Date : ${formatText(data.date)}<br>
+    Formulaire complété le : ${formatCreatedAt(data.createdAt)}<br>
     État : ${formatText(data.etat)}<br>
     Sous-état : ${formatText(data.sousEtat)}<br>
     Environnement : ${formatText(data.environnement)}<br>
@@ -588,6 +613,7 @@ function renderRecensementsList(items){
         <div class="recensement-meta">
           <div><strong>Lieu :</strong> ${escapeHtml(formatText(data.lieu))}</div>
           <div><strong>Environnement :</strong> ${escapeHtml(formatText(data.environnement))}</div>
+          <div><strong>Complété le :</strong> ${escapeHtml(formatCreatedAt(data.createdAt))}</div>
           <div><strong>Coordonnées :</strong> ${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</div>
         </div>
 

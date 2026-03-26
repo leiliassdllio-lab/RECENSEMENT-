@@ -48,3 +48,20 @@ Fichiers du rapport dans `rapport/` :
 
 - Les pages du dossier `site-internet/legacy/` sont secondaires ou conservent d'anciennes versions.
 - La navigation principale du site part de `site-internet/index.html`.
+
+## Export CSV des recensements
+
+Le depot contient maintenant un export CSV versionne dans `data/recensements.csv`.
+
+Fonctionnement :
+- le script `scripts/export-recensements-to-csv.mjs` lit la collection Firestore `recensements`
+- le workflow GitHub Actions `.github/workflows/sync-recensements-csv.yml` regenere le CSV
+- si le fichier change, GitHub commit automatiquement la nouvelle version
+
+Configuration necessaire sur GitHub :
+- ajouter un secret `FIREBASE_SERVICE_ACCOUNT_JSON`
+- sa valeur doit etre le JSON complet d'un compte de service Firebase / Google Cloud ayant acces en lecture a Firestore
+
+Limite importante :
+- dans cette version, la synchronisation tourne toutes les 15 minutes et peut aussi etre lancee manuellement
+- pour une mise a jour strictement immediate a chaque nouveau recensement, il faudrait ajouter une fonction serveur declenchee a l'ecriture dans Firestore

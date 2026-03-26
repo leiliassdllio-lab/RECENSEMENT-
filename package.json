@@ -1,0 +1,11 @@
+{
+  "name": "recensement-csv-sync",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:recensements-csv": "node scripts/export-recensements-to-csv.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

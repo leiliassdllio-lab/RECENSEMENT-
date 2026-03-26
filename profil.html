@@ -802,6 +802,12 @@ const snapshot=await getDocs(q);
 return snapshot.docs
   .map(docSnap=>({ id:docSnap.id, ...docSnap.data() }))
   .sort((a,b)=>{
+    const createdAtA=typeof a.createdAt?.toDate === "function" ? a.createdAt.toDate().getTime() : 0;
+    const createdAtB=typeof b.createdAt?.toDate === "function" ? b.createdAt.toDate().getTime() : 0;
+    if(createdAtA || createdAtB){
+      return createdAtB-createdAtA;
+    }
+
     const dateA=Date.parse(a.date || "") || 0;
     const dateB=Date.parse(b.date || "") || 0;
     return dateB-dateA;
@@ -813,6 +819,28 @@ if(!value) return "Date non renseignée";
 const date=new Date(`${value}T00:00:00`);
 if(Number.isNaN(date.getTime())) return value;
 return date.toLocaleDateString("fr-BE");
+}
+
+function formatCreatedAt(value){
+if(!value) return "Date et heure non renseignées";
+
+let date=null;
+
+if(typeof value?.toDate === "function"){
+  date=value.toDate();
+}else{
+  date=new Date(value);
+}
+
+if(!(date instanceof Date) || Number.isNaN(date.getTime())) return "Date et heure non renseignées";
+
+return date.toLocaleString("fr-BE",{
+  year:"numeric",
+  month:"2-digit",
+  day:"2-digit",
+  hour:"2-digit",
+  minute:"2-digit"
+});
 }
 
 function formatObservationStatus(item){
@@ -900,6 +928,10 @@ container.innerHTML=items.map(item=>{
         <div class="history-meta-item">
           <span class="history-meta-label">Environnement</span>
           <p class="history-meta-value">${escapeHtml(item.environnement || "Non renseigné")}</p>
+        </div>
+        <div class="history-meta-item">
+          <span class="history-meta-label">Formulaire complété</span>
+          <p class="history-meta-value">${escapeHtml(formatCreatedAt(item.createdAt))}</p>
         </div>
         <div class="history-meta-item">
           <span class="history-meta-label">Coordonnées</span>
