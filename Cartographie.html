@@ -324,6 +324,7 @@ line-height:1.6;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:18px;
+align-items:stretch;
 }
 
 .recensement-card{
@@ -334,15 +335,38 @@ border:1px solid #e0ebdc;
 border-radius:20px;
 padding:18px;
 box-shadow:0 10px 24px rgba(51,82,58,0.07);
+transition:border-color .2s,box-shadow .2s,transform .2s;
+}
+
+.recensement-card:hover{
+transform:translateY(-2px);
+box-shadow:0 16px 30px rgba(51,82,58,0.1);
+}
+
+.recensement-card.is-focused{
+border-color:#7eb487;
+box-shadow:0 0 0 3px rgba(76,175,80,0.12),0 16px 30px rgba(51,82,58,0.12);
 }
 
 .recensement-head{
+display:grid;
+gap:10px;
+padding-bottom:12px;
+border-bottom:1px solid #e3ede0;
+}
+
+.recensement-topline{
 display:flex;
 align-items:center;
 justify-content:space-between;
 gap:12px;
-padding-bottom:12px;
-border-bottom:1px solid #e3ede0;
+}
+
+.recensement-title{
+margin:0;
+font-size:1.05rem;
+line-height:1.35;
+color:#234b2c;
 }
 
 .recensement-badge{
@@ -372,6 +396,12 @@ display:grid;
 gap:10px;
 color:#33523a;
 line-height:1.5;
+}
+
+.recensement-meta-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:10px;
 }
 
 .recensement-row{
@@ -459,6 +489,10 @@ margin-top:14px;
 .map-focus-bar{
 flex-direction:column;
 align-items:stretch;
+}
+
+.recensement-meta-grid{
+grid-template-columns:1fr;
 }
 }
 </style>
@@ -726,26 +760,28 @@ function renderRecensementsList(items){
 
   container.innerHTML = items.map(data=>{
     const status = getStatusInfo(data);
+    const isFocused = data.id === focusedRecensementId;
 
     return `
-      <article class="recensement-card">
+      <article class="recensement-card ${isFocused ? "is-focused" : ""}">
         <div class="recensement-head">
-          <span class="recensement-badge ${status.className}">${status.label}</span>
-          <span class="recensement-date">${escapeHtml(formatCreatedAt(data.createdAt))}</span>
+          <div class="recensement-topline">
+            <span class="recensement-badge ${status.className}">${status.label}</span>
+            <span class="recensement-date">${escapeHtml(formatCreatedAt(data.createdAt))}</span>
+          </div>
+          <h3 class="recensement-title">${escapeHtml(formatText(data.lieu))}</h3>
         </div>
 
         <div class="recensement-meta">
-          <div class="recensement-row">
-            <span class="recensement-label">Lieu</span>
-            <span class="recensement-value">${escapeHtml(formatText(data.lieu))}</span>
-          </div>
-          <div class="recensement-row">
-            <span class="recensement-label">Environnement</span>
-            <span class="recensement-value">${escapeHtml(formatText(data.environnement))}</span>
-          </div>
-          <div class="recensement-row">
-            <span class="recensement-label">Coordonnées</span>
-            <span class="recensement-coordinates">${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</span>
+          <div class="recensement-meta-grid">
+            <div class="recensement-row">
+              <span class="recensement-label">Environnement</span>
+              <span class="recensement-value">${escapeHtml(formatText(data.environnement))}</span>
+            </div>
+            <div class="recensement-row">
+              <span class="recensement-label">Coordonnées</span>
+              <span class="recensement-coordinates">${data.latitude.toFixed(5)}, ${data.longitude.toFixed(5)}</span>
+            </div>
           </div>
         </div>
 
