@@ -1,0 +1,28 @@
+\glsdefs@newdocentry{uicn}%
+{%
+name={\acronymfont {\glsentryshort {uicn}}},%
+sort={UICN},%
+type={acronym},%
+first={UICN},%
+firstplural={UICNs},%
+text={UICN},%
+plural={UICNs},%
+description={union internationale pour la conservation de la nature},%
+descriptionplural={union internationale pour la conservation de la nature},%
+symbol={\relax },%
+symbolplural={\relax },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={union internationale pour la conservation de la nature},%
+longplural={union internationale pour la conservation de la natures},%
+short={UICN},%
+shortplural={UICNs},%
+counter={page},%
+parent={},%
+%
+}%
+
