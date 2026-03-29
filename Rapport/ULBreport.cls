@@ -82,7 +82,7 @@
 \colorlet{framecolor}{blue!50!black}
 \hypersetup{
     colorlinks=true,
-    allcolors=red,
+    allcolors=black,
     pdfborder={0 0 0}
 }
 
