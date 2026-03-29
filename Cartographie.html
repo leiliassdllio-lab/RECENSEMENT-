@@ -964,10 +964,7 @@ let focusedRecensementId = null;
 let currentFilteredRecensements = [];
 
 const CSV_COLUMNS = [
-  { key:"id", label:"ID", essential:false },
-  { key:"uid", label:"UID", essential:false },
   { key:"username", label:"Nom d'utilisateur", essential:false },
-  { key:"email", label:"Email", essential:false },
   { key:"lieu", label:"Lieu", essential:true },
   { key:"date", label:"Date d'observation", essential:true },
   { key:"notes", label:"Notes", essential:false },
@@ -1072,10 +1069,7 @@ function csvEscape(value){
 
 function normalizeRecensementForCsv(data){
   return {
-    id: data.id ?? "",
-    uid: data.uid ?? "",
     username: data.username ?? "",
-    email: data.email ?? "",
     lieu: data.lieu ?? "",
     date: data.date ?? "",
     notes: data.notes ?? "",

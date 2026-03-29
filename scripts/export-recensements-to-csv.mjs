@@ -10,10 +10,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const outputPath = path.join(repoRoot, "data", "recensements.csv");
 
 const CSV_HEADERS = [
-  "id",
-  "uid",
   "username",
-  "email",
   "lieu",
   "date",
   "notes",
@@ -76,12 +73,9 @@ function toIsoDate(value) {
   return String(value);
 }
 
-function normalizeDoc(id, data) {
+function normalizeDoc(data) {
   return {
-    id,
-    uid: data.uid ?? "",
     username: data.username ?? "",
-    email: data.email ?? "",
     lieu: data.lieu ?? "",
     date: data.date ?? "",
     notes: data.notes ?? "",
@@ -99,14 +93,14 @@ async function fetchRecensements() {
   const db = admin.firestore();
   const snapshot = await db.collection("recensements").get();
 
-  const records = snapshot.docs.map((doc) => normalizeDoc(doc.id, doc.data()));
+  const records = snapshot.docs.map((doc) => normalizeDoc(doc.data()));
 
   records.sort((a, b) => {
     if (a.createdAt && b.createdAt) {
       return a.createdAt.localeCompare(b.createdAt);
     }
 
-    return a.id.localeCompare(b.id);
+    return (a.date ?? "").localeCompare(b.date ?? "");
   });
 
   return records;

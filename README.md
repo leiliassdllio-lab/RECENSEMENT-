@@ -84,3 +84,4 @@ Commandes utiles :
 Resultat :
 - le CSV inclut aussi les anciennes donnees, car chaque synchronisation relit toute la collection `recensements`
 - a chaque nouveau recensement, la fonction declenche GitHub, qui regenere puis commit le CSV
+- pour la confidentialite, l'export CSV ne contient pas `id`, `uid` ni `email`
